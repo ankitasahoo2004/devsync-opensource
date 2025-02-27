@@ -88,7 +88,7 @@ async function updateUserPRStatus(userId, repoId, prData, status) {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
 app.use(cors({
-    origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'https://devsync-opensource.vercel.app'],
+    origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'ttps://devsync-backend.vercel.app'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
@@ -207,7 +207,7 @@ app.get('/api/leaderboard', async (req, res) => {
 
 app.get('/logout', (req, res) => {
     req.logout();
-    res.redirect('http://localhost:5500/index.html');
+    res.redirect('https://devsync-opensource.vercel.app');
 });
 
 // GitHub API routes
