@@ -2,9 +2,15 @@ services:
   - type: web
     name: devsync-server
     env: node
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: |
+      cd backend
+      npm install
+    startCommand: |
+      cd backend
+      npm start
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: MONGODB_URI
         sync: false
       - key: GITHUB_CLIENT_ID
@@ -13,3 +19,5 @@ services:
         sync: false
       - key: SESSION_SECRET
         generateValue: true
+    autoDeploy: true
+    healthCheckPath: /api/health
