@@ -2,8 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingState = document.getElementById('loadingState');
     const authContainer = document.getElementById('authContainer');
 
-    const API_BASE_URL = 'https://devsync-backend.azurewebsites.net';
-
     const showProjectForm = () => {
         authContainer.innerHTML = `
             <form id="projectForm" class="project-form">
@@ -60,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         authContainer.innerHTML = `
             <div class="auth-prompt">
                 <h3>Please log in to submit a project</h3>
-                <a href="${API_BASE_URL}/auth/github" class="button">
+                <a href="http://localhost:3000/auth/github" class="button">
                     <i class='bx bxl-github'></i> Login with GitHub
                 </a>
             </div>
@@ -79,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/projects`, {
+            const response = await fetch('http://localhost:3000/api/projects', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -104,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const checkAuthAndInitialize = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/user`, {
+            const response = await fetch('http://localhost:3000/api/user', {
                 credentials: 'include'
             });
             const data = await response.json();

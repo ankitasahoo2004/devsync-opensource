@@ -88,20 +88,15 @@ async function updateUserPRStatus(userId, repoId, prData, status) {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
 app.use(cors({
-    origin: ['https://sayan-dev731.github.io', 'http://localhost:5500'],
+    origin: ['http://localhost:5500', 'http://127.0.0.1:5500'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'your_session_secret',
+    secret: 'your_session_secret',
     resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
+    saveUninitialized: false
 }));
 
 app.use(passport.initialize());
@@ -111,9 +106,7 @@ app.use(passport.session());
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: process.env.NODE_ENV === 'production'
-        ? 'https://devsync-backend.azurewebsites.net/auth/github/callback'
-        : 'http://localhost:3000/auth/github/callback'
+    callbackURL: process.env.GITHUB_CALLBACK_URL
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         let user = await User.findOne({ githubId: profile.id });
@@ -149,7 +142,7 @@ app.get('/auth/github',
 app.get('/auth/github/callback',
     passport.authenticate('github', { failureRedirect: '/login' }),
     (req, res) => {
-        res.redirect('https://sayan-dev731.github.io/devsync-opensource/');
+        res.redirect(process.env.FRONTEND_URL);
     }
 );
 

@@ -8,53 +8,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/projects.css">
-    <style>
-        .loading-container {
-            text-align: center;
-            padding: 2rem;
-        }
-        .loading-container i {
-            font-size: 3rem;
-            color: var(--first-color);
-            margin-bottom: 1rem;
-        }
-        .error-message {
-            color: var(--error-color);
-            margin-top: 1rem;
-        }
-        .technology-select {
-            width: 100%;
-            padding: .5rem;
-            border-radius: .5rem;
-            background: var(--container-color);
-            color: var(--text-color);
-            border: 2px solid var(--first-color-light);
-        }
-        .technology-select option {
-            padding: .5rem;
-        }
-        .helper-text {
-            color: var(--text-color-light);
-            font-size: .75rem;
-            margin-top: .25rem;
-        }
-        .message-container {
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: .5rem;
-            display: none;
-        }
-        .message-container.success {
-            background: var(--success-color-light);
-            color: var(--success-color);
-            border: 1px solid var(--success-color);
-        }
-        .message-container.error {
-            background: var(--error-color-light);
-            color: var(--error-color);
-            border: 1px solid var(--error-color);
-        }
-    </style>
 </head>
 <body>
     <!-- Same header as other pages -->
@@ -77,7 +30,6 @@
                 <p>Loading...</p>
             </div>
 
-            <div id="messageContainer" class="message-container"></div>
             <div id="authContainer" class="project-form__container container" style="display: none;">
                 <!-- Content will be dynamically inserted here -->
             </div>
