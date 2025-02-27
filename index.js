@@ -88,21 +88,24 @@ async function updateUserPRStatus(userId, repoId, prData, status) {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
 app.use(cors({
-    origin: [
-        'http://localhost:5500',
-        'http://127.0.0.1:5500',
-        'https://devsync-opensource.vercel.app',
-        'https://devsync-backend.vercel.app'
-    ],
+    origin: process.env.NODE_ENV === 'production'
+        ? ['https://devsync-opensource.vercel.app']
+        : ['http://localhost:5500', 'http://127.0.0.1:5500'],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 app.use(session({
-    secret: 'your_session_secret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
 }));
 
 app.use(passport.initialize());
