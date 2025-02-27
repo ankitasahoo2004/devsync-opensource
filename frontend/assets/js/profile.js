@@ -1,10 +1,14 @@
+const API_URL = process.env.NODE_ENV === 'production'
+    ? 'https://devsync-backend.vercel.app'
+    : 'http://localhost:3000';
+
 async function fetchUserProfile() {
     try {
-        const response = await fetch('http://localhost:3000/api/user', {
+        const response = await fetch(`${API_URL}/api/user`, {
             credentials: 'include'
         });
         const data = await response.json();
-        
+
         if (!data.isAuthenticated) {
             window.location.href = 'login.html';
             return;
@@ -21,19 +25,19 @@ async function fetchUserProfile() {
         document.getElementById('profile-img').src = githubData.avatar_url;
         document.getElementById('profile-name').textContent = githubData.name || githubData.login;
         document.getElementById('profile-bio').textContent = githubData.bio || '';
-        
+
         // Update additional profile details
         document.getElementById('profile-location').textContent = githubData.location || 'Not specified';
         document.getElementById('profile-company').textContent = githubData.company || 'Not specified';
         document.getElementById('profile-blog').href = githubData.blog;
         document.getElementById('profile-blog').textContent = githubData.blog || 'Not specified';
         document.getElementById('profile-twitter').textContent = githubData.twitter_username || 'Not specified';
-        
+
         // Update stats with animations
         updateStatWithAnimation('repos', githubData.public_repos);
         updateStatWithAnimation('followers', githubData.followers);
         updateStatWithAnimation('following', githubData.following);
-        
+
         // Fetch and display activities
         fetchActivities(data.user.username);
 
@@ -60,7 +64,7 @@ function updateStatWithAnimation(elementId, finalValue) {
     const steps = 60;
     const increment = (finalValue - startValue) / steps;
     let currentValue = startValue;
-    
+
     const timer = setInterval(() => {
         currentValue += increment;
         if (currentValue >= finalValue) {
@@ -74,7 +78,7 @@ function updateStatWithAnimation(elementId, finalValue) {
 
 async function fetchActivities(username) {
     try {
-        const response = await fetch(`http://localhost:3000/api/github/activity/${username}`);
+        const response = await fetch(`${API_URL}/api/github/activity/${username}`);
         const activities = await response.json();
         displayActivities(activities);
     } catch (error) {
@@ -87,7 +91,7 @@ function displayActivities(activities) {
     activityList.innerHTML = activities.map(activity => {
         const icon = getActivityIcon(activity.type);
         const time = new Date(activity.created_at).toLocaleDateString();
-        
+
         return `
             <div class="activity__item" data-type="${activity.type.toLowerCase()}">
                 <div class="activity__header">
@@ -98,9 +102,9 @@ function displayActivities(activities) {
                 <a href="${activity.repo_url}" class="activity__repo" target="_blank">
                     ${activity.repo_name}
                 </a>
-                ${activity.description ? 
-                    `<p class="activity__description">${activity.description}</p>` : 
-                    ''}
+                ${activity.description ?
+                `<p class="activity__description">${activity.description}</p>` :
+                ''}
             </div>
         `;
     }).join('');
@@ -119,17 +123,17 @@ function getActivityIcon(type) {
 // Filter activities
 document.addEventListener('DOMContentLoaded', () => {
     const filters = document.querySelectorAll('.activity__filter');
-    
+
     filters.forEach(filter => {
         filter.addEventListener('click', () => {
             // Update active filter
             filters.forEach(f => f.classList.remove('active'));
             filter.classList.add('active');
-            
+
             // Filter activities
             const type = filter.dataset.filter;
             const items = document.querySelectorAll('.activity__item');
-            
+
             items.forEach(item => {
                 if (type === 'all' || item.dataset.type === type) {
                     item.style.display = 'grid';
