@@ -2,6 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingState = document.getElementById('loadingState');
     const authContainer = document.getElementById('authContainer');
 
+    const API_URL = window.location.hostname === 'localhost'
+        ? 'http://localhost:3000'
+        : 'https://devsync-backend.vercel.app';
+
     const showProjectForm = () => {
         authContainer.innerHTML = `
             <form id="projectForm" class="project-form">
@@ -77,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetch('http://localhost:3000/api/projects', {
+            const response = await fetch(`${API_URL}/api/projects`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -102,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const checkAuthAndInitialize = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/user', {
+            const response = await fetch(`${API_URL}/api/user`, {
                 credentials: 'include'
             });
             const data = await response.json();
