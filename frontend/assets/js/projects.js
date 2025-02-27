@@ -106,6 +106,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const checkAuthAndInitialize = async () => {
         try {
+            // First check localStorage
+            const storedUserData = localStorage.getItem('userData');
+            if (storedUserData) {
+                loadingState.style.display = 'none';
+                authContainer.style.display = 'block';
+                showProjectForm();
+                return;
+            }
+
+            // If no stored data, check with server
             const response = await fetch(`${API_URL}/api/user`, {
                 credentials: 'include'
             });

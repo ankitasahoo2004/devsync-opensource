@@ -151,8 +151,13 @@ app.get('/auth/github',
 app.get('/auth/github/callback',
     passport.authenticate('github', { failureRedirect: '/login' }),
     (req, res) => {
-        // Add auth success parameter to help frontend detect successful auth
-        res.redirect(`${process.env.FRONTEND_URL}?auth=success`);
+        const userData = encodeURIComponent(JSON.stringify({
+            id: req.user.id,
+            username: req.user.username,
+            displayName: req.user.displayName || req.user.username,
+            avatarUrl: req.user.photos?.[0]?.value || '/assets/img/default-avatar.png'
+        }));
+        res.redirect(`${process.env.FRONTEND_URL}?auth=success&userData=${userData}`);
     }
 );
 
