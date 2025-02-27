@@ -7,7 +7,7 @@ services:
       npm install
     startCommand: |
       cd backend
-      npm start
+      node server/index.js
     envVars:
       - key: NODE_ENV
         value: production
