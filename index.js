@@ -151,19 +151,22 @@ app.get('/auth/github',
 app.get('/auth/github/callback',
     passport.authenticate('github', { failureRedirect: '/login' }),
     (req, res) => {
-        res.redirect(process.env.FRONTEND_URL);
+        // Add auth success parameter to help frontend detect successful auth
+        res.redirect(`${process.env.FRONTEND_URL}?auth=success`);
     }
 );
 
+// Update the user endpoint to always return user data if authenticated
 app.get('/api/user', (req, res) => {
-    if (req.isAuthenticated()) {
+    if (req.isAuthenticated() && req.user) {
         res.json({
             isAuthenticated: true,
             user: {
                 id: req.user.id,
                 username: req.user.username,
-                displayName: req.user.displayName,
-                photos: req.user.photos
+                displayName: req.user.displayName || req.user.username,
+                photos: req.user.photos || [{ value: '/assets/img/default-avatar.png' }],
+                email: req.user.email
             }
         });
     } else {
