@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="assets/css/swiper-bundle.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <title>DevSync Leaderboard</title>
+</head>
+<body>
+    <div class="page-transition">
+        <div class="transition-content">
+            <h2 class="transition-title">Welcome Champion...</h2>
+            <p class="transition-subtitle">View The Dev Rankings</p>
+        </div>
+    </div>
+
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="index.html" class="nav__logo">
+                <img src="assets/img/logo.png" alt="" class="nav__logo-img">
+                DevSync
+            </a>
+                <div class="nav__menu" id="nav-menu">
+                    <ul class="nav__list">
+                        <li class="nav__item">
+                            <a href="index.html" class="nav__link">Home</a>
+                        </li>
+
+                        <li class="nav__item">
+                            <a href="index.html#about" class="nav__link">About</a>
+                        </li>
+
+                        <li class="nav__item">
+                            <a href="index.html#trick" class="nav__link">Candy</a>
+                        </li>
+
+                        <li class="nav__item">
+                            <a href="index.html#new" class="nav__link">New</a>
+                        </li>
+
+                        <li class="nav__item">
+                            <a href="team.html" class="nav__link">Team</a>
+                        </li>
+
+                        <li class="nav__item">
+                            <a href="leaderboard.html" class="nav__link active-link">Leaderboard</a>
+                        </li>
+
+                        <a href="login.html" class="button button--ghost">Login</a>
+                    </ul>
+
+                    <div class="nav__close" id="nav-close">
+                        <i class='bx bx-x'></i>
+                    </div>
+
+                    <img src="assets/img/nav-img.png" alt="" class="nav__img">
+                </div>
+
+                <div class="nav__toggle" id="nav-toggle">
+                    <i class='bx bx-grid-alt'></i>
+                </div>
+        </nav>
+    </header>
+
+    <main class="main">
+        <section class="section">
+            <h2 class="section__title">Developer Leaderboard</h2>
+            
+            <!-- Top Stats Cards -->
+            <div class="leaderboard-stats container">
+                <div class="stat">
+                    <h3>2,541</h3>
+                    <p>Total Commits</p>
+                </div>
+                <div class="stat">
+                    <h3>487</h3>
+                    <p>Pull Requests</p>
+                </div>
+                <div class="stat">
+                    <h3>152</h3>
+                    <p>Active Users</p>
+                </div>
+            </div>
+
+            <!-- Leaderboard Table -->
+            <div class="leaderboard container">
+                <!-- Top 3 Winners -->
+                <div class="leaderboard-winners">
+                    <!-- Second Place -->
+                    <div class="winner-card second">
+                        <div class="winner-medal">2</div>
+                        <img src="https://i.pravatar.cc/150?img=32" alt="Second place" class="winner-img">
+                        <h3>Emma Wilson</h3>
+                        <p>4,521 points</p>
+                    </div>
+
+                    <!-- First Place -->
+                    <div class="winner-card first">
+                        <div class="winner-medal">1</div>
+                        <img src="https://i.pravatar.cc/150?img=33" alt="First place" class="winner-img">
+                        <h3>John Smith</h3>
+                        <p>5,842 points</p>
+                    </div>
+
+                    <!-- Third Place -->
+                    <div class="winner-card third">
+                        <div class="winner-medal">3</div>
+                        <img src="https://i.pravatar.cc/150?img=31" alt="Third place" class="winner-img">
+                        <h3>Alex Chen</h3>
+                        <p>4,112 points</p>
+                    </div>
+                </div>
+
+                <!-- Rest of Leaderboard -->
+                <div class="leaderboard-list">
+                    <div class="leaderboard-item">
+                        <span class="rank">4</span>
+                        <img src="https://i.pravatar.cc/150?img=34" alt="User" class="user-img">
+                        <div class="user-info">
+                            <h4>Sarah Johnson</h4>
+                            <p>Frontend Developer</p>
+                        </div>
+                        <div class="points">
+                            <span class="points-number">3,845</span>
+                            <span class="points-label">points</span>
+                        </div>
+                        <div class="trend up">
+                            <i class='bx bx-up-arrow-alt'></i>
+                            <span>12%</span>
+                        </div>
+                    </div>
+
+                    <div class="leaderboard-item">
+                        <span class="rank">5</span>
+                        <img src="https://i.pravatar.cc/150?img=35" alt="User" class="user-img">
+                        <div class="user-info">
+                            <h4>Michael Brown</h4>
+                            <p>Backend Developer</p>
+                        </div>
+                        <div class="points">
+                            <span class="points-number">3,562</span>
+                            <span class="points-label">points</span>
+                        </div>
+                        <div class="trend down">
+                            <i class='bx bx-down-arrow-alt'></i>
+                            <span>5%</span>
+                        </div>
+                    </div>
+
+                    <!-- Add more leaderboard items as needed -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <a href="#" class="scrollup" id="scroll-up">
+        <i class='bx bx-up-arrow-alt scrollup__icon'></i>
+    </a>
+    
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

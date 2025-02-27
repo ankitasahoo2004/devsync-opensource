@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Project - DevSync</title>
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/projects.css">
+</head>
+<body>
+    <!-- Same header as other pages -->
+    <header class="header" id="header">
+        <!-- ...existing header code... -->
+    </header>
+
+    <main class="main">
+        <div class="floating-elements">
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+        </div>
+        
+        <section class="projects section">
+            <h2 class="section__title">Submit Your Project</h2>
+            
+            <div id="loadingState" class="loading-container">
+                <i class='bx bx-loader-alt bx-spin'></i>
+                <p>Loading...</p>
+            </div>
+
+            <div id="authContainer" class="project-form__container container" style="display: none;">
+                <!-- Content will be dynamically inserted here -->
+            </div>
+        </section>
+    </main>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/projects.js"></script>
+</body>
+</html>

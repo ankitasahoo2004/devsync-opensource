@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+
+  <!--=============== BOXICONS ===============-->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+
+  <!--=============== SWIPER CSS ===============--> 
+  <link rel="stylesheet" href="assets/css/swiper-bundle.min.css">
+
+  <!--=============== CSS ===============--> 
+  <link rel="stylesheet" href="assets/css/styles.css">
+
+  <link rel="stylesheet" href="style.css">
+  <title>DevSync Team</title>
+</head>
+<body>
+  <div class="page-transition">
+    <div class="transition-content">
+      <h2 class="transition-title">Enter If You Dare...</h2>
+      <p class="transition-subtitle">Meet Our Haunted Team</p>
+    </div>
+  </div>
+  
+  <header class="header" id="header">
+    <nav class="nav container">
+      <a href="index.html" class="nav__logo">
+        <img src="assets/img/logo.png" alt="" class="nav__logo-img">
+        DevSync
+      </a>
+      <div class="nav__menu" id="nav-menu">
+        <ul class="nav__list">
+          <li class="nav__item">
+            <a href="index.html" class="nav__link">Home</a>
+          </li>
+          <li class="nav__item">
+            <a href="index.html#about" class="nav__link">About</a>
+          </li>
+          <li class="nav__item">
+            <a href="index.html#trick" class="nav__link">Candy</a>
+          </li>
+          <li class="nav__item">
+            <a href="index.html#new" class="nav__link">New</a>
+          </li>
+          <li class="nav__item">
+            <a href="team.html" class="nav__link active-link">Team</a>
+          </li>
+          <li class="nav__item">
+            <a href="leaderboard.html" class="nav__link">Leaderboard</a>
+          </li>
+          <a href="login.html" class="button button--ghost">Login</a>
+        </ul>
+        <div class="nav__close" id="nav-close">
+          <i class='bx bx-x'></i>
+        </div>
+        <img src="assets/img/nav-img.png" alt="" class="nav__img">
+      </div>
+      <div class="nav__toggle" id="nav-toggle">
+        <i class='bx bx-grid-alt'></i>
+      </div>
+    </nav>
+  </header>
+
+  <main class="main">
+    <section class="team section">
+      <h2 class="section__title">Meet Our Team</h2>
+      <div class="team__content">
+        <div class="team__group">
+          <div class="team__member">
+            <div class="team__member-img">
+              <img src="./team/member1.jpg" alt="Team member">
+              <div class="hover-content">
+                <div class="socials">
+                  <a href="#"><i class='bx bxl-facebook'></i></a>
+                  <a href="#"><i class='bx bxl-twitter'></i></a>
+                  <a href="#"><i class='bx bxl-github'></i></a>
+                  <a href="#"><i class='bx bxl-linkedin'></i></a>
+                </div>
+              </div>
+            </div>
+            <div class="team__member-info">
+              <h3>John Doe</h3>
+              <p>Frontend Developer</p>
+            </div>
+          </div>
+
+          <div class="team__member">
+            <div class="team__member-img">
+              <img src="./team/member2.jpg" alt="Team member">
+              <div class="hover-content">
+                <div class="socials">
+                  <a href="#"><i class='bx bxl-facebook'></i></a>
+                  <a href="#"><i class='bx bxl-twitter'></i></a>
+                  <a href="#"><i class='bx bxl-github'></i></a>
+                  <a href="#"><i class='bx bxl-linkedin'></i></a>
+                </div>
+              </div>
+            </div>
+            <div class="team__member-info">
+              <h3>Jane Smith</h3>
+              <p>Backend Developer</p>
+            </div>
+          </div>
+
+          <div class="team__member">
+            <div class="team__member-img">
+              <img src="./team/member3.jpg" alt="Team member">
+              <div class="hover-content">
+                <div class="socials">
+                  <a href="#"><i class='bx bxl-facebook'></i></a>
+                  <a href="#"><i class='bx bxl-twitter'></i></a>
+                  <a href="#"><i class='bx bxl-github'></i></a>
+                  <a href="#"><i class='bx bxl-linkedin'></i></a>
+                </div>
+              </div>
+            </div>
+            <div class="team__member-info">
+              <h3>Mike Johnson</h3>
+              <p>UI/UX Designer</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <a href="#" class="scrollup" id="scroll-up">
+    <i class="ri-arrow-up-s-line scrollup__icon"></i>
+  </a>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/scrollreveal.min.js"></script>
+  <script src="assets/js/swiper-bundle.min.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Hide transition overlay when page loads
+        const transition = document.querySelector('.page-transition');
+        transition.classList.add('hide');
+    });
+  </script>
+</body>
+</html>

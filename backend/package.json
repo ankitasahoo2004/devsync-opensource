@@ -1,0 +1,25 @@
+{
+    "name": "devsync-server",
+    "version": "1.0.0",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.7",
+        "express": "^4.21.2",
+        "express-session": "^1.18.1",
+        "mongodb": "^6.13.1",
+        "mongoose": "^8.11.0",
+        "passport": "^0.4.1",
+        "passport-github2": "^0.1.12",
+        "connect-mongo": "^5.1.0"
+    },
+    "description": "",
+    "main": "server/index.js",
+    "scripts": {
+        "start": "node server/index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "commonjs"
+}
