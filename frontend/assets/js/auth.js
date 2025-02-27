@@ -71,17 +71,46 @@ async function checkAuthState() {
     }
 }
 
+// Updated logout handler
+async function handleLogout(e) {
+    e.preventDefault();
+    try {
+        // Clear local storage
+        localStorage.removeItem('userData');
+        
+        // Call logout endpoint
+        const response = await fetch(`${API_URL}/logout`, {
+            credentials: 'include'
+        });
+        
+        if (response.ok) {
+            // Redirect to home page
+            window.location.href = '/index.html';
+        } else {
+            throw new Error('Logout failed');
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        // Force redirect on error
+        window.location.href = '/index.html';
+    }
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     checkAuthFromURL();
     checkAuthState();
+
+    // Add logout handler
+    const logoutButton = document.querySelector('.logout-button');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', handleLogout);
+    }
 });
 
-// Handle logout
+// Remove the old click event listener and replace with the new one
 document.addEventListener('click', (e) => {
-    if (e.target.matches('.logout-button')) {
-        e.preventDefault();
-        localStorage.removeItem('userData');
-        window.location.href = `${API_URL}/logout`;
+    if (e.target.matches('.nav__link[href="#logout"]')) {
+        handleLogout(e);
     }
 });

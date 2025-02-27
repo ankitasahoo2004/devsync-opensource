@@ -15,47 +15,35 @@ async function fetchUserProfile() {
             return;
         }
 
+        // Updated GitHub API fetch with error handling
+        const githubResponse = await fetch(`https://api.github.com/users/${userData.user.username}`, {
+            headers: {
+                'Accept': 'application/vnd.github.v3+json',
+                // Add your GitHub token here if you have one
+                // 'Authorization': `token ${GITHUB_TOKEN}`
+            }
+        });
+
+        if (!githubResponse.ok) {
+            throw new Error('Failed to fetch GitHub data');
+        }
+
+        const githubData = await githubResponse.json();
+
+        // Update UI with user data
+        updateProfileUI(userData.user, githubData);
+
         // Fetch user stats from our backend
         const statsResponse = await fetch(`${API_URL}/api/user/stats`, {
             credentials: 'include'
         });
         const statsData = await statsResponse.json();
 
-        // Fetch GitHub profile data
-        const githubResponse = await fetch(`${API_URL}/api/github/user/${userData.user.username}`, {
-            credentials: 'include'
-        });
-        const githubData = await githubResponse.json();
-
-        // Update UI with user data
-        document.getElementById('profile-img').src = userData.user.photos[0].value;
-        document.getElementById('profile-name').textContent = userData.user.displayName || userData.user.username;
-        document.getElementById('profile-bio').textContent = githubData.bio || 'No bio available';
-
-        // Update profile details
-        document.getElementById('profile-location').textContent = githubData.location || 'Not specified';
-        document.getElementById('profile-company').textContent = githubData.company || 'Not specified';
-        document.getElementById('profile-blog').href = githubData.blog || '#';
-        document.getElementById('profile-blog').textContent = githubData.blog || 'Not specified';
-        document.getElementById('profile-twitter').textContent = githubData.twitter_username || 'Not specified';
-
-        // Update stats with animations
-        updateStatWithAnimation('repos', githubData.public_repos || 0);
-        updateStatWithAnimation('followers', githubData.followers || 0);
-        updateStatWithAnimation('following', githubData.following || 0);
-
-        // Load contribution graph
-        const contributionGraph = document.getElementById('contribution-graph');
-        if (contributionGraph) {
-            contributionGraph.src = `https://ghchart.rshah.org/${userData.user.username}`;
-        }
-
-        // Display DevSync stats
         if (statsData) {
             displayDevSyncStats(statsData);
         }
 
-        // Load recent activities
+        // Load activities
         await Promise.all([
             fetchPushEvents(userData.user.username),
             fetchPullRequests(userData.user.username),
@@ -65,14 +53,46 @@ async function fetchUserProfile() {
 
     } catch (error) {
         console.error('Failed to load profile:', error);
-        // Show error message to user
-        document.querySelector('.profile__container').innerHTML = `
-            <div class="error-message">
-                <h2>Failed to load profile</h2>
-                <p>Please try refreshing the page</p>
-            </div>
-        `;
+        showErrorMessage();
     }
+}
+
+// New function to update profile UI
+function updateProfileUI(user, githubData) {
+    document.getElementById('profile-img').src = user.photos[0].value;
+    document.getElementById('profile-name').textContent = user.displayName || user.username;
+    document.getElementById('profile-bio').textContent = githubData.bio || 'No bio available';
+
+    // Update profile details
+    document.getElementById('profile-location').textContent = githubData.location || 'Not specified';
+    document.getElementById('profile-company').textContent = githubData.company || 'Not specified';
+    document.getElementById('profile-blog').href = githubData.blog || '#';
+    document.getElementById('profile-blog').textContent = githubData.blog || 'Not specified';
+    document.getElementById('profile-twitter').textContent = githubData.twitter_username || 'Not specified';
+
+    // Update stats with animations
+    updateStatWithAnimation('repos', githubData.public_repos || 0);
+    updateStatWithAnimation('followers', githubData.followers || 0);
+    updateStatWithAnimation('following', githubData.following || 0);
+
+    // Load contribution graph
+    const contributionGraph = document.getElementById('contribution-graph');
+    if (contributionGraph) {
+        contributionGraph.src = `https://ghchart.rshah.org/${user.username}`;
+    }
+}
+
+// New function to show error message
+function showErrorMessage() {
+    document.querySelector('.profile__container').innerHTML = `
+        <div class="error-message">
+            <h2>Failed to load profile</h2>
+            <p>Please try refreshing the page or login again</p>
+            <button onclick="window.location.href='${API_URL}/auth/github'" class="button">
+                <i class='bx bxl-github'></i> Login Again
+            </button>
+        </div>
+    `;
 }
 
 // Add this new function to display DevSync specific stats

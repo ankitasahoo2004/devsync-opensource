@@ -222,9 +222,16 @@ app.get('/api/leaderboard', async (req, res) => {
     }
 });
 
+// Updated logout route
 app.get('/logout', (req, res) => {
-    req.logout();
-    res.redirect('https://devsync-opensource.vercel.app');
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Session destruction error:', err);
+        }
+        // Clear the cookie
+        res.clearCookie('connect.sid');
+        res.json({ success: true });
+    });
 });
 
 // GitHub API routes
