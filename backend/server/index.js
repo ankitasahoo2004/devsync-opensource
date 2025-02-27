@@ -8,7 +8,6 @@ const mongoose = require('mongoose');
 const path = require('path');
 const User = require('./models/User');
 const Repo = require('./models/Repo');
-const MongoStore = require('connect-mongo');
 
 const app = express();
 
@@ -91,23 +90,18 @@ app.use(express.static(path.join(__dirname, '..')));
 app.use(cors({
     origin: ['https://sayan-dev731.github.io', 'http://localhost:5500'],
     credentials: true,
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'your_secret_key',
+    secret: process.env.SESSION_SECRET || 'your_session_secret',
     resave: false,
     saveUninitialized: false,
     cookie: {
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    },
-    store: MongoStore.create({
-        mongoUrl: process.env.MONGODB_URI,
-        ttl: 24 * 60 * 60 // 1 day
-    })
+    }
 }));
 
 app.use(passport.initialize());
@@ -118,7 +112,7 @@ passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
     callbackURL: process.env.NODE_ENV === 'production'
-        ? 'http://devsync-opensource.onrender.com/auth/github/callback'
+        ? 'https://devsync-backend.azurewebsites.net/auth/github/callback'
         : 'http://localhost:3000/auth/github/callback'
 }, async (accessToken, refreshToken, profile, done) => {
     try {
@@ -155,10 +149,7 @@ app.get('/auth/github',
 app.get('/auth/github/callback',
     passport.authenticate('github', { failureRedirect: '/login' }),
     (req, res) => {
-        res.redirect(process.env.NODE_ENV === 'production'
-            ? 'https://sayan-dev731.github.io/devsync-opensource'
-            : 'http://localhost:5500/index.html'
-        );
+        res.redirect('https://sayan-dev731.github.io/devsync-opensource/');
     }
 );
 
@@ -223,10 +214,7 @@ app.get('/api/leaderboard', async (req, res) => {
 
 app.get('/logout', (req, res) => {
     req.logout();
-    res.redirect(process.env.NODE_ENV === 'production'
-        ? 'https://sayan-dev731.github.io/DevSync'
-        : 'http://localhost:5500/index.html'
-    );
+    res.redirect('http://localhost:5500/index.html');
 });
 
 // GitHub API routes

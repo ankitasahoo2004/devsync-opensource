@@ -2,9 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingState = document.getElementById('loadingState');
     const authContainer = document.getElementById('authContainer');
 
-    const API_BASE_URL = process.env.NODE_ENV === 'production'
-        ? 'https://devsync-server.onrender.com'
-        : 'http://localhost:3000';
+    const API_BASE_URL = 'https://devsync-backend.azurewebsites.net';
 
     const showProjectForm = () => {
         authContainer.innerHTML = `
