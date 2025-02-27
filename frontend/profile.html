@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile - DevSync</title>
-    
+
     <!--=============== FAVICON ===============-->
     <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
-    
+
     <!--=============== BOXICONS ===============-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
-    
+
     <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="assets/css/styles.css">    
+    <link rel="stylesheet" href="assets/css/styles.css">
     <!--=============== CHART.JS ===============-->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
     <!--==================== HEADER ====================-->
     <header class="header" id="header">
@@ -109,42 +111,42 @@
 
                         <div class="profile__stats animate-slide-right">
                             <h3>GitHub Stats</h3>
-                                <div class="stat__item">
-                                    <i class='bx bx-code-block'></i>
-                                    <span id="gists">0</span>
-                                    <p>Gists</p>
-                                </div>
+                            <div class="stat__item">
+                                <i class='bx bx-code-block'></i>
+                                <span id="gists">0</span>
+                                <p>Gists</p>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="profile__stats">
-                        <div class="stat">
-                            <h3 id="repos">0</h3>
-                            <p>Repositories</p>
-                        </div>
-                        <div class="stat">
-                            <h3 id="followers">0</h3>
-                            <p>Followers</p>
-                        </div>
-                        <div class="stat">
-                            <h3 id="following">0</h3>
-                            <p>Following</p>
-                        </div>
+                <div class="profile__stats">
+                    <div class="stat">
+                        <h3 id="repos">0</h3>
+                        <p>Repositories</p>
                     </div>
-
-                    <div class="profile__contribution-graph">
-                        <h3 class="section__title">Contribution Graph</h3>
-                        <img id="contribution-graph" alt="GitHub Contributions" class="contribution-chart">
+                    <div class="stat">
+                        <h3 id="followers">0</h3>
+                        <p>Followers</p>
                     </div>
-
-                    <div class="profile__actions">
-                        <a href="http://localhost:3000/logout" class="button">
-                            <i class='bx bx-log-out button__icon'></i>
-                            Logout
-                        </a>
+                    <div class="stat">
+                        <h3 id="following">0</h3>
+                        <p>Following</p>
                     </div>
                 </div>
+
+                <div class="profile__contribution-graph">
+                    <h3 class="section__title">Contribution Graph</h3>
+                    <img id="contribution-graph" alt="GitHub Contributions" class="contribution-chart">
+                </div>
+
+                <div class="profile__actions">
+                    <a href="http://localhost:3000/logout" class="button">
+                        <i class='bx bx-log-out button__icon'></i>
+                        Logout
+                    </a>
+                </div>
+            </div>
             </div>
         </section>
 
@@ -162,18 +164,18 @@
                     <div class="activity-section push-events">
                         <!-- Push events will be inserted here by JavaScript -->
                     </div>
-        
+
                     <!-- Pull Requests Section -->
                     <div class="activity-section pull-requests">
                         <!-- PRs will be inserted here by JavaScript -->
                     </div>
-        
+
                     <!-- Issues Section -->
                     <div class="activity-section issues">
                         <!-- Issues will be inserted here by JavaScript -->
                     </div>
                 </div>
-        
+
                 <div class="activity__list" id="activity-list">
                     <!-- Activity items will be inserted here -->
                 </div>
@@ -197,5 +199,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/profile.js"></script>
+    <script src="assets/js/auth.js"></script>
 </body>
+
 </html>
