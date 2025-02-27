@@ -118,7 +118,7 @@ passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
     callbackURL: process.env.NODE_ENV === 'production'
-        ? 'https://devsync-server.onrender.com/auth/github/callback'
+        ? 'http://devsync-opensource.onrender.com/auth/github/callback'
         : 'http://localhost:3000/auth/github/callback'
 }, async (accessToken, refreshToken, profile, done) => {
     try {
