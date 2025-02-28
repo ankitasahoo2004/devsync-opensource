@@ -173,17 +173,20 @@ function updateNavigation() {
                 // Add login button if not logged in
                 nav.innerHTML += `
                     <li class="nav__item">
-                        <a href="/login" class="nav__link">Login</a>
+                        <a href="login.html" class="nav__link">Login</a>
                     </li>`;
             } else {
                 // Replace login with profile pic
                 nav.innerHTML = nav.innerHTML.replace(
-                    `<a href="/login" class="nav__link">Login</a>`,
-                    `<a href="/profile" class="nav__link">
+                    `<a href="login.html" class="nav__link">Login</a>`,
+                    `<a href="profile.html" class="nav__link">
                         <img src="${user.photos[0].value}" alt="Profile" class="nav__profile-img">
                     </a>`
                 );
             }
+        })
+        .catch(error => {
+            console.error('Error fetching user data:', error);
         });
 }
 
