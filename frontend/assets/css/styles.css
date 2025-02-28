@@ -567,7 +567,7 @@ button{
 
 .discount__title{
   font-size: var(--h2-font-size);
-  margin-bottom: var (--mb-2);
+  margin-bottom: var(--mb-2);
 }
 
 .discount__img{
@@ -2431,66 +2431,4 @@ button{
     .points-number {
         font-size: var(--normal-font-size);
     }
-}
-
-/* Profile Badges */
-.profile__badges {
-    margin-top: 1rem;
-    padding: 1rem;
-    background: var(--container-color);
-    border-radius: .5rem;
-}
-
-.badges-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1rem;
-    margin-top: .5rem;
-}
-
-.badge {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    padding: .5rem;
-    background: var(--body-color);
-    border-radius: .25rem;
-}
-
-.badge i {
-    color: var(--first-color);
-    font-size: 1.25rem;
-}
-
-/* Profile DevSync Stats */
-.profile__devsync-stats {
-    margin: 2rem 0;
-    padding: 1rem;
-    background: var(--container-color);
-    border-radius: .5rem;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.stats-grid .stat {
-    text-align: center;
-    padding: 1rem;
-    background: var(--body-color);
-    border-radius: .25rem;
-    transition: transform .3s;
-}
-
-.stats-grid .stat:hover {
-    transform: translateY(-5px);
-}
-
-.stats-grid .stat h4 {
-    font-size: 1.5rem;
-    color: var(--first-color);
-    margin-bottom: .5rem;
 }

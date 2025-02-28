@@ -1,116 +1,32 @@
-const API_URL = window.location.hostname === 'localhost'
-    ? 'http://localhost:3000'
-    : 'https://devsync-backend.vercel.app';
-
-// Function to update UI based on auth state
-function updateAuthUI(userData) {
-    const loginButton = document.querySelector('.button.button--ghost');
-    if (userData) {
-        loginButton.className = 'nav__profile';
-        loginButton.innerHTML = `
-            <img src="${userData.avatarUrl}" 
-                 alt="Profile" 
-                 class="nav__profile-img">
-            <span class="nav__profile-name">${userData.displayName}</span>
-        `;
-        loginButton.href = 'profile.html';
-    } else {
-        loginButton.className = 'button button--ghost';
-        loginButton.innerHTML = 'Login';
-        loginButton.href = `${API_URL}/auth/github`;
-    }
-}
-
-// Function to check URL parameters for auth success
-function checkAuthFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('auth') === 'success') {
-        const userDataParam = urlParams.get('userData');
-        if (userDataParam) {
-            const userData = JSON.parse(decodeURIComponent(userDataParam));
-            localStorage.setItem('userData', JSON.stringify(userData));
-            // Clean URL
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }
-}
-
-// Function to check auth state
-async function checkAuthState() {
+async function checkAuthStatus() {
     try {
-        // First check localStorage
-        const storedUserData = localStorage.getItem('userData');
-        if (storedUserData) {
-            updateAuthUI(JSON.parse(storedUserData));
-            return;
-        }
-
-        // If no stored data, check with server
-        const response = await fetch(`${API_URL}/api/user`, {
+        const response = await fetch(`${config.API_URL}/api/user`, {
             credentials: 'include'
         });
         const data = await response.json();
 
-        if (data.isAuthenticated && data.user) {
-            const userData = {
-                id: data.user.id,
-                username: data.user.username,
-                displayName: data.user.displayName || data.user.username,
-                avatarUrl: data.user.photos[0].value
-            };
-            localStorage.setItem('userData', JSON.stringify(userData));
-            updateAuthUI(userData);
+        const loginButton = document.querySelector('.button.button--ghost');
+
+        if (data.isAuthenticated) {
+            // Create a more sophisticated profile button
+            loginButton.className = 'nav__profile';
+            loginButton.innerHTML = `
+                <img src="${data.user.photos[0].value}" 
+                     alt="Profile" 
+                     class="nav__profile-img">
+                <span class="nav__profile-name">${data.user.displayName}</span>
+            `;
+            loginButton.href = 'profile.html';
         } else {
-            localStorage.removeItem('userData');
-            updateAuthUI(null);
+            // Keep the original login button style
+            loginButton.className = 'button button--ghost';
+            loginButton.innerHTML = 'Login';
+            loginButton.href = `${config.API_URL}/auth/github`;
         }
     } catch (error) {
         console.error('Auth check failed:', error);
-        localStorage.removeItem('userData');
-        updateAuthUI(null);
     }
 }
 
-// Updated logout handler
-async function handleLogout(e) {
-    e.preventDefault();
-    try {
-        // Clear local storage
-        localStorage.removeItem('userData');
-        
-        // Call logout endpoint
-        const response = await fetch(`${API_URL}/logout`, {
-            credentials: 'include'
-        });
-        
-        if (response.ok) {
-            // Redirect to home page
-            window.location.href = '/index.html';
-        } else {
-            throw new Error('Logout failed');
-        }
-    } catch (error) {
-        console.error('Logout error:', error);
-        // Force redirect on error
-        window.location.href = '/index.html';
-    }
-}
-
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    checkAuthFromURL();
-    checkAuthState();
-
-    // Add logout handler
-    const logoutButton = document.querySelector('.logout-button');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', handleLogout);
-    }
-});
-
-// Remove the old click event listener and replace with the new one
-document.addEventListener('click', (e) => {
-    if (e.target.matches('.nav__link[href="#logout"]')) {
-        handleLogout(e);
-    }
-});
+// Check auth status when page loads
+document.addEventListener('DOMContentLoaded', checkAuthStatus);

@@ -1,154 +1,55 @@
-const API_URL = process.env.NODE_ENV === 'production'
-    ? 'https://devsync-backend.vercel.app'
-    : 'http://localhost:3000';
-
 async function fetchUserProfile() {
     try {
-        // First fetch the authenticated user data
-        const userResponse = await fetch(`${API_URL}/api/user`, {
+        const response = await fetch(`${config.API_URL}/api/user`, {
             credentials: 'include'
         });
-        const userData = await userResponse.json();
+        const data = await response.json();
 
-        if (!userData.isAuthenticated || !userData.user) {
+        if (!data.isAuthenticated) {
             window.location.href = 'login.html';
             return;
         }
 
-        // Updated GitHub API fetch with error handling
-        const githubResponse = await fetch(`https://api.github.com/users/${userData.user.username}`, {
-            headers: {
-                'Accept': 'application/vnd.github.v3+json',
-                // Add your GitHub token here if you have one
-                // 'Authorization': `token ${GITHUB_TOKEN}`
-            }
-        });
-
-        if (!githubResponse.ok) {
-            throw new Error('Failed to fetch GitHub data');
-        }
-
+        // Fetch detailed GitHub data
+        const githubResponse = await fetch(`https://api.github.com/users/${data.user.username}`);
         const githubData = await githubResponse.json();
 
-        // Update UI with user data
-        updateProfileUI(userData.user, githubData);
+        // Load contribution graph
+        document.getElementById('contribution-graph').src = `https://ghchart.rshah.org/${data.user.username}`;
 
-        // Fetch user stats from our backend
-        const statsResponse = await fetch(`${API_URL}/api/user/stats`, {
-            credentials: 'include'
-        });
-        const statsData = await statsResponse.json();
+        // Update profile information
+        document.getElementById('profile-img').src = githubData.avatar_url;
+        document.getElementById('profile-name').textContent = githubData.name || githubData.login;
+        document.getElementById('profile-bio').textContent = githubData.bio || '';
 
-        if (statsData) {
-            displayDevSyncStats(statsData);
-        }
+        // Update additional profile details
+        document.getElementById('profile-location').textContent = githubData.location || 'Not specified';
+        document.getElementById('profile-company').textContent = githubData.company || 'Not specified';
+        document.getElementById('profile-blog').href = githubData.blog;
+        document.getElementById('profile-blog').textContent = githubData.blog || 'Not specified';
+        document.getElementById('profile-twitter').textContent = githubData.twitter_username || 'Not specified';
 
-        // Load activities
+        // Update stats with animations
+        updateStatWithAnimation('repos', githubData.public_repos);
+        updateStatWithAnimation('followers', githubData.followers);
+        updateStatWithAnimation('following', githubData.following);
+
+        // Fetch and display activities
+        fetchActivities(data.user.username);
+
+        // Add this line after loading the other profile data
+        await fetchRecentMerges(data.user.username);
+
+        // Fetch additional GitHub activities
         await Promise.all([
-            fetchPushEvents(userData.user.username),
-            fetchPullRequests(userData.user.username),
-            fetchIssues(userData.user.username),
-            fetchRecentMerges(userData.user.username)
+            fetchPushEvents(data.user.username),
+            fetchPullRequests(data.user.username),
+            fetchIssues(data.user.username)
         ]);
 
     } catch (error) {
         console.error('Failed to load profile:', error);
-        showErrorMessage();
     }
-}
-
-// New function to update profile UI
-function updateProfileUI(user, githubData) {
-    document.getElementById('profile-img').src = user.photos[0].value;
-    document.getElementById('profile-name').textContent = user.displayName || user.username;
-    document.getElementById('profile-bio').textContent = githubData.bio || 'No bio available';
-
-    // Update profile details
-    document.getElementById('profile-location').textContent = githubData.location || 'Not specified';
-    document.getElementById('profile-company').textContent = githubData.company || 'Not specified';
-    document.getElementById('profile-blog').href = githubData.blog || '#';
-    document.getElementById('profile-blog').textContent = githubData.blog || 'Not specified';
-    document.getElementById('profile-twitter').textContent = githubData.twitter_username || 'Not specified';
-
-    // Update stats with animations
-    updateStatWithAnimation('repos', githubData.public_repos || 0);
-    updateStatWithAnimation('followers', githubData.followers || 0);
-    updateStatWithAnimation('following', githubData.following || 0);
-
-    // Load contribution graph
-    const contributionGraph = document.getElementById('contribution-graph');
-    if (contributionGraph) {
-        contributionGraph.src = `https://ghchart.rshah.org/${user.username}`;
-    }
-}
-
-// New function to show error message
-function showErrorMessage() {
-    document.querySelector('.profile__container').innerHTML = `
-        <div class="error-message">
-            <h2>Failed to load profile</h2>
-            <p>Please try refreshing the page or login again</p>
-            <button onclick="window.location.href='${API_URL}/auth/github'" class="button">
-                <i class='bx bxl-github'></i> Login Again
-            </button>
-        </div>
-    `;
-}
-
-// Add this new function to display DevSync specific stats
-function displayDevSyncStats(stats) {
-    const { mergedPRs, cancelledPRs, points, badges } = stats;
-
-    // Add badges section if it doesn't exist
-    let badgesContainer = document.querySelector('.profile__badges');
-    if (!badgesContainer) {
-        badgesContainer = document.createElement('div');
-        badgesContainer.className = 'profile__badges';
-        document.querySelector('.profile__data').appendChild(badgesContainer);
-    }
-
-    // Display badges
-    badgesContainer.innerHTML = `
-        <h3>Badges</h3>
-        <div class="badges-grid">
-            ${badges.map(badge => `
-                <div class="badge">
-                    <i class='bx bx-medal'></i>
-                    <span>${badge}</span>
-                </div>
-            `).join('')}
-        </div>
-    `;
-
-    // Add stats section if it doesn't exist
-    let statsContainer = document.querySelector('.profile__devsync-stats');
-    if (!statsContainer) {
-        statsContainer = document.createElement('div');
-        statsContainer.className = 'profile__devsync-stats';
-        document.querySelector('.profile__content').insertBefore(
-            statsContainer,
-            document.querySelector('.profile__contribution-graph')
-        );
-    }
-
-    // Display DevSync stats
-    statsContainer.innerHTML = `
-        <h3>DevSync Stats</h3>
-        <div class="stats-grid">
-            <div class="stat">
-                <h4>${mergedPRs.length}</h4>
-                <p>Merged PRs</p>
-            </div>
-            <div class="stat">
-                <h4>${points}</h4>
-                <p>Points</p>
-            </div>
-            <div class="stat">
-                <h4>${badges.length}</h4>
-                <p>Badges</p>
-            </div>
-        </div>
-    `;
 }
 
 // Add this new function for animated stat updates
@@ -173,7 +74,7 @@ function updateStatWithAnimation(elementId, finalValue) {
 
 async function fetchActivities(username) {
     try {
-        const response = await fetch(`${API_URL}/api/github/activity/${username}`);
+        const response = await fetch(`${config.API_URL}/api/github/activity/${username}`);
         const activities = await response.json();
         displayActivities(activities);
     } catch (error) {

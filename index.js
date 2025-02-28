@@ -8,11 +8,16 @@ const mongoose = require('mongoose');
 const path = require('path');
 const User = require('./models/User');
 const Repo = require('./models/Repo');
+const MongoStore = require('connect-mongo');
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB connection error:', err));
 
@@ -86,25 +91,28 @@ async function updateUserPRStatus(userId, repoId, prData, status) {
 
 // Middleware setup
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..')));
 app.use(cors({
     origin: process.env.NODE_ENV === 'production'
-        ? ['https://devsync-opensource.vercel.app']
-        : ['http://localhost:5500', 'http://127.0.0.1:5500'],
+        ? 'https://devsync-frontend.vercel.app'
+        : 'http://localhost:5500',
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+        ttl: 24 * 60 * 60 // 1 day
+    }),
     cookie: {
         secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        maxAge: 24 * 60 * 60 * 1000 // 1 day
     }
 }));
 
@@ -115,7 +123,9 @@ app.use(passport.session());
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: process.env.GITHUB_CALLBACK_URL
+    callbackURL: process.env.NODE_ENV === 'production'
+        ? 'https://devsync-backend.vercel.app/auth/github/callback'
+        : 'http://localhost:3000/auth/github/callback'
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         let user = await User.findOne({ githubId: profile.id });
@@ -130,8 +140,12 @@ passport.use(new GitHubStrategy({
                 mergedPRs: [],
                 cancelledPRs: [],
                 points: 0,
-                badges: ['Newcomer']
+                badges: ['Newcomer'],
+                accessToken
             });
+        } else {
+            user.accessToken = accessToken;
+            await user.save();
         }
 
         return done(null, { ...profile, userData: user });
@@ -144,163 +158,24 @@ passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
 
 // Auth routes
-app.get('/auth/github',
-    passport.authenticate('github', { scope: ['user'] })
-);
+app.use('/auth', require('./routes/auth'));
+app.use('/api/user', require('./routes/user'));
+app.use('/api/projects', require('./routes/projects'));
+app.use('/api/github', require('./routes/github'));
 
-app.get('/auth/github/callback',
-    passport.authenticate('github', { failureRedirect: '/login' }),
-    (req, res) => {
-        const userData = encodeURIComponent(JSON.stringify({
-            id: req.user.id,
-            username: req.user.username,
-            displayName: req.user.displayName || req.user.username,
-            avatarUrl: req.user.photos?.[0]?.value || '/assets/img/default-avatar.png'
-        }));
-        res.redirect(`${process.env.FRONTEND_URL}?auth=success&userData=${userData}`);
-    }
-);
-
-// Update the user endpoint to always return user data if authenticated
-app.get('/api/user', (req, res) => {
-    if (req.isAuthenticated() && req.user) {
-        res.json({
-            isAuthenticated: true,
-            user: {
-                id: req.user.id,
-                username: req.user.username,
-                displayName: req.user.displayName || req.user.username,
-                photos: req.user.photos || [{ value: '/assets/img/default-avatar.png' }],
-                email: req.user.email
-            }
-        });
-    } else {
-        res.json({ isAuthenticated: false });
-    }
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something went wrong!' });
 });
 
-app.get('/api/user/stats', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    try {
-        const user = await User.findOne({ githubId: req.user.id });
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        res.json({
-            mergedPRs: user.mergedPRs,
-            cancelledPRs: user.cancelledPRs,
-            points: user.points,
-            badges: user.badges
-        });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch user stats' });
-    }
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'OK' });
 });
 
-app.get('/api/leaderboard', async (req, res) => {
-    try {
-        const users = await User.find({})
-            .sort('-points')
-            .limit(10)
-            .select('username points badges mergedPRs');
-
-        const leaderboard = users.map((user, index) => ({
-            rank: index + 1,
-            username: user.username,
-            points: user.points,
-            badges: user.badges,
-            mergedPRs: user.mergedPRs.length
-        }));
-
-        res.json(leaderboard);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch leaderboard' });
-    }
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
 
-// Updated logout route
-app.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            console.error('Session destruction error:', err);
-        }
-        // Clear the cookie
-        res.clearCookie('connect.sid');
-        res.json({ success: true });
-    });
-});
-
-// GitHub API routes
-app.get('/api/github/user/:username', async (req, res) => {
-    try {
-        const response = await fetch(`https://api.github.com/users/${req.params.username}`, {
-            headers: {
-                'Authorization': `token ${req.user.accessToken}`
-            }
-        });
-        const userData = await response.json();
-
-        const contributionsResponse = await fetch(
-            `https://github-contributions-api.now.sh/v1/${req.params.username}`
-        );
-        const contributionsData = await contributionsResponse.json();
-
-        res.json({
-            ...userData,
-            contributions: contributionsData.total
-        });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch GitHub data' });
-    }
-});
-
-app.get('/api/github/contributions/:username', async (req, res) => {
-    try {
-        const response = await fetch(
-            `https://github-contributions-api.now.sh/v1/${req.params.username}`
-        );
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch contribution data' });
-    }
-});
-
-// Project submission route
-app.post('/api/projects', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    try {
-        const projectData = {
-            ...req.body,
-            userId: req.user.id,
-            submittedAt: new Date()
-        };
-
-        if (!projectData.repoLink || !projectData.ownerName || !projectData.technology || !projectData.description) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
-
-        const project = await Repo.create(projectData);
-        res.status(200).json({ success: true, project });
-    } catch (error) {
-        console.error('Error saving project:', error);
-        res.status(500).json({ error: 'Failed to save project' });
-    }
-});
-
-// Initialize and start server
-async function start() {
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-    });
-}
-
-start();
+module.exports = app;

@@ -2,10 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingState = document.getElementById('loadingState');
     const authContainer = document.getElementById('authContainer');
 
-    const API_URL = window.location.hostname === 'localhost'
-        ? 'http://localhost:3000'
-        : 'https://devsync-backend.vercel.app';
-
     const showProjectForm = () => {
         authContainer.innerHTML = `
             <form id="projectForm" class="project-form">
@@ -62,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         authContainer.innerHTML = `
             <div class="auth-prompt">
                 <h3>Please log in to submit a project</h3>
-                <a href="https://devsync-backend.vercel.app/auth/github" class="button">
+                <a href="http://localhost:3000/auth/github" class="button">
                     <i class='bx bxl-github'></i> Login with GitHub
                 </a>
             </div>
@@ -81,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetch(`${API_URL}/api/projects`, {
+            const response = await fetch(`${config.API_URL}/api/projects`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -106,17 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const checkAuthAndInitialize = async () => {
         try {
-            // First check localStorage
-            const storedUserData = localStorage.getItem('userData');
-            if (storedUserData) {
-                loadingState.style.display = 'none';
-                authContainer.style.display = 'block';
-                showProjectForm();
-                return;
-            }
-
-            // If no stored data, check with server
-            const response = await fetch(`${API_URL}/api/user`, {
+            const response = await fetch(`${config.API_URL}/api/user`, {
                 credentials: 'include'
             });
             const data = await response.json();
