@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const repoSchema = new mongoose.Schema({
+const RepoSchema = new mongoose.Schema({
     repoLink: {
         type: String,
         required: true,
@@ -18,14 +18,18 @@ const repoSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    userId: {
+    submittedBy: {
         type: String,
         required: true
     },
     submittedAt: {
         type: Date,
         default: Date.now
+    },
+    isApproved: {
+        type: Boolean,
+        default: true
     }
 });
 
-module.exports = mongoose.model('Repo', repoSchema);
+module.exports = mongoose.models.Repo || mongoose.model('Repo', RepoSchema);

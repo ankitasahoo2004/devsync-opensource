@@ -6,20 +6,31 @@ const GitHubStrategy = require('passport-github2').Strategy;
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
-const User = require('./models/User');
-const Repo = require('./models/Repo');
 const MongoStore = require('connect-mongo');
 
+// Import models
+const User = require('./models/User');
+const Repo = require('./models/Repo');
+
+// Initialize express app
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// MongoDB connection with error handling
+async function connectToMongoDB() {
+    try {
+        await mongoose.connect(process.env.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        console.log('Connected to MongoDB');
+    } catch (err) {
+        console.error('MongoDB connection error:', err);
+    }
+}
+
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('MongoDB connection error:', err));
+connectToMongoDB();
 
 // Calculate points based on contributions from registered repos
 async function calculatePoints(mergedPRs, cancelledPRs) {
@@ -92,15 +103,18 @@ async function updateUserPRStatus(userId, repoId, prData, status) {
 // Middleware setup
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '..')));
+
+// CORS configuration
 app.use(cors({
     origin: process.env.NODE_ENV === 'production'
         ? 'https://devsync-frontend.vercel.app'
         : 'http://localhost:5500',
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Session configuration with MongoStore
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
@@ -116,6 +130,7 @@ app.use(session({
     }
 }));
 
+// Initialize passport
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -134,7 +149,7 @@ passport.use(new GitHubStrategy({
             user = await User.create({
                 githubId: profile.id,
                 username: profile.username,
-                displayName: profile.displayName,
+                displayName: profile.displayName || profile.username,
                 email: profile.emails?.[0]?.value || '',
                 avatarUrl: profile.photos?.[0]?.value || '',
                 mergedPRs: [],
@@ -148,34 +163,65 @@ passport.use(new GitHubStrategy({
             await user.save();
         }
 
-        return done(null, { ...profile, userData: user });
+        return done(null, {
+            id: profile.id,
+            username: profile.username,
+            displayName: profile.displayName || profile.username,
+            photos: profile.photos,
+            emails: profile.emails,
+            userData: user
+        });
     } catch (error) {
+        console.error('Auth error:', error);
         return done(error);
     }
 }));
 
+// Serialize and deserialize user
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
 
-// Auth routes
-app.use('/auth', require('./routes/auth'));
-app.use('/api/user', require('./routes/user'));
-app.use('/api/projects', require('./routes/projects'));
-app.use('/api/github', require('./routes/github'));
+// Import routes
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
+const projectsRoutes = require('./routes/projects');
+const githubRoutes = require('./routes/github');
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Something went wrong!' });
-});
+// Set up routes
+app.use('/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/projects', projectsRoutes);
+app.use('/api/github', githubRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'OK' });
+    res.status(200).json({
+        status: 'OK',
+        timestamp: new Date(),
+        environment: process.env.NODE_ENV || 'development',
+        serverInfo: {
+            platform: process.platform,
+            nodeVersion: process.version
+        }
+    });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Server error:', err.stack);
+    res.status(500).json({
+        error: 'Something went wrong!',
+        message: err.message || 'Unknown error occurred'
+    });
 });
 
+// Start the server if not in serverless environment
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+        console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    });
+}
+
+// For serverless deployment - export the app
 module.exports = app;
