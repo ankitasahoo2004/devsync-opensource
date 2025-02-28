@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const UserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     githubId: {
         type: String,
         required: true,
@@ -13,7 +13,6 @@ const UserSchema = new mongoose.Schema({
     displayName: String,
     email: String,
     avatarUrl: String,
-    accessToken: String,
     mergedPRs: [{
         repoId: String,
         prNumber: Number,
@@ -34,10 +33,10 @@ const UserSchema = new mongoose.Schema({
         type: [String],
         default: ['Newcomer']
     },
-    createdAt: {
+    joinedAt: {
         type: Date,
         default: Date.now
     }
 });
 
-module.exports = mongoose.models.User || mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', userSchema);

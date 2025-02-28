@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetch(`${config.API_URL}/api/projects`, {
+            const response = await fetch('http://localhost:3000/api/projects', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const checkAuthAndInitialize = async () => {
         try {
-            const response = await fetch(`${config.API_URL}/api/user`, {
+            const response = await fetch('http://localhost:3000/api/user', {
                 credentials: 'include'
             });
             const data = await response.json();

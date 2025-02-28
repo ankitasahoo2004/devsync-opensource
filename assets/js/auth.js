@@ -1,6 +1,6 @@
 async function checkAuthStatus() {
     try {
-        const response = await fetch(`${config.API_URL}/api/user`, {
+        const response = await fetch('http://localhost:3000/api/user', {
             credentials: 'include'
         });
         const data = await response.json();
@@ -21,7 +21,7 @@ async function checkAuthStatus() {
             // Keep the original login button style
             loginButton.className = 'button button--ghost';
             loginButton.innerHTML = 'Login';
-            loginButton.href = `${config.API_URL}/auth/github`;
+            loginButton.href = 'http://localhost:3000/auth/github';
         }
     } catch (error) {
         console.error('Auth check failed:', error);
