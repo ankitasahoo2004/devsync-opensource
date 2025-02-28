@@ -6,14 +6,24 @@ const GitHubStrategy = require('passport-github2').Strategy;
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
+const MongoStore = require('connect-mongo');
 const User = require('./models/User');
 const Repo = require('./models/Repo');
 
 const app = express();
 
+// Get environment variables
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5500';
+const SESSION_SECRET = process.env.SESSION_SECRET || 'your_secret_key';
+
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('Connected to MongoDB'))
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000
+}).then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB connection error:', err));
 
 // Calculate points based on contributions from registered repos
@@ -88,15 +98,25 @@ async function updateUserPRStatus(userId, repoId, prData, status) {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
 app.use(cors({
-    origin: ['http://localhost:5500', 'http://127.0.0.1:5500'],
+    origin: [FRONTEND_URL, 'https://sayan-dev731.github.io'],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(session({
-    secret: 'your_session_secret',
+    secret: SESSION_SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        secure: NODE_ENV === 'production',
+        sameSite: NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    },
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+        ttl: 24 * 60 * 60 // 1 day
+    })
 }));
 
 app.use(passport.initialize());
@@ -106,7 +126,7 @@ app.use(passport.session());
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: process.env.GITHUB_CALLBACK_URL
+    callbackURL: `${CLIENT_URL}/auth/github/callback`
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         let user = await User.findOne({ githubId: profile.id });
@@ -142,7 +162,7 @@ app.get('/auth/github',
 app.get('/auth/github/callback',
     passport.authenticate('github', { failureRedirect: '/login' }),
     (req, res) => {
-        res.redirect(process.env.FRONTEND_URL);
+        res.redirect(FRONTEND_URL);
     }
 );
 
@@ -206,8 +226,10 @@ app.get('/api/leaderboard', async (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-    req.logout();
-    res.redirect('http://localhost:5500/index.html');
+    req.logout(function (err) {
+        if (err) { return next(err); }
+        res.redirect(FRONTEND_URL);
+    });
 });
 
 // GitHub API routes
