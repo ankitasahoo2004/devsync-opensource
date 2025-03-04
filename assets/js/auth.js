@@ -21,6 +21,7 @@ async function checkAuthStatus() {
         const data = await response.json();
 
         const loginButton = document.querySelector('.button.button--ghost');
+        if (!loginButton) return;
 
         if (data.isAuthenticated) {
             loginButton.className = 'nav__profile';
@@ -38,6 +39,13 @@ async function checkAuthStatus() {
         }
     } catch (error) {
         console.error('Auth check failed:', error);
+        // Fallback to login state on error
+        const loginButton = document.querySelector('.button.button--ghost');
+        if (loginButton) {
+            loginButton.className = 'button button--ghost';
+            loginButton.innerHTML = 'Login';
+            loginButton.href = `${apiUrl}/auth/github`;
+        }
     }
 }
 
