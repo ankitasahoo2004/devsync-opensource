@@ -164,37 +164,30 @@ sr.reveal(`.about__img, .discount__data`, { origin: 'right' })
 // Check login status and update nav
 function updateNavigation() {
     const nav = document.querySelector('.nav__list');
-    fetch('https://devsync-backend-6fe4.onrender.com/api/user', {
-        credentials: 'include'
-    })
+    fetch('/api/user')
         .then(res => res.json())
         .then(user => {
             if (user.error) {
                 // Add login button if not logged in
                 nav.innerHTML += `
                     <li class="nav__item">
-                        <a href="login.html" class="nav__link">Login</a>
+                        <a href="/login" class="nav__link">Login</a>
                     </li>`;
             } else {
                 // Replace login with profile pic
                 nav.innerHTML = nav.innerHTML.replace(
-                    `<a href="login.html" class="nav__link">Login</a>`,
-                    `<a href="profile.html" class="nav__link">
+                    `<a href="/login" class="nav__link">Login</a>`,
+                    `<a href="/profile" class="nav__link">
                         <img src="${user.photos[0].value}" alt="Profile" class="nav__profile-img">
                     </a>`
                 );
             }
-        })
-        .catch(error => {
-            console.error('Error fetching user data:', error);
         });
 }
 
 // Load profile data if on profile page
 if (window.location.pathname === '/profile') {
-    fetch('https://devsync-backend-6fe4.onrender.com/api/user', {
-        credentials: 'include'
-    })
+    fetch('/api/user')
         .then(res => res.json())
         .then(user => {
             document.getElementById('profile-img').src = user.photos[0].value;
@@ -203,9 +196,7 @@ if (window.location.pathname === '/profile') {
         });
 
     // Load leaderboard
-    fetch('https://devsync-backend-6fe4.onrender.com/api/leaderboard', {
-        credentials: 'include'
-    })
+    fetch('/api/leaderboard')
         .then(res => res.json())
         .then(data => {
             const leaderboardList = document.getElementById('leaderboard-list');
@@ -224,3 +215,64 @@ if (window.location.pathname === '/profile') {
 
 // Initialize navigation state
 document.addEventListener('DOMContentLoaded', updateNavigation);
+
+/*=============== AUTH STATE MANAGEMENT ===============*/
+function updateAuthState(user) {
+    const authButtons = document.querySelectorAll('.auth-button');
+    const profileMenus = document.querySelectorAll('.profile-menu');
+
+    if (user) {
+        // Update UI for logged in state
+        authButtons.forEach(btn => {
+            btn.innerHTML = `
+                <img src="${user.photos[0].value}" alt="${user.displayName}" class="nav__profile-img">
+                <span class="nav__profile-name">${user.displayName}</span>
+            `;
+            btn.href = "profile.html";
+        });
+
+        profileMenus.forEach(menu => menu.classList.remove('hidden'));
+    } else {
+        // Update UI for logged out state
+        authButtons.forEach(btn => {
+            btn.innerHTML = `<i class='bx bx-log-in-circle'></i> Login`;
+            btn.href = "login.html";
+        });
+
+        profileMenus.forEach(menu => menu.classList.add('hidden'));
+    }
+}
+
+// Check auth state when page loads
+document.addEventListener('DOMContentLoaded', async () => {
+    // ...existing DOMContentLoaded code...
+
+    try {
+        const response = await fetch('http://localhost:3000/api/user', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+
+        if (data.isAuthenticated) {
+            updateAuthState(data.user);
+        }
+    } catch (error) {
+        console.error('Failed to check auth status:', error);
+    }
+});
+
+// Add logout handler
+document.querySelectorAll('.logout-button').forEach(button => {
+    button.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        try {
+            await fetch('http://localhost:3000/logout', {
+                credentials: 'include'
+            });
+            window.location.href = 'index.html';
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    });
+});

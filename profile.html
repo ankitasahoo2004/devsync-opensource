@@ -1,57 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevSync - Your Profile</title>
-
+    <title>Profile - DevSync</title>
+    
     <!--=============== FAVICON ===============-->
     <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
-
+    
     <!--=============== BOXICONS ===============-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
-
+    
     <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/profile.css">
+    <link rel="stylesheet" href="assets/css/styles.css">    
     <!--=============== CHART.JS ===============-->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
     <!--==================== HEADER ====================-->
     <header class="header" id="header">
         <nav class="nav container">
             <a href="index.html" class="nav__logo">
                 <img src="assets/img/logo.png" alt="" class="nav__logo-img">
-                DevSync
+                Halloween
             </a>
 
             <div class="nav__menu" id="nav-menu">
                 <ul class="nav__list">
                     <li class="nav__item">
-                        <a href="index.html" class="nav__link">Home</a>
+                        <a href="#home" class="nav__link active-link">Home</a>
                     </li>
+
                     <li class="nav__item">
-                        <a href="index.html#about" class="nav__link">About</a>
+                        <a href="#about" class="nav__link">About</a>
                     </li>
+
                     <li class="nav__item">
-                        <a href="index.html#trick" class="nav__link">Candy</a>
+                        <a href="#trick" class="nav__link">Candy</a>
                     </li>
+
                     <li class="nav__item">
-                        <a href="index.html#new" class="nav__link">New</a>
+                        <a href="#new" class="nav__link">leaderboard</a>
                     </li>
+
                     <li class="nav__item">
                         <a href="team.html" class="nav__link">Team</a>
                     </li>
-                    <li class="nav__item">
-                        <a href="leaderboard.html" class="nav__link">Leaderboard</a>
-                    </li>
-                    <a href="#" class="nav__profile">
-                        <img src="" alt="Profile" class="nav__profile-img">
-                        <span class="nav__profile-name">Loading...</span>
-                    </a>
                 </ul>
 
                 <div class="nav__close" id="nav-close">
@@ -69,101 +63,130 @@
     </header>
 
     <main class="main">
-        <section class="profile section container">
-            <h2 class="section__title">Your Profile</h2>
-
-            <div class="profile__container">
-                <div class="profile__card">
-                    <div class="profile__header">
-                        <div class="profile__avatar-container">
-                            <img src="" alt="Avatar" class="profile__avatar" id="user-avatar">
+        <section class="profile section">
+            <div class="profile__container container">
+                <div class="profile__header animate-fade-in">
+                    <div class="profile__cover-wrapper">
+                        <img id="profile-cover" class="profile__cover">
+                        <div class="profile__cover-overlay"></div>
+                    </div>
+                    <div class="profile__user-info">
+                        <img src="" alt="" class="profile__img" id="profile-img">
+                        <div class="profile__data">
+                            <h2 class="profile__name" id="profile-name"></h2>
+                            <p class="profile__bio" id="profile-bio"></p>
                         </div>
-                        <h2 class="profile__name" id="user-name">Loading...</h2>
-                        <p class="profile__username" id="user-username">@username</p>
+                    </div>
+                </div>
 
-                        <div class="profile__stats">
-                            <div class="stat">
-                                <span class="stat__value" id="repo-count">-</span>
-                                <span class="stat__label">Repositories</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat__value" id="follower-count">-</span>
-                                <span class="stat__label">Followers</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat__value" id="following-count">-</span>
-                                <span class="stat__label">Following</span>
+                <div class="profile__content">
+                    <div class="profile__details animate-slide-left">
+                        <div class="profile__info">
+                            <h3>Profile Details</h3>
+                            <ul class="profile__list">
+                                <li>
+                                    <i class='bx bx-map'></i>
+                                    <span>Location:</span>
+                                    <span id="profile-location"></span>
+                                </li>
+                                <li>
+                                    <i class='bx bx-building'></i>
+                                    <span>Company:</span>
+                                    <span id="profile-company"></span>
+                                </li>
+                                <li>
+                                    <i class='bx bx-link'></i>
+                                    <span>Website:</span>
+                                    <a id="profile-blog" target="_blank"></a>
+                                </li>
+                                <li>
+                                    <i class='bx bxl-twitter'></i>
+                                    <span>Twitter:</span>
+                                    <span id="profile-twitter"></span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="profile__stats animate-slide-right">
+                            <h3>GitHub Stats</h3>
+                                <div class="stat__item">
+                                    <i class='bx bx-code-block'></i>
+                                    <span id="gists">0</span>
+                                    <p>Gists</p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="profile__content">
-                        <div class="profile__section">
-                            <h3 class="profile__section-title">Your Activity</h3>
-                            <div class="profile__activity">
-                                <div class="activity-placeholder">Loading your activity...</div>
-                                <div class="contribution-graph" id="contribution-graph"></div>
-                            </div>
+                    <div class="profile__stats">
+                        <div class="stat">
+                            <h3 id="repos">0</h3>
+                            <p>Repositories</p>
                         </div>
-
-                        <div class="profile__section">
-                            <h3 class="profile__section-title">Your Repositories</h3>
-                            <div class="profile__repos" id="user-repos">
-                                <div class="loading-placeholder">Loading repositories...</div>
-                            </div>
+                        <div class="stat">
+                            <h3 id="followers">0</h3>
+                            <p>Followers</p>
+                        </div>
+                        <div class="stat">
+                            <h3 id="following">0</h3>
+                            <p>Following</p>
                         </div>
                     </div>
 
-                    <div class="profile__footer">
-                        <button id="logout-button" class="button button--flex">
-                            <i class='bx bx-log-out-circle'></i> Logout
-                        </button>
+                    <div class="profile__contribution-graph">
+                        <h3 class="section__title">Contribution Graph</h3>
+                        <img id="contribution-graph" alt="GitHub Contributions" class="contribution-chart">
+                    </div>
+
+                    <div class="profile__actions">
+                        <a href="http://localhost:3000/logout" class="button">
+                            <i class='bx bx-log-out button__icon'></i>
+                            Logout
+                        </a>
                     </div>
                 </div>
             </div>
         </section>
-    </main>
 
-    <footer class="footer section">
-        <div class="footer__container container grid">
-            <div class="footer__content">
-                <a href="#" class="footer__logo">
-                    <img src="assets/img/logo.png" alt="" class="footer__logo-img">
-                    DevSync
-                </a>
-                <p class="footer__description">Find your perfect <br> open source project match</p>
+        <section class="activity section">
+            <h2 class="section__title reveal-up">Recent Activity</h2>
+            <div class="activity__container container reveal-up">
+                <div class="activity__filters">
+                    <button class="activity__filter active" data-filter="all">All</button>
+                    <button class="activity__filter" data-filter="push">Pushes</button>
+                    <button class="activity__filter" data-filter="pr">Pull Requests</button>
+                    <button class="activity__filter" data-filter="issue">Issues</button>
+                </div>
+                <div class="activities-grid">
+                    <!-- Push Events Section -->
+                    <div class="activity-section push-events">
+                        <!-- Push events will be inserted here by JavaScript -->
+                    </div>
+        
+                    <!-- Pull Requests Section -->
+                    <div class="activity-section pull-requests">
+                        <!-- PRs will be inserted here by JavaScript -->
+                    </div>
+        
+                    <!-- Issues Section -->
+                    <div class="activity-section issues">
+                        <!-- Issues will be inserted here by JavaScript -->
+                    </div>
+                </div>
+        
+                <div class="activity__list" id="activity-list">
+                    <!-- Activity items will be inserted here -->
+                </div>
             </div>
+        </section>
 
-            <div class="footer__content"></div>
-            <h3 class="footer__title">Our Services</h3>
-            <ul class="footer__links">
-                <li><a href="#" class="footer__link">Project Discovery</a></li>
-                <li><a href="#" class="footer__link">Skill Matching</a></li>
-                <li><a href="#" class="footer__link">Contribution Tracking</a></li>
-            </ul>
-        </div>
-
-        <div class="footer__content">
-            <h3 class="footer__title">Company</h3>
-            <ul class="footer__links">
-                <li><a href="#" class="footer__link">Blog</a></li>
-                <li><a href="#" class="footer__link">About us</a></li>
-                <li><a href="#" class="footer__link">Our Mission</a></li>
-            </ul>
-        </div>
-
-        <div class="footer__content">
-            <h3 class="footer__title">Support</h3>
-            <ul class="footer__links">
-                <li><a href="#" class="footer__link">FAQs</a></li>
-                <li><a href="#" class="footer__link">Support Center</a></li>
-                <li><a href="#" class="footer__link">Contact Us</a></li>
-            </ul>
-        </div>
-        </div>
-
-        <span class="footer__copy">&#169; DevSync. All rights reserved</span>
-    </footer>
+        <section class="section">
+            <h2 class="section__title">Recent Merges</h2>
+            <div class="merges-timeline" id="merges-timeline">
+                <!-- Merges will be dynamically inserted here -->
+            </div>
+        </section>
+    </main>
 
     <!--=============== SCROLL UP ===============-->
     <a href="#" class="scrollup" id="scroll-up">
@@ -173,8 +196,6 @@
     <!--=============== MAIN JS ===============-->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="assets/js/main.js"></script>
-    <script src="assets/js/auth.js"></script>
     <script src="assets/js/profile.js"></script>
 </body>
-
 </html>

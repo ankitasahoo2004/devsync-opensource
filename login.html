@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,9 +8,9 @@
     <link rel="stylesheet" href="assets/css/login.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
 </head>
-
 <body class="login-body">
     <div class="background">
+        <span></span>
         <span></span>
         <span></span>
         <span></span>
@@ -41,16 +40,11 @@
                     </div>
                 </div>
 
-                <a href="https://devsync-backend-6fe4.onrender.com/auth/github" class="login__button" id="github-login">
+                <a href="http://localhost:3000/auth/github" class="login__button">
                     <i class='bx bxl-github'></i>
                     <span>Continue with GitHub</span>
                     <div class="button__overlay"></div>
                 </a>
-
-                <div class="login__status" id="login-status" style="display: none;">
-                    <p class="status-message">Authenticating with GitHub...</p>
-                    <div class="spinner"></div>
-                </div>
             </div>
 
             <div class="login__footer">
@@ -66,47 +60,5 @@
 
     <div class="particles"></div>
     <script src="assets/js/login.js"></script>
-    <script src="assets/js/auth.js"></script>
-    <script src="assets/js/redirects.js"></script>
-    <script>
-        // Add event listener to login button
-        document.getElementById('github-login').addEventListener('click', function (e) {
-            e.preventDefault();
-
-            // Show status message
-            document.getElementById('login-status').style.display = 'block';
-
-            // Start OAuth flow with correct URL
-            const authUrl = 'https://devsync-backend-6fe4.onrender.com/auth/github';
-
-            // Store the current URL as the redirect destination after successful login
-            localStorage.setItem('redirect_after_login', window.location.origin + '/profile.html');
-
-            // Redirect to GitHub OAuth
-            window.location.href = authUrl;
-        });
-
-        // Check for authentication errors or successful login redirects
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-
-            // Handle error cases
-            if (urlParams.has('error')) {
-                alert('Login failed: ' + (urlParams.get('error_description') || 'Unknown error'));
-            }
-
-            // Check for authentication token in URL
-            checkAuthCallback();
-
-            // Check if user is already authenticated
-            checkAuthStatus().then(isAuthenticated => {
-                if (isAuthenticated) {
-                    // User is already logged in, redirect to profile page
-                    redirectToPage('profile.html');
-                }
-            });
-        });
-    </script>
 </body>
-
 </html>

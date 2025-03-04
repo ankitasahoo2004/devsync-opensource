@@ -1,6 +1,114 @@
 document.addEventListener('DOMContentLoaded', () => {
     const loadingState = document.getElementById('loadingState');
     const authContainer = document.getElementById('authContainer');
+    const projectForm = document.getElementById('projectForm');
+
+    // Add loading state UI
+    function showLoading(message = 'Loading...') {
+        loadingState.innerHTML = `
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>${message}</p>
+            </div>
+        `;
+        loadingState.style.display = 'block';
+    }
+
+    // Add error state UI
+    function showError(message) {
+        loadingState.innerHTML = `
+            <div class="error-state">
+                <i class='bx bx-error-circle'></i>
+                <p>${message}</p>
+                <button onclick="window.location.reload()">Try Again</button>
+            </div>
+        `;
+        loadingState.style.display = 'block';
+    }
+
+    // Enhance form validation
+    function validateForm(formData) {
+        const errors = [];
+
+        if (!formData.repoLink.match(/^https:\/\/github\.com\/[\w-]+\/[\w-]+$/)) {
+            errors.push('Please enter a valid GitHub repository URL');
+        }
+
+        if (formData.description.length < 50) {
+            errors.push('Description must be at least 50 characters');
+        }
+
+        if (formData.technology.length === 0) {
+            errors.push('Please select at least one technology');
+        }
+
+        return errors;
+    }
+
+    // Handle form submission with enhanced error handling
+    async function handleSubmit(e) {
+        e.preventDefault();
+
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Submitting...';
+
+        const formData = {
+            repoLink: e.target.repoLink.value,
+            ownerName: e.target.ownerName.value,
+            technology: Array.from(e.target.technology.selectedOptions).map(opt => opt.value),
+            description: e.target.description.value
+        };
+
+        const errors = validateForm(formData);
+        if (errors.length > 0) {
+            alert(errors.join('\n'));
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalButtonText;
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:3000/api/projects', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showSuccess('Project submitted successfully!');
+                e.target.reset();
+            } else {
+                throw new Error(data.error || 'Failed to submit project');
+            }
+        } catch (error) {
+            showError(error.message || 'Failed to submit project. Please try again.');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalButtonText;
+        }
+    }
+
+    // Success message UI
+    function showSuccess(message) {
+        const successAlert = document.createElement('div');
+        successAlert.className = 'success-alert';
+        successAlert.innerHTML = `
+            <i class='bx bx-check-circle'></i>
+            <p>${message}</p>
+        `;
+        document.body.appendChild(successAlert);
+
+        setTimeout(() => {
+            successAlert.remove();
+        }, 3000);
+    }
 
     const showProjectForm = () => {
         authContainer.innerHTML = `
@@ -58,51 +166,16 @@ document.addEventListener('DOMContentLoaded', () => {
         authContainer.innerHTML = `
             <div class="auth-prompt">
                 <h3>Please log in to submit a project</h3>
-                <a href="https://devsync-backend-6fe4.onrender.com/auth/github" class="button">
+                <a href="http://localhost:3000/auth/github" class="button">
                     <i class='bx bxl-github'></i> Login with GitHub
                 </a>
             </div>
         `;
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const form = e.target;
-
-        const formData = {
-            repoLink: form.repoLink.value,
-            ownerName: form.ownerName.value,
-            technology: Array.from(form.technology.selectedOptions).map(opt => opt.value),
-            description: form.description.value
-        };
-
-        try {
-            const response = await fetch('https://devsync-backend-6fe4.onrender.com/api/projects', {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert('Project submitted successfully!');
-                form.reset();
-            } else {
-                throw new Error(data.error || 'Failed to submit project');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert(error.message || 'Failed to submit project. Please try again.');
-        }
-    };
-
     const checkAuthAndInitialize = async () => {
         try {
-            const response = await fetch('https://devsync-backend-6fe4.onrender.com/api/user', {
+            const response = await fetch('http://localhost:3000/api/user', {
                 credentials: 'include'
             });
             const data = await response.json();

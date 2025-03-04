@@ -6,24 +6,21 @@ const GitHubStrategy = require('passport-github2').Strategy;
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
-const MongoStore = require('connect-mongo');
 const User = require('./models/User');
 const Repo = require('./models/Repo');
+const helmet = require('helmet');
+const config = require('./config');
 
 const app = express();
 
-// Get environment variables
-const NODE_ENV = process.env.NODE_ENV || 'development';
-const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5500';
-const SESSION_SECRET = process.env.SESSION_SECRET || 'your_secret_key';
+// Enhanced security middleware
+app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+app.use(helmet.hidePoweredBy());
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 5000
-}).then(() => console.log('Connected to MongoDB'))
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB connection error:', err));
 
 // Calculate points based on contributions from registered repos
@@ -98,25 +95,24 @@ async function updateUserPRStatus(userId, repoId, prData, status) {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
 app.use(cors({
-    origin: [FRONTEND_URL, 'https://sayan-dev731.github.io'],
+    origin: config.corsOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['set-cookie']
 }));
 
 app.use(session({
-    secret: SESSION_SECRET,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: NODE_ENV === 'production',
-        sameSite: NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined,
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     },
-    store: MongoStore.create({
-        mongoUrl: process.env.MONGODB_URI,
-        ttl: 24 * 60 * 60 // 1 day
-    })
+    name: 'sessionId' // Change default session cookie name
 }));
 
 app.use(passport.initialize());
@@ -126,7 +122,7 @@ app.use(passport.session());
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: `${CLIENT_URL}/auth/github/callback`
+    callbackURL: process.env.GITHUB_CALLBACK_URL
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         let user = await User.findOne({ githubId: profile.id });
@@ -162,7 +158,7 @@ app.get('/auth/github',
 app.get('/auth/github/callback',
     passport.authenticate('github', { failureRedirect: '/login' }),
     (req, res) => {
-        res.redirect(FRONTEND_URL);
+        res.redirect(process.env.FRONTEND_URL);
     }
 );
 
@@ -226,10 +222,8 @@ app.get('/api/leaderboard', async (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-    req.logout(function (err) {
-        if (err) { return next(err); }
-        res.redirect(FRONTEND_URL);
-    });
+    req.logout();
+    res.redirect(process.env.FRONTEND_URL);
 });
 
 // GitHub API routes

@@ -1,6 +1,76 @@
+// Add configuration object at the top
+const CONFIG = {
+    API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:3000',
+    GITHUB_API_URL: 'https://api.github.com',
+    CACHE_DURATION: 5 * 60 * 1000, // 5 minutes
+};
+
+// Add request helper with security headers
+async function securedFetch(url, options = {}) {
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        ...options.headers,
+    };
+
+    try {
+        const response = await fetch(url, { ...options, headers });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response;
+    } catch (error) {
+        console.error(`Failed to fetch ${url}:`, error);
+        throw error;
+    }
+}
+
+// Add caching utility
+const cache = new Map();
+function getCachedData(key) {
+    const cached = cache.get(key);
+    if (cached && Date.now() - cached.timestamp < CONFIG.CACHE_DURATION) {
+        return cached.data;
+    }
+    return null;
+}
+
+function setCachedData(key, data) {
+    cache.set(key, {
+        data,
+        timestamp: Date.now()
+    });
+}
+
+// Add error handling utility
+function handleError(error, elementId) {
+    console.error(`Error in ${elementId}:`, error);
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.innerHTML = `
+            <div class="error-state">
+                <i class='bx bx-error-circle'></i>
+                <h3>Something went wrong</h3>
+                <p>${error.message || 'Please try again later'}</p>
+            </div>
+        `;
+    }
+}
+
 async function fetchUserProfile() {
     try {
-        const response = await fetch('https://devsync-backend-6fe4.onrender.com/api/user', {
+        showLoadingState('profile');
+        const authResponse = await securedFetch(`${CONFIG.API_BASE_URL}/api/user`, {
+            credentials: 'include'
+        });
+        const authData = await authResponse.json();
+
+        if (!authData.isAuthenticated) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const response = await securedFetch(`${CONFIG.API_BASE_URL}/api/user`, {
             credentials: 'include'
         });
         const data = await response.json();
@@ -11,8 +81,7 @@ async function fetchUserProfile() {
         }
 
         // Fetch detailed GitHub data
-        const githubResponse = await fetch(`https://api.github.com/users/${data.user.username}`);
-        const githubData = await githubResponse.json();
+        const githubData = await fetchGitHubData(`users/${data.user.username}`, data.user.username);
 
         // Load contribution graph
         document.getElementById('contribution-graph').src = `https://ghchart.rshah.org/${data.user.username}`;
@@ -47,8 +116,18 @@ async function fetchUserProfile() {
             fetchIssues(data.user.username)
         ]);
 
+        // Add error states for UI elements
+        document.querySelectorAll('.profile-section').forEach(section => {
+            section.innerHTML = section.innerHTML || `
+                <div class="error-state">
+                    <i class='bx bx-error'></i>
+                    <p>Failed to load data</p>
+                </div>
+            `;
+        });
+
     } catch (error) {
-        console.error('Failed to load profile:', error);
+        handleError(error, 'profile');
     }
 }
 
@@ -74,7 +153,7 @@ function updateStatWithAnimation(elementId, finalValue) {
 
 async function fetchActivities(username) {
     try {
-        const response = await fetch(`https://devsync-backend-6fe4.onrender.com/api/github/activity/${username}`);
+        const response = await securedFetch(`${CONFIG.API_BASE_URL}/api/github/activity/${username}`);
         const activities = await response.json();
         displayActivities(activities);
     } catch (error) {
@@ -190,14 +269,14 @@ stats.forEach(stat => {
 async function fetchRecentMerges(username) {
     try {
         // First fetch user's repositories
-        const reposResponse = await fetch(`https://api.github.com/users/${username}/repos`);
+        const reposResponse = await securedFetch(`${CONFIG.GITHUB_API_URL}/users/${username}/repos`);
         const repos = await reposResponse.json();
 
         // Get recent commits from each repo
         const mergePromises = repos.map(async repo => {
             try {
-                const commitsResponse = await fetch(
-                    `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits?per_page=10`
+                const commitsResponse = await securedFetch(
+                    `${CONFIG.GITHUB_API_URL}/repos/${repo.owner.login}/${repo.name}/commits?per_page=10`
                 );
                 const commits = await commitsResponse.json();
                 return commits.map(commit => ({
@@ -270,7 +349,7 @@ function displayMerges(merges) {
 
 async function fetchPushEvents(username) {
     try {
-        const response = await fetch(`https://api.github.com/users/${username}/events`);
+        const response = await securedFetch(`${CONFIG.GITHUB_API_URL}/users/${username}/events`);
         const events = await response.json();
         const pushEvents = events.filter(event => event.type === 'PushEvent');
         displayPushEvents(pushEvents.slice(0, 5));
@@ -281,7 +360,7 @@ async function fetchPushEvents(username) {
 
 async function fetchPullRequests(username) {
     try {
-        const response = await fetch(`https://api.github.com/search/issues?q=type:pr+author:${username}`);
+        const response = await securedFetch(`${CONFIG.GITHUB_API_URL}/search/issues?q=type:pr+author:${username}`);
         const data = await response.json();
         displayPullRequests(data.items.slice(0, 5));
     } catch (error) {
@@ -291,7 +370,7 @@ async function fetchPullRequests(username) {
 
 async function fetchIssues(username) {
     try {
-        const response = await fetch(`https://api.github.com/search/issues?q=type:issue+author:${username}`);
+        const response = await securedFetch(`${CONFIG.GITHUB_API_URL}/search/issues?q=type:issue+author:${username}`);
         const data = await response.json();
         displayIssues(data.items.slice(0, 5));
     } catch (error) {
@@ -386,3 +465,23 @@ function formatDate(dateString) {
         'day'
     );
 }
+
+// Add loading states
+function showLoadingState(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.innerHTML = `
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Loading...</p>
+            </div>
+        `;
+    }
+}
+
+// Initialize loading states
+document.addEventListener('DOMContentLoaded', () => {
+    const sections = ['profile-stats', 'activity-feed', 'contribution-graph'];
+    sections.forEach(showLoadingState);
+    fetchUserProfile();
+});
