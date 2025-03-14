@@ -25,6 +25,23 @@ const repoSchema = new mongoose.Schema({
     submittedAt: {
         type: Date,
         default: Date.now
+    },
+    reviewStatus: {
+        type: String,
+        enum: ['pending', 'accepted', 'rejected'],
+        default: 'pending'
+    },
+    reviewedAt: {
+        type: Date,
+        default: null
+    },
+    reviewedBy: {
+        type: String,
+        default: null
+    },
+    successPoints: {
+        type: Number,
+        default: 50
     }
 });
 

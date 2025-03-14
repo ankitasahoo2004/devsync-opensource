@@ -1,76 +1,8 @@
-// Add configuration object at the top
-const CONFIG = {
-    API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:3000',
-    GITHUB_API_URL: 'https://api.github.com',
-    CACHE_DURATION: 5 * 60 * 1000, // 5 minutes
-};
-
-// Add request helper with security headers
-async function securedFetch(url, options = {}) {
-    const headers = {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        ...options.headers,
-    };
-
-    try {
-        const response = await fetch(url, { ...options, headers });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response;
-    } catch (error) {
-        console.error(`Failed to fetch ${url}:`, error);
-        throw error;
-    }
-}
-
-// Add caching utility
-const cache = new Map();
-function getCachedData(key) {
-    const cached = cache.get(key);
-    if (cached && Date.now() - cached.timestamp < CONFIG.CACHE_DURATION) {
-        return cached.data;
-    }
-    return null;
-}
-
-function setCachedData(key, data) {
-    cache.set(key, {
-        data,
-        timestamp: Date.now()
-    });
-}
-
-// Add error handling utility
-function handleError(error, elementId) {
-    console.error(`Error in ${elementId}:`, error);
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.innerHTML = `
-            <div class="error-state">
-                <i class='bx bx-error-circle'></i>
-                <h3>Something went wrong</h3>
-                <p>${error.message || 'Please try again later'}</p>
-            </div>
-        `;
-    }
-}
+const API_BASE_URL = config.API_BASE_URL;
 
 async function fetchUserProfile() {
     try {
-        showLoadingState('profile');
-        const authResponse = await securedFetch(`${CONFIG.API_BASE_URL}/api/user`, {
-            credentials: 'include'
-        });
-        const authData = await authResponse.json();
-
-        if (!authData.isAuthenticated) {
-            window.location.href = 'login.html';
-            return;
-        }
-
-        const response = await securedFetch(`${CONFIG.API_BASE_URL}/api/user`, {
+        const response = await fetch(`${API_BASE_URL}/api/user`, {
             credentials: 'include'
         });
         const data = await response.json();
@@ -80,58 +12,85 @@ async function fetchUserProfile() {
             return;
         }
 
-        // Fetch detailed GitHub data
-        const githubData = await fetchGitHubData(`users/${data.user.username}`, data.user.username);
-
-        // Load contribution graph
-        document.getElementById('contribution-graph').src = `https://ghchart.rshah.org/${data.user.username}`;
+        // Fetch comprehensive profile data
+        const profileResponse = await fetch(`${API_BASE_URL}/api/user/profile/${data.user.username}`, {
+            credentials: 'include'
+        });
+        const profileData = await profileResponse.json();
 
         // Update profile information
-        document.getElementById('profile-img').src = githubData.avatar_url;
-        document.getElementById('profile-name').textContent = githubData.name || githubData.login;
-        document.getElementById('profile-bio').textContent = githubData.bio || '';
-
-        // Update additional profile details
-        document.getElementById('profile-location').textContent = githubData.location || 'Not specified';
-        document.getElementById('profile-company').textContent = githubData.company || 'Not specified';
-        document.getElementById('profile-blog').href = githubData.blog;
-        document.getElementById('profile-blog').textContent = githubData.blog || 'Not specified';
-        document.getElementById('profile-twitter').textContent = githubData.twitter_username || 'Not specified';
-
-        // Update stats with animations
-        updateStatWithAnimation('repos', githubData.public_repos);
-        updateStatWithAnimation('followers', githubData.followers);
-        updateStatWithAnimation('following', githubData.following);
-
-        // Fetch and display activities
-        fetchActivities(data.user.username);
-
-        // Add this line after loading the other profile data
-        await fetchRecentMerges(data.user.username);
-
-        // Fetch additional GitHub activities
-        await Promise.all([
-            fetchPushEvents(data.user.username),
-            fetchPullRequests(data.user.username),
-            fetchIssues(data.user.username)
-        ]);
-
-        // Add error states for UI elements
-        document.querySelectorAll('.profile-section').forEach(section => {
-            section.innerHTML = section.innerHTML || `
-                <div class="error-state">
-                    <i class='bx bx-error'></i>
-                    <p>Failed to load data</p>
-                </div>
-            `;
-        });
+        updateProfileInfo(profileData);
+        updateProfileStats(profileData);
+        displayPullRequests(profileData.pullRequests);
 
     } catch (error) {
-        handleError(error, 'profile');
+        console.error('Failed to load profile:', error);
     }
 }
 
-// Add this new function for animated stat updates
+function updateProfileInfo(data) {
+    document.getElementById('profile-img').src = data.avatar_url;
+    document.getElementById('profile-name').textContent = data.name || data.login;
+    document.getElementById('profile-bio').textContent = data.bio || '';
+    document.getElementById('profile-location').textContent = data.location || 'Not specified';
+    document.getElementById('profile-company').textContent = data.company || 'Not specified';
+    document.getElementById('profile-blog').href = data.blog;
+    document.getElementById('profile-blog').textContent = data.blog || 'Not specified';
+    document.getElementById('profile-twitter').textContent = data.twitter_username || 'Not specified';
+}
+
+function updateProfileStats(data) {
+    updateStatWithAnimation('repos', data.public_repos);
+    updateStatWithAnimation('followers', data.followers);
+    updateStatWithAnimation('following', data.following);
+    updateStatWithAnimation('gists', data.public_gists);
+}
+
+function displayActivities(activities) {
+    const container = document.querySelector('.activities-grid');
+    container.innerHTML = '';
+
+    // Display push events
+    if (activities.pushEvents.length > 0) {
+        const pushSection = createActivitySection('Recent Pushes', activities.pushEvents, (event) => `
+            <div class="activity-card push-card">
+                <div class="activity-card__header">
+                    <i class='bx bx-git-commit activity-card__icon'></i>
+                    <span class="activity-card__date">${formatDate(event.createdAt)}</span>
+                </div>
+                <h4 class="activity-card__title">${event.repo}</h4>
+                <div class="activity-card__commits">
+                    ${event.commits?.map(commit => `
+                        <p class="commit-message">
+                            <i class='bx bx-code-commit'></i>
+                            ${commit.message}
+                        </p>
+                    `).join('') || ''}
+                </div>
+            </div>
+        `);
+        container.appendChild(pushSection);
+    }
+
+    // Display pull requests
+    if (activities.pullRequests.length > 0) {
+        const prSection = createActivitySection('Pull Requests', activities.pullRequests, (pr) => `
+            <div class="activity-card pr-card">
+                <div class="activity-card__header">
+                    <i class='bx bx-git-pull-request activity-card__icon'></i>
+                    <span class="activity-card__status ${pr.state}">${pr.state}</span>
+                    <span class="activity-card__date">${formatDate(pr.createdAt)}</span>
+                </div>
+                <h4 class="activity-card__title">
+                    <a href="${pr.url}" target="_blank">${pr.title}</a>
+                </h4>
+                <p class="activity-card__repo">${pr.repository}</p>
+            </div>
+        `);
+        container.appendChild(prSection);
+    }
+}
+
 function updateStatWithAnimation(elementId, finalValue) {
     const element = document.getElementById(elementId);
     const startValue = 0;
@@ -149,298 +108,6 @@ function updateStatWithAnimation(elementId, finalValue) {
             element.textContent = Math.floor(currentValue);
         }
     }, duration / steps);
-}
-
-async function fetchActivities(username) {
-    try {
-        const response = await securedFetch(`${CONFIG.API_BASE_URL}/api/github/activity/${username}`);
-        const activities = await response.json();
-        displayActivities(activities);
-    } catch (error) {
-        console.error('Failed to load activities:', error);
-    }
-}
-
-function displayActivities(activities) {
-    const activityList = document.getElementById('activity-list');
-    activityList.innerHTML = activities.map(activity => {
-        const icon = getActivityIcon(activity.type);
-        const time = new Date(activity.created_at).toLocaleDateString();
-
-        return `
-            <div class="activity__item" data-type="${activity.type.toLowerCase()}">
-                <div class="activity__header">
-                    <i class="bx ${icon} activity__icon"></i>
-                    <span class="activity__time">${time}</span>
-                </div>
-                <h3 class="activity__title">${activity.title}</h3>
-                <a href="${activity.repo_url}" class="activity__repo" target="_blank">
-                    ${activity.repo_name}
-                </a>
-                ${activity.description ?
-                `<p class="activity__description">${activity.description}</p>` :
-                ''}
-            </div>
-        `;
-    }).join('');
-}
-
-function getActivityIcon(type) {
-    const icons = {
-        'push': 'bx-git-repo-forked',
-        'pr': 'bx-git-pull-request',
-        'issue': 'bx-message-square-detail',
-        'default': 'bx-code-alt'
-    };
-    return icons[type.toLowerCase()] || icons.default;
-}
-
-// Filter activities
-document.addEventListener('DOMContentLoaded', () => {
-    const filters = document.querySelectorAll('.activity__filter');
-
-    filters.forEach(filter => {
-        filter.addEventListener('click', () => {
-            // Update active filter
-            filters.forEach(f => f.classList.remove('active'));
-            filter.classList.add('active');
-
-            // Filter activities
-            const type = filter.dataset.filter;
-            const items = document.querySelectorAll('.activity__item');
-
-            items.forEach(item => {
-                if (type === 'all' || item.dataset.type === type) {
-                    item.style.display = 'grid';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-    });
-
-    // Initial load
-    fetchUserProfile().then(() => {
-        initializeAnimations();
-    });
-});
-
-// Remove initializeAnimations function that used GSAP
-function initializeAnimations() {
-    // Add animation classes when elements come into view
-    const observerCallback = (entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
-            }
-        });
-    };
-
-    const observer = new IntersectionObserver(observerCallback, {
-        threshold: 0.1
-    });
-
-    // Observe elements with animation classes
-    document.querySelectorAll('.animate-fade-in, .animate-slide-left, .animate-slide-right, .animate-fade-up')
-        .forEach(element => observer.observe(element));
-}
-
-// Update stat hover animations to use CSS only
-const stats = document.querySelectorAll('.stat');
-stats.forEach(stat => {
-    stat.addEventListener('mouseenter', () => {
-        gsap.to(stat, {
-            y: -10,
-            duration: 0.3,
-            ease: "power2.out"
-        });
-    });
-
-    stat.addEventListener('mouseleave', () => {
-        gsap.to(stat, {
-            y: 0,
-            duration: 0.3,
-            ease: "power2.out"
-        });
-    });
-});
-
-async function fetchRecentMerges(username) {
-    try {
-        // First fetch user's repositories
-        const reposResponse = await securedFetch(`${CONFIG.GITHUB_API_URL}/users/${username}/repos`);
-        const repos = await reposResponse.json();
-
-        // Get recent commits from each repo
-        const mergePromises = repos.map(async repo => {
-            try {
-                const commitsResponse = await securedFetch(
-                    `${CONFIG.GITHUB_API_URL}/repos/${repo.owner.login}/${repo.name}/commits?per_page=10`
-                );
-                const commits = await commitsResponse.json();
-                return commits.map(commit => ({
-                    ...commit,
-                    repo: repo.name,
-                    repo_url: repo.html_url
-                }));
-            } catch (error) {
-                console.error(`Error fetching commits for ${repo.name}:`, error);
-                return [];
-            }
-        });
-
-        const allMerges = await Promise.all(mergePromises);
-        const merges = allMerges
-            .flat()
-            .sort((a, b) => new Date(b.commit.author.date) - new Date(a.commit.author.date))
-            .slice(0, 10); // Show only the 10 most recent merges
-
-        displayMerges(merges);
-    } catch (error) {
-        console.error('Error fetching merges:', error);
-    }
-}
-
-function displayMerges(merges) {
-    const timelineContainer = document.getElementById('merges-timeline');
-    timelineContainer.innerHTML = merges.map((merge, index) => {
-        const date = new Date(merge.commit.author.date).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        });
-
-        return `
-            <div class="merge-item" style="animation-delay: ${index * 0.2}s">
-                <div class="merge-content">
-                    <div class="merge-header">
-                        <img src="${merge.author?.avatar_url || 'assets/img/default-avatar.png'}" 
-                             alt="${merge.commit.author.name}" 
-                             class="merge-avatar">
-                        <div class="merge-info">
-                            <div class="merge-author">${merge.commit.author.name}</div>
-                            <div class="merge-date">${date}</div>
-                        </div>
-                    </div>
-                    <h3 class="merge-title">${merge.commit.message}</h3>
-                    <a href="${merge.repo_url}" class="merge-repo" target="_blank">
-                        <i class='bx bx-git-repo-forked'></i>
-                        ${merge.repo}
-                    </a>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    // Add intersection observer for animation
-    const mergeItems = document.querySelectorAll('.merge-item');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.1 });
-
-    mergeItems.forEach(item => observer.observe(item));
-}
-
-async function fetchPushEvents(username) {
-    try {
-        const response = await securedFetch(`${CONFIG.GITHUB_API_URL}/users/${username}/events`);
-        const events = await response.json();
-        const pushEvents = events.filter(event => event.type === 'PushEvent');
-        displayPushEvents(pushEvents.slice(0, 5));
-    } catch (error) {
-        console.error('Failed to fetch push events:', error);
-    }
-}
-
-async function fetchPullRequests(username) {
-    try {
-        const response = await securedFetch(`${CONFIG.GITHUB_API_URL}/search/issues?q=type:pr+author:${username}`);
-        const data = await response.json();
-        displayPullRequests(data.items.slice(0, 5));
-    } catch (error) {
-        console.error('Failed to fetch pull requests:', error);
-    }
-}
-
-async function fetchIssues(username) {
-    try {
-        const response = await securedFetch(`${CONFIG.GITHUB_API_URL}/search/issues?q=type:issue+author:${username}`);
-        const data = await response.json();
-        displayIssues(data.items.slice(0, 5));
-    } catch (error) {
-        console.error('Failed to fetch issues:', error);
-    }
-}
-
-function displayPushEvents(events) {
-    const container = document.querySelector('.activities-grid');
-    const pushSection = createActivitySection('Recent Pushes', events, (event) => `
-        <div class="activity-card push-card">
-            <div class="activity-card__header">
-                <i class='bx bx-git-commit activity-card__icon'></i>
-                <span class="activity-card__date">${formatDate(event.created_at)}</span>
-            </div>
-            <h4 class="activity-card__title">${event.repo.name}</h4>
-            <div class="activity-card__commits">
-                ${event.payload.commits?.map(commit => `
-                    <p class="commit-message">
-                        <i class='bx bx-code-commit'></i>
-                        ${commit.message}
-                    </p>
-                `).join('') || ''}
-            </div>
-        </div>
-    `);
-    container.appendChild(pushSection);
-}
-
-function displayPullRequests(prs) {
-    const container = document.querySelector('.activities-grid');
-    const prSection = createActivitySection('Pull Requests', prs, (pr) => `
-        <div class="activity-card pr-card">
-            <div class="activity-card__header">
-                <i class='bx bx-git-pull-request activity-card__icon'></i>
-                <span class="activity-card__status ${pr.state}">${pr.state}</span>
-                <span class="activity-card__date">${formatDate(pr.created_at)}</span>
-            </div>
-            <h4 class="activity-card__title">
-                <a href="${pr.html_url}" target="_blank">${pr.title}</a>
-            </h4>
-            <p class="activity-card__repo">${pr.repository_url.split('/').slice(-1)}</p>
-        </div>
-    `);
-    container.appendChild(prSection);
-}
-
-function displayIssues(issues) {
-    const container = document.querySelector('.activities-grid');
-    const issueSection = createActivitySection('Issues', issues, (issue) => `
-        <div class="activity-card issue-card">
-            <div class="activity-card__header">
-                <i class='bx bx-error-circle activity-card__icon'></i>
-                <span class="activity-card__status ${issue.state}">${issue.state}</span>
-                <span class="activity-card__date">${formatDate(issue.created_at)}</span>
-            </div>
-            <h4 class="activity-card__title">
-                <a href="${issue.html_url}" target="_blank">${issue.title}</a>
-            </h4>
-            <p class="activity-card__repo">${issue.repository_url.split('/').slice(-1)}</p>
-            ${issue.labels.length ? `
-                <div class="activity-card__labels">
-                    ${issue.labels.map(label => `
-                        <span class="label" style="background: #${label.color}">${label.name}</span>
-                    `).join('')}
-                </div>
-            ` : ''}
-        </div>
-    `);
-    container.appendChild(issueSection);
 }
 
 function createActivitySection(title, items, cardTemplate) {
@@ -466,22 +133,140 @@ function formatDate(dateString) {
     );
 }
 
-// Add loading states
-function showLoadingState(elementId) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.innerHTML = `
-            <div class="loading-spinner">
-                <div class="spinner"></div>
-                <p>Loading...</p>
-            </div>
-        `;
-    }
+// Initialize profile on page load
+document.addEventListener('DOMContentLoaded', () => {
+    fetchUserProfile().then(() => {
+        initializeAnimations();
+    });
+});
+
+function initializeAnimations() {
+    // Add animation classes when elements come into view
+    const observerCallback = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, {
+        threshold: 0.1
+    });
+
+    // Observe elements with animation classes
+    document.querySelectorAll('.animate-fade-in, .animate-slide-left, .animate-slide-right, .animate-fade-up')
+        .forEach(element => observer.observe(element));
 }
 
-// Initialize loading states
-document.addEventListener('DOMContentLoaded', () => {
-    const sections = ['profile-stats', 'activity-feed', 'contribution-graph'];
-    sections.forEach(showLoadingState);
-    fetchUserProfile();
-});
+function displayPullRequests(prs) {
+    const timeline = document.getElementById('prTimeline');
+    timeline.innerHTML = prs.map((pr, index) => {
+        const isDevSyncRepo = pr.isDevSyncRepo;
+        const statusClass = getStatusClass(pr);
+        const statusText = getStatusText(pr);
+
+        return `
+            <div class="pr-card" style="animation-delay: ${index * 0.2}s">
+                <div class="pr-status ${statusClass}">
+                    <i class='bx ${getStatusIcon(pr)}'></i>
+                    ${statusText}
+                </div>
+                <h3 class="pr-title">${pr.title}</h3>
+                <a href="${pr.url}" class="pr-repo" target="_blank">
+                    <i class='bx bxl-github'></i>
+                    ${pr.repository}
+                </a>
+                <div class="pr-date">
+                    <i class='bx bx-time-five'></i>
+                    ${formatDate(pr.createdAt)}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Initialize animations after adding PR cards
+    initializePRAnimations();
+}
+
+function getStatusClass(pr) {
+    if (!pr.isDevSyncRepo) return 'non-devsync';
+    if (pr.merged && !pr.isDevSyncDetected) return 'waiting';
+    if (pr.merged) return 'merged';
+    if (pr.closed) return 'closed';
+    return 'devsync';
+}
+
+function getStatusText(pr) {
+    if (!pr.isDevSyncRepo) return 'Not a DevSync Repository';
+    if (pr.merged && !pr.isDevSyncDetected) return 'Waiting for Approval';
+    if (pr.merged) return 'Successfully Merged';
+    if (pr.closed) return 'Closed';
+    return 'DevSync Repository';
+}
+
+function getStatusIcon(pr) {
+    if (!pr.isDevSyncRepo) return 'bx-x-circle';
+    if (pr.merged && !pr.isDevSyncDetected) return 'bx-time-five';
+    if (pr.merged) return 'bx-check-circle';
+    if (pr.closed) return 'bx-x-circle';
+    return 'bx-git-pull-request';
+}
+
+function initializePRAnimations() {
+    // Add scroll progress indicator
+    const scrollProgress = document.createElement('div');
+    scrollProgress.className = 'scroll-progress';
+    document.body.prepend(scrollProgress);
+
+    // Update scroll progress
+    window.addEventListener('scroll', () => {
+        const winScroll = document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        document.documentElement.style.setProperty('--scroll-percent', `${scrolled}%`);
+    });
+
+    // Initialize Intersection Observer for PR cards
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                // Add a small delay between each card animation
+                const index = Array.from(entry.target.parentNode.children).indexOf(entry.target);
+                entry.target.style.animationDelay = `${index * 0.1}s`;
+            }
+        });
+    }, {
+        threshold: 0.2,
+        rootMargin: '0px 0px -10% 0px'
+    });
+
+    // Observe PR cards
+    document.querySelectorAll('.pr-card').forEach(card => {
+        observer.observe(card);
+    });
+
+    // Add parallax effect to cards on mouse move
+    document.querySelector('.pr-timeline').addEventListener('mousemove', (e) => {
+        const cards = document.querySelectorAll('.pr-card');
+        cards.forEach(card => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const offsetX = ((x - rect.width / 2) / rect.width) * 10;
+            const offsetY = ((y - rect.height / 2) / rect.height) * 10;
+
+            card.style.transform = `perspective(1000px) rotateY(${offsetX}deg) rotateX(${-offsetY}deg) translateZ(10px)`;
+        });
+    });
+
+    // Reset card transform on mouse leave
+    document.querySelector('.pr-timeline').addEventListener('mouseleave', () => {
+        document.querySelectorAll('.pr-card').forEach(card => {
+            card.style.transform = '';
+        });
+    });
+}

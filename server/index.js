@@ -6,17 +6,20 @@ const GitHubStrategy = require('passport-github2').Strategy;
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
+const { Octokit } = require('@octokit/rest');
 const User = require('./models/User');
 const Repo = require('./models/Repo');
-const helmet = require('helmet');
-const config = require('./config');
+const MongoStore = require('connect-mongo');
 
 const app = express();
 
-// Enhanced security middleware
-app.use(helmet());
-app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
-app.use(helmet.hidePoweredBy());
+// DevSync program start date - all contributions are tracked from this date
+const PROGRAM_START_DATE = '2025-03-14';
+
+// Create authenticated Octokit instance
+const octokit = new Octokit({
+    auth: process.env.GITHUB_ACCESS_TOKEN
+});
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -24,15 +27,23 @@ mongoose.connect(process.env.MONGODB_URI)
     .catch(err => console.error('MongoDB connection error:', err));
 
 // Calculate points based on contributions from registered repos
-async function calculatePoints(mergedPRs, cancelledPRs) {
+async function calculatePoints(mergedPRs, userId) {
     try {
-        const registeredRepos = await Repo.find({}, 'repoLink');
-        const registeredRepoIds = registeredRepos.map(repo => repo.repoLink);
+        let totalPoints = 0;
 
-        const validMergedPRs = mergedPRs.filter(pr => registeredRepoIds.includes(pr.repoId));
-        const validCancelledPRs = cancelledPRs.filter(pr => registeredRepoIds.includes(pr.repoId));
+        // Calculate points for merged PRs only
+        for (const pr of mergedPRs) {
+            const repo = await Repo.findOne({ repoLink: pr.repoId });
+            if (repo) {
+                // Skip points if user is the maintainer
+                if (repo.userId === userId) {
+                    continue;
+                }
+                totalPoints += repo.successPoints || 50;
+            }
+        }
 
-        return (validMergedPRs.length * 10) + (validCancelledPRs.length * -2);
+        return totalPoints;
     } catch (error) {
         console.error('Error calculating points:', error);
         return 0;
@@ -73,16 +84,9 @@ async function updateUserPRStatus(userId, repoId, prData, status) {
                 title: prData.title,
                 mergedAt: new Date()
             });
-        } else if (status === 'cancelled') {
-            user.cancelledPRs.push({
-                repoId,
-                prNumber: prData.number,
-                title: prData.title,
-                cancelledAt: new Date()
-            });
         }
 
-        user.points = await calculatePoints(user.mergedPRs, user.cancelledPRs);
+        user.points = await calculatePoints(user.mergedPRs, user.githubId);
         user.badges = await checkBadges(user.mergedPRs, user.points);
 
         await user.save();
@@ -95,24 +99,31 @@ async function updateUserPRStatus(userId, repoId, prData, status) {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
 app.use(cors({
-    origin: config.corsOrigins,
+    origin: process.env.NODE_ENV === 'production'
+        ? [process.env.CLIENT_URL, 'https://github.com']
+        : ['http://localhost:5500', 'http://127.0.0.1:5500', 'https://github.com'],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['set-cookie']
 }));
 
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'your_session_secret',
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+        ttl: 24 * 60 * 60, // Session TTL in seconds (1 day)
+        autoRemove: 'native' // Enable automatic removal of expired sessions
+    }),
     cookie: {
         secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined,
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : 'localhost'
     },
-    name: 'sessionId' // Change default session cookie name
+    name: 'devsync.sid' // Custom session cookie name
 }));
 
 app.use(passport.initialize());
@@ -122,7 +133,9 @@ app.use(passport.session());
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: config.github.callbackURL
+    callbackURL: process.env.NODE_ENV === 'production'
+        ? `${process.env.API_URL}/auth/github/callback`
+        : 'http://localhost:3000/auth/github/callback'
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         let user = await User.findOne({ githubId: profile.id });
@@ -131,18 +144,24 @@ passport.use(new GitHubStrategy({
             user = await User.create({
                 githubId: profile.id,
                 username: profile.username,
-                displayName: profile.displayName,
+                displayName: profile.displayName || profile.username,
                 email: profile.emails?.[0]?.value || '',
                 avatarUrl: profile.photos?.[0]?.value || '',
                 mergedPRs: [],
                 cancelledPRs: [],
                 points: 0,
-                badges: ['Newcomer']
+                badges: ['Newcomer'],
+                accessToken // Store GitHub access token
             });
+        } else {
+            // Update access token on login
+            user.accessToken = accessToken;
+            await user.save();
         }
 
         return done(null, { ...profile, userData: user });
     } catch (error) {
+        console.error('Auth Error:', error);
         return done(error);
     }
 }));
@@ -156,9 +175,15 @@ app.get('/auth/github',
 );
 
 app.get('/auth/github/callback',
-    passport.authenticate('github', { failureRedirect: '/login' }),
+    passport.authenticate('github', {
+        failureRedirect: process.env.NODE_ENV === 'production'
+            ? `${process.env.CLIENT_URL}/login.html`
+            : 'http://localhost:5500/login.html'
+    }),
     (req, res) => {
-        res.redirect(process.env.FRONTEND_URL);
+        res.redirect(process.env.NODE_ENV === 'production'
+            ? `${process.env.CLIENT_URL}/`
+            : 'http://localhost:5500/');
     }
 );
 
@@ -200,50 +225,139 @@ app.get('/api/user/stats', async (req, res) => {
     }
 });
 
+// Add helper function to calculate trends
+async function calculateTrends(users) {
+    try {
+        // Get previous rankings from 24 hours ago
+        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const oldRankings = await User.find(
+            { 'mergedPRs.mergedAt': { $lt: oneDayAgo } },
+            'username points'
+        ).lean();
+
+        // Sort old rankings by points
+        const oldRanked = oldRankings.sort((a, b) => b.points - a.points);
+        const oldRankMap = new Map(oldRanked.map((user, index) => [user.username, index + 1]));
+
+        // Sort current users by points
+        const currentRanked = users.sort((a, b) => b.points - a.points);
+
+        // Calculate trend for each user
+        return currentRanked.map((user, currentRank) => {
+            const oldRank = oldRankMap.get(user.username) || currentRank + 1;
+            const rankChange = oldRank - (currentRank + 1);
+            const trend = oldRank !== 0 ? Math.round((rankChange / oldRank) * 100) : 0;
+            return {
+                ...user,
+                trend
+            };
+        });
+    } catch (error) {
+        console.error('Error calculating trends:', error);
+        return users.map(user => ({ ...user, trend: 0 }));
+    }
+}
+
+// Update leaderboard endpoint
 app.get('/api/leaderboard', async (req, res) => {
     try {
-        const users = await User.find({})
-            .sort('-points')
-            .limit(10)
-            .select('username points badges mergedPRs');
+        // Add cache control headers
+        res.set({
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        });
 
-        const leaderboard = users.map((user, index) => ({
-            rank: index + 1,
+        const users = await User.find({})
+            .select('username points badges mergedPRs')
+            .lean();
+
+        // Format user data with required fields only
+        let formattedUsers = users.map(user => ({
             username: user.username,
-            points: user.points,
-            badges: user.badges,
-            mergedPRs: user.mergedPRs.length
+            points: user.points || 0,
+            mergedPRs: (user.mergedPRs || []).map(pr => ({
+                title: pr.title,
+                mergedAt: pr.mergedAt
+            })),
+            badges: user.badges || ['Newcomer'],
+            trend: 0
         }));
 
-        res.json(leaderboard);
+        // Calculate and add trends
+        formattedUsers = await calculateTrends(formattedUsers);
+
+        // Sort by points and add ranks
+        formattedUsers.sort((a, b) => b.points - a.points);
+        formattedUsers = formattedUsers.map((user, index) => ({
+            ...user,
+            rank: index + 1
+        }));
+
+        res.json(formattedUsers);
     } catch (error) {
+        console.error('Error fetching leaderboard:', error);
         res.status(500).json({ error: 'Failed to fetch leaderboard' });
+    }
+});
+
+// Add global stats endpoint
+app.get('/api/stats/global', async (req, res) => {
+    try {
+        // Get all users and accepted repos
+        const [users, acceptedRepos] = await Promise.all([
+            User.find({}),
+            Repo.find({ reviewStatus: 'accepted' })
+        ]);
+
+        // Calculate total merged PRs
+        const totalMergedPRs = users.reduce((total, user) => total + user.mergedPRs.length, 0);
+
+        // Count active users (users with at least 1 merged PR)
+        const activeUsers = users.filter(user => user.mergedPRs.length > 0).length;
+
+        // Count registered repos
+        const registeredRepos = acceptedRepos.length;
+
+        res.json({
+            totalMergedPRs,
+            activeUsers,
+            registeredRepos
+        });
+    } catch (error) {
+        console.error('Error fetching global stats:', error);
+        res.status(500).json({ error: 'Failed to fetch global stats' });
     }
 });
 
 app.get('/logout', (req, res) => {
     req.logout();
-    res.redirect(process.env.FRONTEND_URL);
+    res.redirect(process.env.NODE_ENV === 'production'
+        ? `${process.env.CLIENT_URL}/login.html`
+        : 'http://localhost:5500/login.html');
 });
 
-// GitHub API routes
+// Update GitHub API routes with Octokit
 app.get('/api/github/user/:username', async (req, res) => {
     try {
-        const response = await fetch(`https://api.github.com/users/${req.params.username}`, {
-            headers: {
-                'Authorization': `token ${req.user.accessToken}`
-            }
+        const { data: userData } = await octokit.users.getByUsername({
+            username: req.params.username
         });
-        const userData = await response.json();
 
-        const contributionsResponse = await fetch(
-            `https://github-contributions-api.now.sh/v1/${req.params.username}`
-        );
-        const contributionsData = await contributionsResponse.json();
+        // Get user's contributions using GraphQL API
+        const { data: contributionsData } = await octokit.graphql(`
+            query($username: String!) {
+                user(login: $username) {
+                    contributionsCollection {
+                        totalCommitContributions
+                    }
+                }
+            }
+        `, { username: req.params.username });
 
         res.json({
             ...userData,
-            contributions: contributionsData.total
+            contributions: contributionsData.user.contributionsCollection.totalCommitContributions
         });
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch GitHub data' });
@@ -262,29 +376,571 @@ app.get('/api/github/contributions/:username', async (req, res) => {
     }
 });
 
-// Project submission route
+// Add this helper function near other helpers
+async function normalizeAndValidateGitHubUrl(url) {
+    try {
+        // Handle URLs without protocol
+        if (!url.startsWith('http')) {
+            url = 'https://' + url;
+        }
+
+        const urlObj = new URL(url);
+        if (!urlObj.hostname.toLowerCase().endsWith('github.com')) {
+            throw new Error('Not a GitHub repository URL');
+        }
+
+        // Clean and split path
+        const cleanPath = urlObj.pathname
+            .toLowerCase()                    // Convert to lowercase
+            .replace(/\.git$/, '')           // Remove .git suffix
+            .replace(/\/$/, '')              // Remove trailing slash
+            .split('/')
+            .filter(Boolean);                // Remove empty parts
+
+        if (cleanPath.length < 2) {
+            throw new Error('Invalid repository URL format');
+        }
+
+        const [owner, repo] = cleanPath;
+
+        // Verify repo exists and is public using Octokit
+        try {
+            const { data: repoData } = await octokit.repos.get({
+                owner,
+                repo
+            });
+
+            if (repoData.private) {
+                throw new Error('Private repositories are not allowed');
+            }
+
+            // Return canonical URL format using actual case from GitHub API
+            return `https://github.com/${repoData.owner.login}/${repoData.name}`;
+        } catch (error) {
+            if (error.status === 404) {
+                throw new Error('Repository not found');
+            }
+            throw error;
+        }
+    } catch (error) {
+        if (error instanceof TypeError) {
+            throw new Error('Invalid URL format');
+        }
+        throw error;
+    }
+}
+
+// Update the project submission route
 app.post('/api/projects', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
     try {
+        let { repoLink, ownerName, technology, description } = req.body;
+
+        if (!repoLink || !ownerName || !technology || !description) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        // Normalize and validate repository URL
+        try {
+            repoLink = await normalizeAndValidateGitHubUrl(repoLink);
+        } catch (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        // Case-insensitive check for duplicate repository using normalized URL
+        const existingProject = await Repo.findOne({
+            repoLink: {
+                $regex: new RegExp(`^${repoLink.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i')
+            }
+        });
+
+        if (existingProject) {
+            return res.status(400).json({
+                error: 'This repository has already been submitted',
+                status: existingProject.reviewStatus,
+                submitDate: existingProject.submittedAt,
+                submittedBy: existingProject.ownerName
+            });
+        }
+
+        // Create project with normalized URL
         const projectData = {
-            ...req.body,
+            repoLink,
+            ownerName,
+            technology,
+            description,
             userId: req.user.id,
             submittedAt: new Date()
         };
 
-        if (!projectData.repoLink || !projectData.ownerName || !projectData.technology || !projectData.description) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
-
         const project = await Repo.create(projectData);
         res.status(200).json({ success: true, project });
+
     } catch (error) {
         console.error('Error saving project:', error);
         res.status(500).json({ error: 'Failed to save project' });
     }
+});
+
+// Delete project route
+app.delete('/api/projects/:projectId', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    try {
+        const project = await Repo.findById(req.params.projectId);
+
+        if (!project) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        // Check if user is admin
+        const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+        const isAdmin = adminIds.includes(req.user.username);
+
+        // Allow deletion if user owns the project OR is an admin
+        if (project.userId.toString() !== req.user.id && !isAdmin) {
+            return res.status(403).json({ error: 'Not authorized to delete this project' });
+        }
+
+        await Repo.findByIdAndDelete(req.params.projectId);
+        res.status(200).json({ message: 'Project deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting project:', error);
+        res.status(500).json({ error: 'Failed to delete project' });
+    }
+});
+
+// Get all accepted projects
+app.get('/api/accepted-projects', async (req, res) => {
+    try {
+        const projects = await Repo.find({ reviewStatus: 'accepted' })
+            .select('repoLink ownerName technology description reviewStatus reviewedAt')
+            .sort({ submittedAt: -1 });
+        res.json(projects);
+    } catch (error) {
+        console.error('Error fetching accepted projects:', error);
+        res.status(500).json({ error: 'Failed to fetch projects' });
+    }
+});
+
+// Get user's projects
+app.get('/api/projects/:userId', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    try {
+        // Verify the requested userId matches the authenticated user's id
+        if (req.params.userId !== req.user.id) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+
+        const projects = await Repo.find({ userId: req.params.userId })
+            .select('repoLink ownerName technology description reviewStatus reviewedAt')
+            .sort({ submittedAt: -1 });
+        res.json(projects);
+    } catch (error) {
+        console.error('Error fetching user projects:', error);
+        res.status(500).json({ error: 'Failed to fetch projects' });
+    }
+});
+
+// Admin verification endpoint
+app.get('/api/admin/verify', (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ isAdmin: false });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    const isAdmin = adminIds.includes(req.user.username);
+
+    res.json({ isAdmin });
+});
+
+// Admin projects endpoint
+app.get('/api/admin/projects', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const allProjects = await Repo.find({}).sort({ submittedAt: -1 });
+        res.json(allProjects);
+    } catch (error) {
+        console.error('Error fetching all projects:', error);
+        res.status(500).json({ error: 'Failed to fetch projects' });
+    }
+});
+
+// Add review project endpoint
+app.post('/api/admin/projects/:projectId/review', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { status } = req.body;
+        if (!['accepted', 'rejected'].includes(status)) {
+            return res.status(400).json({ error: 'Invalid review status' });
+        }
+
+        const project = await Repo.findByIdAndUpdate(
+            req.params.projectId,
+            {
+                reviewStatus: status,
+                reviewedAt: new Date(),
+                reviewedBy: req.user.username
+            },
+            { new: true }
+        );
+
+        if (!project) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        res.json(project);
+    } catch (error) {
+        console.error('Error reviewing project:', error);
+        res.status(500).json({ error: 'Failed to review project' });
+    }
+});
+
+// Update points update endpoint
+app.patch('/api/admin/projects/:projectId/points', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { successPoints } = req.body;
+
+        const project = await Repo.findByIdAndUpdate(
+            req.params.projectId,
+            {
+                successPoints
+            },
+            { new: true }
+        );
+
+        if (!project) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        res.json(project);
+    } catch (error) {
+        console.error('Error updating project points:', error);
+        res.status(500).json({ error: 'Failed to update project points' });
+    }
+});
+
+// Helper function to check if repo is registered and accepted
+async function isRegisteredRepo(repoFullName) {
+    const repoUrl = `https://github.com/${repoFullName}`;
+    const repo = await Repo.find({
+        repoLink: repoUrl,
+        reviewStatus: 'accepted'
+    });
+    return repo ? repo : null;
+}
+
+// Helper function to fetch PR details using Octokit
+async function fetchPRDetails(username) {
+    try {
+        const { data } = await octokit.search.issuesAndPullRequests({
+            q: `type:pr+author:${username}+is:merged+created:>=${PROGRAM_START_DATE}`,
+            per_page: 100
+        });
+
+        return data;
+    } catch (error) {
+        console.error(`Error fetching PRs for ${username}:`, error);
+        return { items: [] };
+    }
+}
+
+// Update PR status check endpoint
+app.get('/api/github/prs/update', async (req, res) => {
+    try {
+        const users = await User.find({});
+        const results = [];
+
+        const acceptedRepos = await Repo.find({
+            reviewStatus: 'accepted'
+        }, 'repoLink successPoints userId');
+
+        for (const user of users) {
+            try {
+                const prData = await fetchPRDetails(user.username);
+                const mergedPRs = [];
+
+                for (const pr of prData.items) {
+                    try {
+                        const [owner, repo] = pr.repository_url.split('/repos/')[1].split('/');
+                        const repoUrl = `https://github.com/${owner}/${repo}`;
+
+                        const registeredRepo = acceptedRepos.find(repo => repo.repoLink === repoUrl);
+
+                        if (registeredRepo) {
+                            // Get detailed PR info using Octokit
+                            const { data: prDetails } = await octokit.pulls.get({
+                                owner,
+                                repo,
+                                pull_number: pr.number
+                            });
+
+                            if (prDetails.merged) {
+                                mergedPRs.push({
+                                    repoId: repoUrl,
+                                    prNumber: pr.number,
+                                    title: pr.title,
+                                    mergedAt: prDetails.merged_at
+                                });
+                            }
+                        }
+                    } catch (prError) {
+                        console.error(`Error processing PR ${pr.number}:`, prError);
+                        continue;
+                    }
+                }
+
+                // Update user's data
+                user.mergedPRs = mergedPRs;
+                user.points = await calculatePoints(mergedPRs, user.githubId);
+                user.badges = await checkBadges(mergedPRs, user.points);
+                await user.save();
+
+                results.push({
+                    username: user.username,
+                    status: 'success',
+                    mergedCount: mergedPRs.length,
+                    points: user.points
+                });
+
+            } catch (userError) {
+                console.error(`Error processing user ${user.username}:`, userError);
+                results.push({
+                    username: user.username,
+                    status: 'error',
+                    error: userError.message
+                });
+                continue;
+            }
+        }
+
+        res.json({
+            message: 'PR status update completed',
+            results
+        });
+
+    } catch (error) {
+        console.error('Error in PR status update:', error);
+        res.status(500).json({
+            error: 'Failed to update PR status',
+            details: error.message
+        });
+    }
+});
+
+// Add automatic PR status and leaderboard update
+setInterval(async () => {
+    try {
+        const response = await fetch(`http://localhost:${process.env.PORT}/api/github/prs/update`);
+
+        if (!response.ok) {
+            throw new Error(`Update failed with status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Scheduled update completed:', result);
+    } catch (error) {
+        console.error('Scheduled update failed:', error);
+    }
+}, 5 * 60 * 1000); // Every 5 minutes
+
+// Enhanced GitHub API routes with Octokit
+app.get('/api/github/user/:username', async (req, res) => {
+    try {
+        // Get basic user data
+        const { data: userData } = await octokit.users.getByUsername({
+            username: req.params.username
+        });
+
+        // Get contribution data using GraphQL
+        const { data: { user } } = await octokit.graphql(`
+            query($username: String!) {
+                user(login: $username) {
+                    contributionsCollection {
+                        totalCommitContributions
+                        contributionCalendar {
+                            totalContributions
+                            weeks {
+                                contributionDays {
+                                    contributionCount
+                                    date
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        `, {
+            username: req.params.username
+        });
+
+        res.json({
+            ...userData,
+            contributions: user.contributionsCollection
+        });
+    } catch (error) {
+        console.error('Error fetching GitHub user data:', error);
+        res.status(500).json({ error: 'Failed to fetch GitHub data' });
+    }
+});
+
+app.get('/api/github/events/:username/pushes', async (req, res) => {
+    try {
+        const { data } = await octokit.activity.listPublicEventsForUser({
+            username: req.params.username,
+            per_page: 10
+        });
+
+        const pushEvents = data.filter(event => event.type === 'PushEvent');
+        res.json(pushEvents);
+    } catch (error) {
+        console.error('Error fetching push events:', error);
+        res.status(500).json({ error: 'Failed to fetch push events' });
+    }
+});
+
+app.get('/api/github/events/:username/prs', async (req, res) => {
+    try {
+        const { data } = await octokit.search.issuesAndPullRequests({
+            q: `type:pr+author:${req.params.username}`,
+            per_page: 10,
+            sort: 'updated',
+            order: 'desc'
+        });
+        res.json(data.items);
+    } catch (error) {
+        console.error('Error fetching PRs:', error);
+        res.status(500).json({ error: 'Failed to fetch pull requests' });
+    }
+});
+
+app.get('/api/github/events/:username/merges', async (req, res) => {
+    try {
+        const { data } = await octokit.search.issuesAndPullRequests({
+            q: `type:pr+author:${req.params.username}+is:merged`,
+            per_page: 10,
+            sort: 'updated',
+            order: 'desc'
+        });
+        res.json(data.items);
+    } catch (error) {
+        console.error('Error fetching merges:', error);
+        res.status(500).json({ error: 'Failed to fetch merged PRs' });
+    }
+});
+
+// Add new comprehensive user profile endpoint
+app.get('/api/user/profile/:username', async (req, res) => {
+    try {
+        // Get GitHub user data and DevSync data
+        const [userData, acceptedRepos, user] = await Promise.all([
+            octokit.users.getByUsername({ username: req.params.username }),
+            Repo.find({ reviewStatus: 'accepted' }, 'repoLink'),
+            User.findOne({ username: req.params.username }, 'mergedPRs')
+        ]);
+
+        const { data } = await octokit.search.issuesAndPullRequests({
+            q: `type:pr+author:${req.params.username}+created:>=${PROGRAM_START_DATE}`,
+            per_page: 10,
+            sort: 'updated',
+            order: 'desc'
+        });
+
+        const pullRequests = await Promise.all(data.items.map(async (pr) => {
+            const repoUrl = `https://github.com/${pr.repository_url.split('/repos/')[1]}`;
+            const isDevSyncRepo = acceptedRepos.some(repo => repo.repoLink === repoUrl);
+
+            // Get additional PR details
+            const [owner, repo] = pr.repository_url.split('/repos/')[1].split('/');
+            const { data: prDetails } = await octokit.pulls.get({
+                owner,
+                repo,
+                pull_number: pr.number
+            });
+
+            // Check if PR is detected by DevSync
+            const isDevSyncDetected = user?.mergedPRs.some(
+                mergedPr => mergedPr.repoId === repoUrl && mergedPr.prNumber === pr.number
+            );
+
+            return {
+                id: pr.id,
+                title: pr.title,
+                number: pr.number,
+                state: pr.state,
+                createdAt: pr.created_at,
+                url: pr.html_url,
+                repository: pr.repository_url.split('/repos/')[1],
+                isDevSyncRepo,
+                merged: prDetails.merged,
+                closed: pr.state === 'closed' && !prDetails.merged,
+                isDevSyncDetected: isDevSyncRepo ? isDevSyncDetected : false
+            };
+        }));
+
+        const profileData = {
+            ...userData.data,
+            pullRequests,
+            programStartDate: PROGRAM_START_DATE // Add start date to response
+        };
+
+        res.json(profileData);
+    } catch (error) {
+        console.error('Error fetching profile data:', error);
+        res.status(500).json({ error: 'Failed to fetch profile data' });
+    }
+});
+
+// Add security headers middleware
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    next();
+});
+
+// Add error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Server Error:', err);
+    res.status(500).json({
+        error: process.env.NODE_ENV === 'production'
+            ? 'Internal server error'
+            : err.message
+    });
 });
 
 // Initialize and start server

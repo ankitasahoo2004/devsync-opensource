@@ -1,7 +1,30 @@
 /*=============== SHOW MENU ===============*/
-const navMenu = document.getElementById('nav-menu'),
-    navToggle = document.getElementById('nav-toggle'),
-    navClose = document.getElementById('nav-close')
+const navMenu = document.querySelector('.nav__menu'),
+    navToggle = document.getElementById('nav-toggle')
+
+if (navToggle) {
+    navToggle.addEventListener('click', () => {
+        navMenu.classList.toggle('show-menu')
+        navToggle.classList.toggle('active')
+    })
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav__menu') && !e.target.closest('.nav__toggle')) {
+            navMenu.classList.remove('show-menu')
+            navToggle.classList.remove('active')
+        }
+    })
+
+    // Add smooth transition when menu items are clicked
+    const navLinks = document.querySelectorAll('.nav__link')
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            navMenu.classList.remove('show-menu')
+            navToggle.classList.remove('active')
+        })
+    })
+}
 
 /*===== MENU SHOW =====*/
 /* Validate if constant exists */
@@ -43,8 +66,12 @@ let homeSwiper = new Swiper(".home-swiper", {
 /*=============== CHANGE BACKGROUND HEADER ===============*/
 function scrollHeader() {
     const header = document.getElementById('header')
-    // When the scroll is greater than 50 viewport height, add the scroll-header class to the header tag
-    if (this.scrollY >= 50) header.classList.add('scroll-header'); else header.classList.remove('scroll-header')
+    const nav = document.querySelector('.nav');
+    if (this.scrollY >= 50) {
+        nav.classList.add('scroll-header');
+    } else {
+        nav.classList.remove('scroll-header');
+    }
 }
 window.addEventListener('scroll', scrollHeader)
 
@@ -174,11 +201,13 @@ function updateNavigation() {
                         <a href="/login" class="nav__link">Login</a>
                     </li>`;
             } else {
-                // Replace login with profile pic
+                // Replace login with profile pic and shortened name
+                const displayName = user.displayName.split(' ')[0]; // Show only first name
                 nav.innerHTML = nav.innerHTML.replace(
                     `<a href="/login" class="nav__link">Login</a>`,
-                    `<a href="/profile" class="nav__link">
+                    `<a href="/profile" class="nav__profile">
                         <img src="${user.photos[0].value}" alt="Profile" class="nav__profile-img">
+                        <span class="nav__profile-name">${displayName}</span>
                     </a>`
                 );
             }
@@ -215,64 +244,3 @@ if (window.location.pathname === '/profile') {
 
 // Initialize navigation state
 document.addEventListener('DOMContentLoaded', updateNavigation);
-
-/*=============== AUTH STATE MANAGEMENT ===============*/
-function updateAuthState(user) {
-    const authButtons = document.querySelectorAll('.auth-button');
-    const profileMenus = document.querySelectorAll('.profile-menu');
-
-    if (user) {
-        // Update UI for logged in state
-        authButtons.forEach(btn => {
-            btn.innerHTML = `
-                <img src="${user.photos[0].value}" alt="${user.displayName}" class="nav__profile-img">
-                <span class="nav__profile-name">${user.displayName}</span>
-            `;
-            btn.href = "profile.html";
-        });
-
-        profileMenus.forEach(menu => menu.classList.remove('hidden'));
-    } else {
-        // Update UI for logged out state
-        authButtons.forEach(btn => {
-            btn.innerHTML = `<i class='bx bx-log-in-circle'></i> Login`;
-            btn.href = "login.html";
-        });
-
-        profileMenus.forEach(menu => menu.classList.add('hidden'));
-    }
-}
-
-// Check auth state when page loads
-document.addEventListener('DOMContentLoaded', async () => {
-    // ...existing DOMContentLoaded code...
-
-    try {
-        const response = await fetch('http://localhost:3000/api/user', {
-            credentials: 'include'
-        });
-        const data = await response.json();
-
-        if (data.isAuthenticated) {
-            updateAuthState(data.user);
-        }
-    } catch (error) {
-        console.error('Failed to check auth status:', error);
-    }
-});
-
-// Add logout handler
-document.querySelectorAll('.logout-button').forEach(button => {
-    button.addEventListener('click', async (e) => {
-        e.preventDefault();
-
-        try {
-            await fetch('http://localhost:3000/logout', {
-                credentials: 'include'
-            });
-            window.location.href = 'index.html';
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
-    });
-});

@@ -1,3 +1,9 @@
+/* Variables */
+:root {
+    --first-color: #ff6347; /* Example color, replace with your actual color */
+}
+
+/* General Styles */
 .login-body {
     min-height: 100vh;
     background: linear-gradient(45deg, #0a0a0a, #1a1a1a);
@@ -42,6 +48,7 @@
 }
 
 .login__card {
+    display: flex;
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -92,6 +99,10 @@
     font-size: 1rem;
 }
 
+#login__header {
+    display: none;
+}
+
 /* GitHub Animation */
 .github-animation {
     position: relative;
@@ -135,18 +146,18 @@
 
 /* Login Button */
 .login__button {
+    height: 220px;
+    width: 550px;
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     gap: 1rem;
+    margin-top: 90px;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     padding: 1rem;
     border-radius: 12px;
     color: #ffffff;
     font-size: 1.1rem;
-    font-weight: 500;
+    font-weight: 600;
     overflow: hidden;
     transition: all 0.3s ease;
 }
@@ -227,15 +238,6 @@
     }
     50% {
         transform: translateY(-10px);
-    }
-}
-
-@keyframes logoSpin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
     }
 }
 
