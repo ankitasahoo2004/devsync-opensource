@@ -5,17 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - DevSync</title>
+
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/login.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+
+    <!-- Config File -->
     <script src="assets/js/config.js"></script>
-    <script>
-        // Update the login button href dynamically
-        document.addEventListener('DOMContentLoaded', () => {
-            const loginBtn = document.querySelector('.login__button');
-            loginBtn.href = config.GITHUB_AUTH_URL;
-        });
-    </script>
 </head>
 
 <body class="login-body">
@@ -33,27 +30,16 @@
 
     <div class="login__container container">
         <div class="login__card">
-
             <div class="login__header">
-                <div class="login__logo">
+                <div class="login__logo" id="login__header">
                     <img src="./assets/img/logo.png" alt="DevSync Logo" class="logo__img">
                     <span class="logo__text">DevSync</span>
-                </div id="login__header">
-
-                <!-- <h1 class="login__title">Welcome !!!</h1>
-                <p class="login__subtitle">Register to be a part of Devsync</p> -->
+                </div>
                 <img src="assets/img/home1-img.png" alt="">
             </div>
 
-            <!-- <div class="login__content">
-                <div class="github-animation">
-                    <div class="github-mark"></div>
-                    <div class="github-orbit">
-                        <div class="satellite"></div>
-                    </div>
-                </div> -->
-
-            <a href="https://devsync-fpekg0cggua3abdp.centralus-01.azurewebsites.net/auth/github" class="login__button">
+            <!-- GitHub Login Button -->
+            <a href="http://localhost:8000/auth/github" class="login__button">
                 <i class='bx bxl-github'></i>
                 <span>Continue with GitHub</span>
                 <div class="button__overlay"></div>
@@ -69,10 +55,25 @@
             </div>
         </div>
     </div>
-    </div>
 
     <div class="particles"></div>
+
+    <!-- JavaScript Files -->
     <script src="assets/js/login.js"></script>
+
+    <!-- Dynamic GitHub Auth URL Update -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof config !== 'undefined' && config.GITHUB_AUTH_URL) {
+                const loginBtn = document.querySelector('.login__button');
+                if (loginBtn) {
+                    loginBtn.href = config.GITHUB_AUTH_URL;
+                }
+            } else {
+                console.error("config.js is not loaded or GITHUB_AUTH_URL is undefined");
+            }
+        });
+    </script>
 </body>
 
 </html>
