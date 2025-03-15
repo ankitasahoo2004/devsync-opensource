@@ -71,41 +71,18 @@ async function checkBadges(mergedPRs, points) {
     }
 }
 
-// Update user data when PRs are merged or cancelled
-async function updateUserPRStatus(userId, repoId, prData, status) {
-    try {
-        const user = await User.findOne({ githubId: userId });
-        if (!user) return;
-
-        if (status === 'merged') {
-            user.mergedPRs.push({
-                repoId,
-                prNumber: prData.number,
-                title: prData.title,
-                mergedAt: new Date()
-            });
-        }
-
-        user.points = await calculatePoints(user.mergedPRs, user.githubId);
-        user.badges = await checkBadges(user.mergedPRs, user.points);
-
-        await user.save();
-    } catch (error) {
-        console.error('Error updating user PR status:', error);
-    }
-}
 
 // Middleware setup
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
-app.use(cors({
-    origin: process.env.NODE_ENV === 'production'
-        ? [process.env.CLIENT_URL, 'https://github.com']
-        : ['http://localhost:5500', 'http://127.0.0.1:5500', 'https://github.com'],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+// app.use(cors({
+//     origin: process.env.NODE_ENV === 'production'
+//         ? [process.env.CLIENT_URL, 'https://github.com']
+//         : ['http://localhost:5500', 'http://127.0.0.1:5500', 'https://github.com'],
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+// }));
 
 // Update CORS configuration
 app.use(cors({
@@ -697,6 +674,7 @@ async function isRegisteredRepo(repoFullName) {
     });
     return repo ? repo : null;
 }
+
 
 // Helper function to fetch PR details using Octokit
 async function fetchPRDetails(username) {
