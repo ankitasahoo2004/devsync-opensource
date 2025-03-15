@@ -107,6 +107,20 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
+// Update CORS configuration
+app.use(cors({
+    origin: [
+        process.env.CLIENT_URL,
+        'https://sayan-dev731.github.io',
+        'https://github.com'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    exposedHeaders: ['Set-Cookie'],
+    preflightContinue: true
+}));
+
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your_session_secret',
     resave: false,
@@ -126,6 +140,25 @@ app.use(session({
     name: 'devsync.sid' // Custom session cookie name
 }));
 
+// Update session configuration
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+        ttl: 24 * 60 * 60
+    }),
+    cookie: {
+        secure: true, // Required for cross-domain cookies
+        httpOnly: true,
+        sameSite: 'none', // Required for cross-domain cookies
+        maxAge: 24 * 60 * 60 * 1000,
+        domain: '.azurewebsites.net' // Allow cookies for all azurewebsites.net subdomains
+    },
+    proxy: true
+}));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -133,9 +166,7 @@ app.use(passport.session());
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: process.env.NODE_ENV === 'production'
-        ? `${process.env.API_URL}/auth/github/callback`
-        : 'http://localhost:3000/auth/github/callback'
+    callbackURL: process.env.GITHUB_CALLBACK_URL // Use the full callback URL from env
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         let user = await User.findOne({ githubId: profile.id });
@@ -171,19 +202,23 @@ passport.deserializeUser((user, done) => done(null, user));
 
 // Auth routes
 app.get('/auth/github',
-    passport.authenticate('github', { scope: ['user'] })
+    (req, res, next) => {
+        console.log('Starting GitHub auth...');
+        passport.authenticate('github', {
+            scope: ['user'],
+            session: true
+        })(req, res, next);
+    }
 );
 
 app.get('/auth/github/callback',
-    passport.authenticate('github', {
-        failureRedirect: process.env.NODE_ENV === 'production'
-            ? `${process.env.CLIENT_URL}/login.html`
-            : 'http://localhost:5500/login.html'
-    }),
-    (req, res) => {
-        res.redirect(process.env.NODE_ENV === 'production'
-            ? `${process.env.CLIENT_URL}/`
-            : 'http://localhost:5500/');
+    (req, res, next) => {
+        console.log('Received callback from GitHub...');
+        passport.authenticate('github', {
+            failureRedirect: `${process.env.CLIENT_URL}/login.html`,
+            successRedirect: process.env.CLIENT_URL,
+            session: true
+        })(req, res, next);
     }
 );
 
@@ -943,12 +978,45 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Add error logging middleware
+app.use((req, res, next) => {
+    const oldSend = res.send;
+    res.send = function (data) {
+        console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - Status: ${res.statusCode}`);
+        return oldSend.apply(res, arguments);
+    };
+    next();
+});
+
 // Initialize and start server
 async function start() {
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-    });
+    try {
+        // Ensure MongoDB connection before starting server
+        await mongoose.connect(process.env.MONGODB_URI);
+        console.log('Connected to MongoDB');
+
+        // Use WEBSITES_PORT for Azure or fallback to PORT/3000
+        const PORT = process.env.WEBSITES_PORT || process.env.PORT || 3000;
+
+        const server = app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+
+        // Add error handlers
+        server.on('error', (error) => {
+            console.error('Server error:', error);
+            process.exit(1);
+        });
+
+        process.on('unhandledRejection', (error) => {
+            console.error('Unhandled Rejection:', error);
+            process.exit(1);
+        });
+
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
 }
 
 start();

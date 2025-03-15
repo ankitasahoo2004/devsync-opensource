@@ -3,8 +3,19 @@ const API_BASE_URL = 'https://devsync-fpekg0cggua3abdp.centralus-01.azurewebsite
 async function checkAuthStatus() {
     try {
         const response = await fetch(`${API_BASE_URL}/api/user`, {
-            credentials: 'include'
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            mode: 'cors'
         });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         return data;
     } catch (error) {
@@ -13,9 +24,10 @@ async function checkAuthStatus() {
     }
 }
 
-// Update login redirect
+// Update login redirect to use SameSite=None cookie
 function redirectToGitHubLogin() {
-    window.location.href = `${API_BASE_URL}/auth/github`;
+    const loginUrl = `${API_BASE_URL}/auth/github`;
+    window.location.href = loginUrl;
 }
 
 async function updateLoginButton() {
