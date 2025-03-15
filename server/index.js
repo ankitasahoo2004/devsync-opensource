@@ -4,6 +4,7 @@ const session = require('express-session');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
 const cors = require('cors');
+const fetch = require('node-fetch');
 const mongoose = require('mongoose');
 const path = require('path');
 const { Octokit } = require('@octokit/rest');
@@ -200,20 +201,21 @@ app.get('/auth/github/callback',
 );
 
 app.get('/api/user', (req, res) => {
-    if (req.isAuthenticated()) {
+    if (req.isAuthenticated() && req.user.userData) {
         res.json({
             isAuthenticated: true,
             user: {
-                id: req.user.id,
-                username: req.user.username,
-                displayName: req.user.displayName,
-                photos: req.user.photos
+                id: req.user.userData._id,
+                username: req.user.userData.username,
+                displayName: req.user.userData.displayName,
+                avatarUrl: req.user.userData.avatarUrl
             }
         });
     } else {
         res.json({ isAuthenticated: false });
     }
 });
+
 
 app.get('/api/user/stats', async (req, res) => {
     if (!req.isAuthenticated()) {
@@ -342,11 +344,15 @@ app.get('/api/stats/global', async (req, res) => {
     }
 });
 
-app.get('/logout', (req, res) => {
-    req.logout();
-    res.redirect(process.env.NODE_ENV === 'production'
-        ? `${process.env.CLIENT_URL}/login.html`
-        : 'http://localhost:5500/login.html');
+app.get('/logout', (req, res, next) => {
+    req.logout(function (err) {
+        if (err) {
+            return next(err);
+        }
+        res.redirect(process.env.NODE_ENV === 'production'
+            ? `${process.env.CLIENT_URL}/login.html`
+            : 'http://localhost:5500/login.html');
+    });
 });
 
 // Update GitHub API routes with Octokit
@@ -358,7 +364,7 @@ app.get('/api/github/user/:username', async (req, res) => {
 
         // Get user's contributions using GraphQL API
         const { data: contributionsData } = await octokit.graphql(`
-            query($username: String!) {
+            query ($username: String!) {
                 user(login: $username) {
                     contributionsCollection {
                         totalCommitContributions
@@ -366,6 +372,7 @@ app.get('/api/github/user/:username', async (req, res) => {
                 }
             }
         `, { username: req.params.username });
+        
 
         res.json({
             ...userData,
@@ -378,9 +385,7 @@ app.get('/api/github/user/:username', async (req, res) => {
 
 app.get('/api/github/contributions/:username', async (req, res) => {
     try {
-        const response = await fetch(
-            `https://github-contributions-api.now.sh/v1/${req.params.username}`
-        );
+        const response = await fetch(`https://github-contributions-api.now.sh/v1/${req.params.username}`);
         const data = await response.json();
         res.json(data);
     } catch (error) {

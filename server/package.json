@@ -2,8 +2,8 @@
   "name": "devsync-server",
   "version": "1.0.0",
   "dependencies": {
-    "@octokit/rest": "^20.0.2",
     "@octokit/graphql": "^7.0.2",
+    "@octokit/rest": "^20.0.2",
     "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -11,9 +11,9 @@
     "express-session": "^1.18.1",
     "mongodb": "^6.13.1",
     "mongoose": "^8.11.0",
+    "node-fetch": "^2.7.0",
     "passport": "^0.4.1",
-    "passport-github2": "^0.1.12",
-    "node-fetch": "^2.7.0"
+    "passport-github2": "^0.1.12"
   },
   "description": "",
   "main": "index.js",
