@@ -149,7 +149,10 @@ function updateNavigation() {
     const nav = document.querySelector('.nav__list');
     if (!nav) return;
 
-    fetch('https://devsync-fpekg0cggua3abdp.centralus-01.azurewebsites.net/api/user') // ✅ Fixed API URL
+    // Use window.fetch to ensure the fetch function is accessed from the global scope
+    window.fetch('https://devsync-fpekg0cggua3abdp.centralus-01.azurewebsites.net/api/user', {
+        credentials: 'include'  // Add credentials to include cookies
+    })
         .then(res => {
             if (!res.ok) {
                 throw new Error('Network response was not ok');
@@ -157,23 +160,33 @@ function updateNavigation() {
             return res.json();
         })
         .then(user => {
-            if (user.error) {
+            if (user.error || !user.isAuthenticated) {
                 nav.innerHTML += `
                     <li class="nav__item">
-                        <a href="/login" class="nav__link">Login</a>
+                        <a href="javascript:void(0)" class="nav__link" onclick="window.DevSyncAuth.redirectToGitHubLogin()">Login</a>
                     </li>`;
             } else {
-                const displayName = user.displayName.split(' ')[0];
-                nav.innerHTML = nav.innerHTML.replace(
-                    `<a href="/login" class="nav__link">Login</a>`,
-                    `<a href="/profile" class="nav__profile">
-                        <img src="${user.photos[0].value}" alt="Profile" class="nav__profile-img">
+                const displayName = user.user.displayName ? user.user.displayName.split(' ')[0] : user.user.username;
+                const avatar = user.user.avatarUrl || (user.user.photos && user.user.photos[0] ? user.user.photos[0].value : 'assets/img/default-avatar.png');
+
+                const loginLink = nav.querySelector('a[href="/login"]');
+                if (loginLink) {
+                    loginLink.outerHTML = `<a href="profile.html" class="nav__profile">
+                        <img src="${avatar}" alt="Profile" class="nav__profile-img">
                         <span class="nav__profile-name">${displayName}</span>
-                    </a>`
-                );
+                    </a>`;
+                } else {
+                    nav.innerHTML += `
+                        <li class="nav__item">
+                            <a href="profile.html" class="nav__profile">
+                                <img src="${avatar}" alt="Profile" class="nav__profile-img">
+                                <span class="nav__profile-name">${displayName}</span>
+                            </a>
+                        </li>`;
+                }
             }
         })
-        .catch(error => console.error('Error fetching user:', error)); // ✅ Added error handling
+        .catch(error => console.error('Error fetching user:', error));
 }
 
 /*=============== PROFILE PAGE DATA ===============*/
