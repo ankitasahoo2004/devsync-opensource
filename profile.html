@@ -14,8 +14,9 @@
     <link rel="stylesheet" href="assets/css/navstyles.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     <!--=============== CHART.JS ===============-->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="assets/js/config.js"></script>
+    <script>document.getElementById("profile-img").src = "assets/img/default-profile.png";
+    </script>
 </head>
 
 <body>
@@ -72,7 +73,7 @@
                         <div class="profile__cover-overlay"></div>
                     </div>
                     <div class="profile__user-info">
-                        <img src="" alt="" class="profile__img" id="profile-img">
+                        <img src="assets/img/default-profile.png" alt="Profile" class="profile__img" id="profile-img">
                         <div class="profile__data">
                             <h2 class="profile__name" id="profile-name"></h2>
                             <p class="profile__bio" id="profile-bio"></p>
@@ -142,7 +143,7 @@
                 </section>
 
                 <div class="profile__actions">
-                    <a href="http://https://devsync-fpekg0cggua3abdp.centralus-01.azurewebsites.net/logout"
+                    <a href="https://devsync-fpekg0cggua3abdp.centralus-01.azurewebsites.net/logout"
                         class="button">
                         <i class='bx bx-log-out button__icon'></i>
                         Logout
@@ -159,10 +160,12 @@
     </a>
 
     <!--=============== MAIN JS ===============-->
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="assets/js/main.js"></script>
-    <script src="assets/js/auth.js"></script>
-    <script src="assets/js/profile.js"></script>
+    <script type="module" src="assets/js/main.js"></script>
+    <script type="module" src="assets/js/auth.js"></script>
+    <script type="module" src="assets/js/profile.js"></script>
+    
 </body>
 
 </html>
