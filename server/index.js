@@ -86,37 +86,47 @@ app.use(express.static(path.join(__dirname, '..')));
 // }));
 
 // Update CORS configuration
+// app.use(cors({
+//     origin: [
+//         process.env.CLIENT_URL,
+//         'https://sayan-dev731.github.io',
+//         'https://github.com'
+//     ],
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+//     exposedHeaders: ['Set-Cookie'],
+//     preflightContinue: true
+// }));
+
 app.use(cors({
-    origin: [
-        process.env.CLIENT_URL,
-        'https://sayan-dev731.github.io',
-        'https://github.com'
-    ],
+    origin: process.env.CLIENT_URL,
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['Set-Cookie'],
     preflightContinue: true
 }));
 
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'your_session_secret',
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-        mongoUrl: process.env.MONGODB_URI,
-        ttl: 24 * 60 * 60, // Session TTL in seconds (1 day)
-        autoRemove: 'native' // Enable automatic removal of expired sessions
-    }),
-    cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : 'localhost'
-    },
-    name: 'devsync.sid' // Custom session cookie name
-}));
+
+// app.use(session({
+//     secret: process.env.SESSION_SECRET || 'your_session_secret',
+//     resave: false,
+//     saveUninitialized: false,
+//     store: MongoStore.create({
+//         mongoUrl: process.env.MONGODB_URI,
+//         ttl: 24 * 60 * 60, // Session TTL in seconds (1 day)
+//         autoRemove: 'native' // Enable automatic removal of expired sessions
+//     }),
+//     cookie: {
+//         secure: process.env.NODE_ENV === 'production',
+//         httpOnly: true,
+//         maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+//         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+//         domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : 'localhost'
+//     },
+//     name: 'devsync.sid' // Custom session cookie name
+// }));
 
 // Update session configuration
 app.use(session({
