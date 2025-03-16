@@ -1,6 +1,6 @@
-// const API_BASE_URL = 'https://devsync-fpekg0cggua3abdp.centralus-01.azurewebsites.net';
-const API_BASE_URL = 'http://localhost:8000/auth/github';
-const fetch = require('node-fetch');
+const API_BASE_URL = 'https://devsync-fpekg0cggua3abdp.centralus-01.azurewebsites.net';
+// const API_BASE_URL = 'http://localhost:8000/auth/github';
+import fetch from 'node-fetch';
 
 async function checkAuthStatus() {
     try {
