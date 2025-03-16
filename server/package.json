@@ -1,6 +1,7 @@
 {
   "name": "devsync-server",
   "version": "1.0.0",
+  "type": "module",
   "dependencies": {
     "@octokit/graphql": "^7.0.2",
     "@octokit/rest": "^20.0.2",
@@ -28,7 +29,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "devDependencies": {
     "jest": "^29.7.0"
   }
