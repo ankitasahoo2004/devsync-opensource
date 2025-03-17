@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 /*=============== SHOW MENU ===============*/
 const navMenu = document.querySelector('.nav__menu'),
     navToggle = document.getElementById('nav-toggle'),
