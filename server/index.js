@@ -100,7 +100,7 @@ app.use(express.static(path.join(__dirname, '..')));
 // }));
 
 app.use(cors({
-    origin: process.env.CLIENT_URL,
+    origin: "https://sayan-dev731.github.io/devsync-opensource/",
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
