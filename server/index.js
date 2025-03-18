@@ -147,8 +147,10 @@ app.use(session({
     proxy: true
 }));
 
+app.use(require('express-session')({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 // Passport configuration
 passport.use(new GitHubStrategy({
@@ -185,46 +187,45 @@ passport.use(new GitHubStrategy({
     }
 }));
 
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((user, done) => done(null, user));
+passport.serializeUser((user, done) => done(null, user._id));
+passport.deserializeUser(async (id, done) => {
+    const user = await User.findById(id);
+    done(null, user);
+});
+
 
 // Auth routes
 app.get('/auth/github',
     (req, res, next) => {
         console.log('Starting GitHub auth...');
-        passport.authenticate('github', {
-            scope: ['user'],
-            session: true
-        })(req, res, next);
+        return passport.authenticate('github', { scope: ['user:email'] })(req, res, next);
     }
 );
 
-app.get('/auth/github/callback',
-    (req, res, next) => {
-        console.log('Received callback from GitHub...');
-        passport.authenticate('github', {
-            failureRedirect: `${process.env.CLIENT_URL}/login.html`,
-            successRedirect: process.env.CLIENT_URL,
-            session: true
-        })(req, res, next);
+app.get('/auth/github/callback', passport.authenticate('github', { failureRedirect: `${process.env.CLIENT_URL}/login.html`, session: true }), 
+    (req, res) => {
+        console.log('GitHub authentication successful:', req.user);
+        res.redirect(process.env.CLIENT_URL);  // Redirect after user is properly set
     }
 );
+
 
 app.get('/api/user', (req, res) => {
-    if (req.isAuthenticated() && req.user.userData) {
+    if (req.isAuthenticated() && req.user) {  // No need for req.user.userData
         res.json({
             isAuthenticated: true,
             user: {
-                id: req.user.userData._id,
-                username: req.user.userData.username,
-                displayName: req.user.userData.displayName,
-                avatarUrl: req.user.userData.avatarUrl
+                id: req.user._id,          // Directly from req.user
+                username: req.user.username,
+                displayName: req.user.displayName,
+                avatarUrl: req.user.avatarUrl
             }
         });
     } else {
-        res.json({ isAuthenticated: false });
+        res.status(401).json({ isAuthenticated: false, message: 'Not authenticated' });
     }
 });
+
 
 
 app.get('/api/user/stats', async (req, res) => {

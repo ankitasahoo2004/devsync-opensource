@@ -11,7 +11,11 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     displayName: String,
-    email: String,
+    email: {
+        type: String,
+        unique: true,  // Ensure uniqueness (optional)
+        sparse: true   // Allows multiple `null` values
+    },
     avatarUrl: String,
     mergedPRs: [{
         repoId: String,
