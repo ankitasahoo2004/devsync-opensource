@@ -86,18 +86,18 @@ app.use(express.static(path.join(__dirname, '..')));
 // }));
 
 // Update CORS configuration
-// app.use(cors({
-//     origin: [
-//         process.env.CLIENT_URL,
-//         'https://sayan-dev731.github.io',
-//         'https://github.com'
-//     ],
-//     credentials: true,
-//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-//     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-//     exposedHeaders: ['Set-Cookie'],
-//     preflightContinue: true
-// }));
+app.use(cors({
+    origin: [
+        process.env.CLIENT_URL,
+        'https://sayan-dev731.github.io',
+        'https://github.com'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    exposedHeaders: ['Set-Cookie'],
+    preflightContinue: true
+}));
 
 app.use(cors({
     origin: "https://sayan-dev731.github.io/devsync-opensource/",
@@ -159,39 +159,40 @@ passport.use(new GitHubStrategy({
     callbackURL: process.env.GITHUB_CALLBACK_URL // Use the full callback URL from env
 }, async (accessToken, refreshToken, profile, done) => {
     try {
+        console.log('GitHub Profile:', profile);
+        
         let user = await User.findOne({ githubId: profile.id });
 
         if (!user) {
-            user = await User.create({
+            user = new User({
                 githubId: profile.id,
                 username: profile.username,
                 displayName: profile.displayName || profile.username,
-                email: profile.emails?.[0]?.value || '',
-                avatarUrl: profile.photos?.[0]?.value || '',
-                mergedPRs: [],
-                cancelledPRs: [],
-                points: 0,
-                badges: ['Newcomer'],
-                accessToken // Store GitHub access token
+                email: profile.emails?.[0]?.value || null,  // GitHub might not return an email
+                avatarUrl: profile.photos?.[0]?.value || null
             });
-        } else {
-            // Update access token on login
-            user.accessToken = accessToken;
             await user.save();
         }
-
-        return done(null, { ...profile, userData: user });
+        return done(null, user);
     } catch (error) {
-        console.error('Auth Error:', error);
-        return done(error);
+        console.error('Error in GitHub OAuth:', error);
+        return done(error, null);
     }
 }));
 
-passport.serializeUser((user, done) => done(null, user._id));
-passport.deserializeUser(async (id, done) => {
-    const user = await User.findById(id);
-    done(null, user);
+passport.serializeUser((user, done) => {
+    done(null, user._id);  // Store only user ID in session
 });
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (error) {
+        done(error, null);
+    }
+});
+
 
 
 // Auth routes
