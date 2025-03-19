@@ -4,13 +4,13 @@ const session = require('express-session');
 const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
 const cors = require('cors');
-const fetch = require('node-fetch');
 const mongoose = require('mongoose');
 const path = require('path');
 const { Octokit } = require('@octokit/rest');
 const User = require('./models/User');
 const Repo = require('./models/Repo');
 const MongoStore = require('connect-mongo');
+const PORT = process.env.PORT || 5500;
 
 const app = express();
 
@@ -72,162 +72,120 @@ async function checkBadges(mergedPRs, points) {
     }
 }
 
+// Update user data when PRs are merged or cancelled
+async function updateUserPRStatus(userId, repoId, prData, status) {
+    try {
+        const user = await User.findOne({ githubId: userId });
+        if (!user) return;
+
+        if (status === 'merged') {
+            user.mergedPRs.push({
+                repoId,
+                prNumber: prData.number,
+                title: prData.title,
+                mergedAt: new Date()
+            });
+        }
+
+        user.points = await calculatePoints(user.mergedPRs, user.githubId);
+        user.badges = await checkBadges(user.mergedPRs, user.points);
+
+        await user.save();
+    } catch (error) {
+        console.error('Error updating user PR status:', error);
+    }
+}
 
 // Middleware setup
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
-// app.use(cors({
-//     origin: process.env.NODE_ENV === 'production'
-//         ? [process.env.CLIENT_URL, 'https://github.com']
-//         : ['http://localhost:5500', 'http://127.0.0.1:5500', 'https://github.com'],
-//     credentials: true,
-//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-//     allowedHeaders: ['Content-Type', 'Authorization'],
-// }));
-
-// Update CORS configuration
 app.use(cors({
-    origin: [
-        process.env.CLIENT_URL,
-        'https://sayan-dev731.github.io',
-        'https://github.com'
-    ],
+    origin: ['https://devsync-pied.vercel.app', 'https://devsync-pied.vercel.app'],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-    exposedHeaders: ['Set-Cookie'],
-    preflightContinue: true
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
 }));
 
-app.use(cors({
-    origin: "https://sayan-dev731.github.io/devsync-opensource/",
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['Set-Cookie'],
-    preflightContinue: true
-}));
-
-
-// app.use(session({
-//     secret: process.env.SESSION_SECRET || 'your_session_secret',
-//     resave: false,
-//     saveUninitialized: false,
-//     store: MongoStore.create({
-//         mongoUrl: process.env.MONGODB_URI,
-//         ttl: 24 * 60 * 60, // Session TTL in seconds (1 day)
-//         autoRemove: 'native' // Enable automatic removal of expired sessions
-//     }),
-//     cookie: {
-//         secure: process.env.NODE_ENV === 'production',
-//         httpOnly: true,
-//         maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
-//         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-//         domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : 'localhost'
-//     },
-//     name: 'devsync.sid' // Custom session cookie name
-// }));
-
-// Update session configuration
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'your_session_secret',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
         mongoUrl: process.env.MONGODB_URI,
-        ttl: 24 * 60 * 60
+        collectionName: 'sessions',
+        ttl: 24 * 60 * 60, // Session TTL in seconds (1 day)
+        autoRemove: 'native' // Enable automatic removal of expired sessions
     }),
     cookie: {
-        secure: true, // Required for cross-domain cookies
+        secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
-        sameSite: 'none', // Required for cross-domain cookies
-        maxAge: 24 * 60 * 60 * 1000,
-        domain: '.azurewebsites.net' // Allow cookies for all azurewebsites.net subdomains
+        maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+        sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
     },
-    proxy: true
+    name: 'devsync.sid' // Custom session cookie name
 }));
 
-app.use(require('express-session')({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
-
 
 // Passport configuration
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: process.env.GITHUB_CALLBACK_URL // Use the full callback URL from env
+    callbackURL: process.env.GITHUB_CALLBACK_URL
 }, async (accessToken, refreshToken, profile, done) => {
     try {
-        console.log('GitHub Profile:', profile);
-        
         let user = await User.findOne({ githubId: profile.id });
 
         if (!user) {
-            user = new User({
+            user = await User.create({
                 githubId: profile.id,
                 username: profile.username,
-                displayName: profile.displayName || profile.username,
-                email: profile.emails?.[0]?.value || null,  // GitHub might not return an email
-                avatarUrl: profile.photos?.[0]?.value || null
+                displayName: profile.displayName,
+                email: profile.emails?.[0]?.value || '',
+                avatarUrl: profile.photos?.[0]?.value || '',
+                mergedPRs: [],
+                cancelledPRs: [],
+                points: 0,
+                badges: ['Newcomer']
             });
-            await user.save();
         }
-        return done(null, user);
+
+        return done(null, { ...profile, userData: user });
     } catch (error) {
-        console.error('Error in GitHub OAuth:', error);
-        return done(error, null);
+        return done(error);
     }
 }));
 
-passport.serializeUser((user, done) => {
-    done(null, user._id);  // Store only user ID in session
-});
-
-passport.deserializeUser(async (id, done) => {
-    try {
-        const user = await User.findById(id);
-        done(null, user);
-    } catch (error) {
-        done(error, null);
-    }
-});
-
-
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((user, done) => done(null, user));
 
 // Auth routes
 app.get('/auth/github',
-    (req, res, next) => {
-        console.log('Starting GitHub auth...');
-        return passport.authenticate('github', { scope: ['user:email'] })(req, res, next);
-    }
+    passport.authenticate('github', { scope: ['user'] })
 );
 
-app.get('/auth/github/callback', passport.authenticate('github', { failureRedirect: `${process.env.CLIENT_URL}/login.html`, session: true }), 
+app.get('/auth/github/callback',
+    passport.authenticate('github', { failureRedirect: '/login' }),
     (req, res) => {
-        console.log('GitHub authentication successful:', req.user);
-        res.redirect(process.env.CLIENT_URL);  // Redirect after user is properly set
+        res.redirect(process.env.FRONTEND_URL);
     }
 );
-
 
 app.get('/api/user', (req, res) => {
-    if (req.isAuthenticated() && req.user) {  // No need for req.user.userData
+    if (req.isAuthenticated()) {
         res.json({
             isAuthenticated: true,
             user: {
-                id: req.user._id,          // Directly from req.user
+                id: req.user.id,
                 username: req.user.username,
                 displayName: req.user.displayName,
-                avatarUrl: req.user.avatarUrl
+                photos: req.user.photos
             }
         });
     } else {
-        res.status(401).json({ isAuthenticated: false, message: 'Not authenticated' });
+        res.json({ isAuthenticated: false });
     }
 });
-
-
 
 app.get('/api/user/stats', async (req, res) => {
     if (!req.isAuthenticated()) {
@@ -356,15 +314,9 @@ app.get('/api/stats/global', async (req, res) => {
     }
 });
 
-app.get('/logout', (req, res, next) => {
-    req.logout(function (err) {
-        if (err) {
-            return next(err);
-        }
-        res.redirect(process.env.NODE_ENV === 'production'
-            ? `${process.env.CLIENT_URL}/login.html`
-            : 'http://localhost:5500/login.html');
-    });
+app.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect('https://devsync-pied.vercel.app/index.html');
 });
 
 // Update GitHub API routes with Octokit
@@ -376,7 +328,7 @@ app.get('/api/github/user/:username', async (req, res) => {
 
         // Get user's contributions using GraphQL API
         const { data: contributionsData } = await octokit.graphql(`
-            query ($username: String!) {
+            query($username: String!) {
                 user(login: $username) {
                     contributionsCollection {
                         totalCommitContributions
@@ -384,7 +336,6 @@ app.get('/api/github/user/:username', async (req, res) => {
                 }
             }
         `, { username: req.params.username });
-        
 
         res.json({
             ...userData,
@@ -397,7 +348,9 @@ app.get('/api/github/user/:username', async (req, res) => {
 
 app.get('/api/github/contributions/:username', async (req, res) => {
     try {
-        const response = await fetch(`https://github-contributions-api.now.sh/v1/${req.params.username}`);
+        const response = await fetch(
+            `https://github-contributions-api.now.sh/v1/${req.params.username}`
+        );
         const data = await response.json();
         res.json(data);
     } catch (error) {
@@ -692,7 +645,6 @@ async function isRegisteredRepo(repoFullName) {
     return repo ? repo : null;
 }
 
-
 // Helper function to fetch PR details using Octokit
 async function fetchPRDetails(username) {
     try {
@@ -954,64 +906,100 @@ app.get('/api/user/profile/:username', async (req, res) => {
     }
 });
 
-// Add security headers middleware
-app.use((req, res, next) => {
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'DENY');
-    res.setHeader('X-XSS-Protection', '1; mode=block');
-    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-    next();
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve index.html for all routes to support client-side routing
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Add error handling middleware
-app.use((err, req, res, next) => {
-    console.error('Server Error:', err);
-    res.status(500).json({
-        error: process.env.NODE_ENV === 'production'
-            ? 'Internal server error'
-            : err.message
-    });
-});
+// Update static file serving
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Add error logging middleware
-app.use((req, res, next) => {
-    const oldSend = res.send;
-    res.send = function (data) {
-        console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - Status: ${res.statusCode}`);
-        return oldSend.apply(res, arguments);
-    };
-    next();
-});
+// Update cors configuration to handle frontend requests
+app.use(cors({
+    origin: ['http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
+}));
 
 // Initialize and start server
-async function start() {
+async function startServer() {
     try {
-        // Ensure MongoDB connection before starting server
-        await mongoose.connect(process.env.MONGODB_URI);
-        console.log('Connected to MongoDB');
+        const PORT = process.env.PORT || 3000;
 
-        // Use WEBSITES_PORT for Azure or fallback to PORT/3000
-        const PORT = process.env.WEBSITES_PORT || process.env.PORT || 3000;
+        // Ensure all routes are registered before the catch-all
 
-        const server = app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
+        // Catch-all route for SPA - must be after API routes
+        app.get('*', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public', 'index.html'));
         });
 
-        // Add error handlers
-        server.on('error', (error) => {
-            console.error('Server error:', error);
-            process.exit(1);
+        app.listen(PORT, () => {
+            console.log(`Server running on http://localhost:${PORT}`);
+            console.log('Serving frontend from', path.join(__dirname, 'public'));
+        }).on('error', (err) => {
+            if (err.code === 'EADDRINUSE') {
+                console.error(`Port ${PORT} is already in use`);
+                process.exit(1);
+            } else {
+                throw err;
+            }
         });
-
-        process.on('unhandledRejection', (error) => {
-            console.error('Unhandled Rejection:', error);
-            process.exit(1);
-        });
-
     } catch (error) {
         console.error('Failed to start server:', error);
         process.exit(1);
     }
 }
 
-start();
+// Start the server
+startServer();
+
+// Update cors configuration
+app.use(cors({
+    origin: [process.env.FRONTEND_URL || 'https://devsync-pied.vercel.app'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
+}));
+
+// Update session configuration
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+        collectionName: 'sessions',
+        ttl: 24 * 60 * 60,
+        autoRemove: 'native'
+    }),
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
+// Update GitHub callback URL for production
+const GITHUB_CALLBACK_URL = process.env.NODE_ENV === 'production'
+    ? 'https://devsync-pied.vercel.app/auth/github/callback'
+    : 'http://localhost:3000/auth/github/callback';
+
+// Handle SPA routing
+app.get('*', (req, res) => {
+    if (req.url.startsWith('/api/')) {
+        return; // Let API routes handle these requests
+    }
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Export the Express app for Vercel
+module.exports = app;
+
+// Only start the server in development
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+    });
+}

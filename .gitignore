@@ -2,6 +2,7 @@
 /node_modules
 /.pnp
 .pnp.js
+node_modules
 
 # Testing
 /coverage
@@ -9,6 +10,8 @@
 # Production
 /dist
 /build
+.next
+out
 
 # Environment files
 .env
@@ -16,6 +19,7 @@
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*.local
 
 # IDE specific files
 .vscode/*
@@ -65,3 +69,10 @@ ehthumbs_vista.db
 # Local development
 .history/
 *.local
+
+# Vercel
+.vercel
+
+# Build files
+build
+dist

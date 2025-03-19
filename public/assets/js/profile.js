@@ -1,8 +1,6 @@
-const API_BASE_URL = config.API_BASE_URL;
-
 async function fetchUserProfile() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/user`, {
+        const response = await fetch('https://devsync-pied.vercel.app/api/user', {
             credentials: 'include'
         });
         const data = await response.json();
@@ -13,7 +11,7 @@ async function fetchUserProfile() {
         }
 
         // Fetch comprehensive profile data
-        const profileResponse = await fetch(`${API_BASE_URL}/api/user/profile/${data.user.username}`, {
+        const profileResponse = await fetch(`https://devsync-pied.vercel.app/api/user/profile/${data.user.username}`, {
             credentials: 'include'
         });
         const profileData = await profileResponse.json();

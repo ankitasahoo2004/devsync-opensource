@@ -1,7 +1,7 @@
 // Global stats update
 async function updateGlobalStats() {
     try {
-        const response = await fetch('https://devsync-fpekg0cggua3abdp.centralus-01.azurewebsites.net/api/stats/global');
+        const response = await fetch('https://devsync-pied.vercel.app/api/stats/global');
         const stats = await response.json();
 
         document.querySelector('#globalStats').innerHTML = `
@@ -65,7 +65,7 @@ function searchLeaderboard(searchTerm, users) {
 // Leaderboard update function
 async function updateLeaderboard(timeRange = 'all', filterBy = 'points') {
     try {
-        const response = await fetch('https://devsync-fpekg0cggua3abdp.centralus-01.azurewebsites.net/api/leaderboard', {
+        const response = await fetch('https://devsync-pied.vercel.app/api/leaderboard', {
             method: 'GET',
             headers: {
                 'Cache-Control': 'no-cache',
