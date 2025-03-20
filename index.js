@@ -11,7 +11,7 @@ const User = require('./models/User');
 const Repo = require('./models/Repo');
 const MongoStore = require('connect-mongo');
 const PORT = process.env.PORT || 5500;
-const serverUrl = process.env.SERVER_URL || 'http://localhost:3000';
+const serverUrl = process.env.SERVER_URL;
 
 
 const app = express();

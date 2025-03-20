@@ -1,4 +1,4 @@
-const serverUrl = process.env.SERVER_URL||'http://localhost:3000';
+const serverUrl = 'https://devsync-opensource.onrender.com';
 
 async function checkAuthStatus() {
     try {
