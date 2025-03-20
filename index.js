@@ -759,7 +759,7 @@ setInterval(async () => {
     } catch (error) {
         console.error('Scheduled update failed:', error);
     }
-}, 5 * 60 * 1000); // Every 5 minutes
+}, 60 * 60 * 1000); // Every 60 minutes
 
 // Enhanced GitHub API routes with Octokit
 app.get('/api/github/user/:username', async (req, res) => {
