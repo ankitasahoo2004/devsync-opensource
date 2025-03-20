@@ -4,8 +4,8 @@
   "description": "DevSync Open Source Platform",
   "main": "server.js",
   "scripts": {
-    "start": "concurrently \"node index.js\" \"node index.js\"",
-    "dev": "concurrently \"nodemon index.js\" \"nodemon index.js\"",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "frontend": "node index.js",
     "backend": "node index.js"
   },
@@ -25,6 +25,5 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
-  },
-  "type":"module"
+  }
 }

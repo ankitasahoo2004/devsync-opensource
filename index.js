@@ -11,6 +11,8 @@ const User = require('./models/User');
 const Repo = require('./models/Repo');
 const MongoStore = require('connect-mongo');
 const PORT = process.env.PORT || 5500;
+const serverUrl = 'http://localhost:3000';
+
 
 const app = express();
 
@@ -100,7 +102,7 @@ async function updateUserPRStatus(userId, repoId, prData, status) {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
 app.use(cors({
-    origin: ['https://devsync-pied.vercel.app', 'https://devsync-pied.vercel.app'],
+    origin: [serverUrl],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
 }));
@@ -316,7 +318,7 @@ app.get('/api/stats/global', async (req, res) => {
 
 app.get('/logout', (req, res) => {
     req.logout();
-    res.redirect('https://devsync-pied.vercel.app/index.html');
+    res.redirect(`${serverUrl}/index.html`);
 });
 
 // Update GitHub API routes with Octokit
@@ -746,7 +748,7 @@ app.get('/api/github/prs/update', async (req, res) => {
 // Add automatic PR status and leaderboard update
 setInterval(async () => {
     try {
-        const response = await fetch(`http://localhost:${process.env.PORT}/api/github/prs/update`);
+        const response = await fetch(`${serverUrl}/api/github/prs/update`);
 
         if (!response.ok) {
             throw new Error(`Update failed with status: ${response.status}`);
@@ -918,7 +920,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Update cors configuration to handle frontend requests
 app.use(cors({
-    origin: ['http://localhost:3000'],
+    origin: [serverUrl],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
 }));
@@ -954,52 +956,3 @@ async function startServer() {
 
 // Start the server
 startServer();
-
-// Update cors configuration
-app.use(cors({
-    origin: [process.env.FRONTEND_URL || 'https://devsync-pied.vercel.app'],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
-}));
-
-// Update session configuration
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-        mongoUrl: process.env.MONGODB_URI,
-        collectionName: 'sessions',
-        ttl: 24 * 60 * 60,
-        autoRemove: 'native'
-    }),
-    cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
-}));
-
-// Update GitHub callback URL for production
-const GITHUB_CALLBACK_URL = process.env.NODE_ENV === 'production'
-    ? 'https://devsync-pied.vercel.app/auth/github/callback'
-    : 'http://localhost:3000/auth/github/callback';
-
-// Handle SPA routing
-app.get('*', (req, res) => {
-    if (req.url.startsWith('/api/')) {
-        return; // Let API routes handle these requests
-    }
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Export the Express app for Vercel
-module.exports = app;
-
-// Only start the server in development
-if (process.env.NODE_ENV !== 'production') {
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
-    });
-}

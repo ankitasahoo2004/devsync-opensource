@@ -1,6 +1,8 @@
+const serverUrl = process.env.SERVER_URL||'http://localhost:3000';
+
 async function checkAuthStatus() {
     try {
-        const response = await fetch('https://devsync-pied.vercel.app/api/user', {
+        const response = await fetch(`${serverUrl}/api/user`, {
             credentials: 'include'
         });
         const data = await response.json();
@@ -21,7 +23,7 @@ async function checkAuthStatus() {
             // Keep the original login button style
             loginButton.className = 'button button--ghost';
             loginButton.innerHTML = 'Login';
-            loginButton.href = 'https://devsync-pied.vercel.app/auth/github';
+            loginButton.href = `${serverUrl}/auth/github`;
         }
     } catch (error) {
         console.error('Auth check failed:', error);

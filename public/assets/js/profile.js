@@ -1,6 +1,6 @@
 async function fetchUserProfile() {
     try {
-        const response = await fetch('https://devsync-pied.vercel.app/api/user', {
+        const response = await fetch(`${serverUrl}/api/user`, {
             credentials: 'include'
         });
         const data = await response.json();
@@ -11,7 +11,7 @@ async function fetchUserProfile() {
         }
 
         // Fetch comprehensive profile data
-        const profileResponse = await fetch(`https://devsync-pied.vercel.app/api/user/profile/${data.user.username}`, {
+        const profileResponse = await fetch(`${serverUrl}/api/user/profile/${data.user.username}`, {
             credentials: 'include'
         });
         const profileData = await profileResponse.json();

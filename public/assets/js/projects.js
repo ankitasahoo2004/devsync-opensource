@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!confirmed) return;
 
             try {
-                const response = await fetch(`https://devsync-pied.vercel.app/api/projects/${projectId}`, {
+                const response = await fetch(`${serverUrl}/api/projects/${projectId}`, {
                     method: 'DELETE',
                     credentials: 'include'
                 });
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const displayUserProjects = async (userId) => {
         try {
-            const response = await fetch(`https://devsync-pied.vercel.app/api/projects/${userId}`, {
+            const response = await fetch(`${serverUrl}/api/projects/${userId}`, {
                 credentials: 'include'
             });
             const projects = await response.json();
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const reviewProject = async (projectId, status) => {
         try {
-            const response = await fetch(`https://devsync-pied.vercel.app/api/admin/projects/${projectId}/review`, {
+            const response = await fetch(`${serverUrl}/api/admin/projects/${projectId}/review`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -354,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
         authContainer.innerHTML = `
             <div class="auth-prompt">
                 <h3>Please log in to submit a project</h3>
-                <a href="https://devsync-pied.vercel.app/auth/github" class="button">
+                <a href="${serverUrl}/auth/github" class="button">
                     <i class='bx bxl-github'></i> Login with GitHub
                 </a>
             </div>
@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 description: form.description.value
             };
 
-            const response = await fetch('https://devsync-pied.vercel.app/api/projects', {
+            const response = await fetch(`${serverUrl}/api/projects`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -531,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add this after checkAuthAndInitialize initialization
     const loadAcceptedProjects = async () => {
         try {
-            const response = await fetch('https://devsync-pied.vercel.app/api/accepted-projects');
+            const response = await fetch(`${serverUrl}/api/accepted-projects`);
 
             if (!response.ok) {
                 throw new Error('Failed to fetch projects');
@@ -629,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Load accepted projects regardless of authentication
             await loadAcceptedProjects();
 
-            const response = await fetch('https://devsync-pied.vercel.app/api/user', {
+            const response = await fetch(`${serverUrl}/api/user`, {
                 credentials: 'include'
             });
             const data = await response.json();
@@ -643,7 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 await displayUserProjects(currentUser.id);
 
                 // Check if user is admin
-                const adminResponse = await fetch('https://devsync-pied.vercel.app/api/admin/verify', {
+                const adminResponse = await fetch(`${serverUrl}/api/admin/verify`, {
                     credentials: 'include'
                 });
                 const adminData = await adminResponse.json();
@@ -687,7 +687,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loadAllProjects = async () => {
         try {
-            const response = await fetch('https://devsync-pied.vercel.app/api/admin/projects', {
+            const response = await fetch(`${serverUrl}/api/admin/projects`, {
                 credentials: 'include'
             });
 
@@ -758,7 +758,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 try {
-                    const response = await fetch(`https://devsync-pied.vercel.app/api/admin/projects/${projectId}/points`, {
+                    const response = await fetch(`${serverUrl}/api/admin/projects/${projectId}/points`, {
                         method: 'PATCH',
                         credentials: 'include',
                         headers: {
@@ -812,7 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (!confirmed) return;
 
                         try {
-                            const response = await fetch(`https://devsync-pied.vercel.app/api/projects/${projectId}`, {
+                            const response = await fetch(`${serverUrl}/api/projects/${projectId}`, {
                                 method: 'DELETE',
                                 credentials: 'include'
                             });
