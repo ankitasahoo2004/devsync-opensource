@@ -41,10 +41,10 @@ function sortUsersByPointsAndMerges(users) {
     });
 }
 
-// Add searchLeaderboard function
+// Simplified search function
 function searchLeaderboard(searchTerm, users) {
     if (!searchTerm) return users;
-
+    const searchString = searchTerm.toLowerCase();
     return users.filter(user => {
         const searchString = searchTerm.toLowerCase();
         // Search by username
@@ -52,11 +52,6 @@ function searchLeaderboard(searchTerm, users) {
 
         // Search by points
         if (user.points.toString().includes(searchString)) return true;
-
-        // Search by PRs
-        if (user.mergedPRs.some(pr =>
-            pr.title.toLowerCase().includes(searchString)
-        )) return true;
 
         return false;
     });
@@ -113,12 +108,20 @@ async function updateLeaderboard(timeRange = 'all', filterBy = 'points') {
 }
 
 // Add function to update leaderboard display
-function updateLeaderboardDisplay(users) {
-    const winners = users.slice(0, 3);
-    const remainingUsers = users.slice(3);
-
+function updateLeaderboardDisplay(users, isSearching = false) {
+    // Always show top 3 winners
+    const winners = window.leaderboardUsers ? window.leaderboardUsers.slice(0, 3) : users.slice(0, 3);
     document.getElementById('topWinners').innerHTML = renderTopWinners(winners);
-    document.getElementById('leaderboardList').innerHTML = renderLeaderboardList(remainingUsers);
+
+    if (isSearching) {
+        // During search, show all users in list format with original ranks
+        const leaderboardHtml = users.map(user => renderLeaderboardItem(user, true)).join('');
+        document.getElementById('leaderboardList').innerHTML = leaderboardHtml;
+    } else {
+        // Normal display of remaining users
+        const remainingUsers = users.slice(3);
+        document.getElementById('leaderboardList').innerHTML = renderLeaderboardList(remainingUsers);
+    }
 }
 
 function renderTopWinners(winners) {
@@ -137,59 +140,108 @@ function renderTopWinners(winners) {
 function renderWinnerCard(user, position, rank) {
     return `
         <div class="winner-card ${position}" data-user="${user.username}">
-            <div class="winner-medal">${rank}</div>
+            <div class="winner-medal">
+                <i class='bx ${rank === 1 ? 'bxs-crown' : 'bx-medal'}'></i>
+            </div>
             <img src="https://github.com/${user.username}.png" 
                  alt="${user.username}" 
                  class="winner-img"
                  onerror="this.src='assets/img/default-avatar.png'">
-            <h3>${user.username}</h3>
-            <div class="stats">
-                <div class="points">
-                    <i class='bx bx-trophy'></i>
-                    <span>${user.points} points</span>
-                    ${renderTrendIndicator(user.trend)}
-                </div>
-                <div class="merges">
-                    <i class='bx bx-git-merge'></i>
-                    <span>${user.mergedPRs.length} merges</span>
-                </div>
-            </div>
-            <div class="badges">
-                ${user.badges.map(badge => `<span class="badge">${badge}</span>`).join('')}
-            </div>
-        </div>
-    `;
-}
-
-function renderLeaderboardList(users) {
-    if (users.length === 0) return '<div class="no-data">No more users to display</div>';
-
-    return users.map((user, index) => `
-        <div class="leaderboard-item" data-user="${user.username}">
-            <span class="rank">${user.rank || index + 4}</span>
-            <img src="https://github.com/${user.username}.png" 
-                 alt="${user.username}" 
-                 class="user-img"
-                 onerror="this.src='assets/img/default-avatar.png'">
-            <div class="user-info">
-                <h4>${user.username}</h4>
+            <div class="winner-content">
+                <h3>${user.username}</h3>
                 <div class="stats">
                     <div class="points">
-                        <i class='bx bx-trophy'></i>
-                        <span>${user.points} points</span>
-                        ${renderTrendIndicator(user.trend)}
+                        <span class="points-value">${user.points}</span>
+                        <span class="points-label">points</span>
                     </div>
+                    <div class="divider"></div>
                     <div class="merges">
-                        <i class='bx bx-git-merge'></i>
-                        <span>${user.mergedPRs.length} merges</span>
+                        <span class="merges-value">${user.mergedPRs.length}</span>
+                        <span class="merges-label">merges</span>
                     </div>
                 </div>
                 <div class="badges">
                     ${user.badges.map(badge => `<span class="badge">${badge}</span>`).join('')}
                 </div>
             </div>
+            ${renderTrendIndicator(user.trend)}
         </div>
-    `).join('');
+    `;
+}
+
+function renderLeaderboardList(users) {
+    if (users.length === 0) return '<div class="no-data">No users found</div>';
+
+    // First 10 runners-up (positions 4-13)
+    const runnersUp = users.slice(0, 10);
+    const remainingUsers = users.slice(10);
+
+    return `
+        <div class="runners-up-grid">
+            ${runnersUp.map((user, index) => `
+                <div class="runner-up-card" data-user="${user.username}">
+                    <span class="rank">#${user.rank || index + 4}</span>
+                    <img src="https://github.com/${user.username}.png" 
+                         alt="${user.username}" 
+                         class="user-img"
+                         onerror="this.src='assets/img/default-avatar.png'">
+                    <div class="user-info">
+                        <h4>${user.username}</h4>
+                        <div class="user-stats">
+                            <span class="stat-item">
+                                <i class='bx bx-trophy'></i>
+                                ${user.points}
+                            </span>
+                            <span class="stat-divider">•</span>
+                            <span class="stat-item">
+                                <i class='bx bx-git-merge'></i>
+                                ${user.mergedPRs.length}
+                            </span>
+                        </div>
+                        <div class="badges-container">
+                            ${user.badges.map(badge => `<span class="badge">${badge}</span>`).join('')}
+                        </div>
+                    </div>
+                    ${renderTrendIndicator(user.trend)}
+                </div>
+            `).join('')}
+        </div>
+        <div class="leaderboard-list">
+            ${remainingUsers.map(user => renderLeaderboardItem(user)).join('')}
+        </div>
+    `;
+}
+
+function renderLeaderboardItem(user, isSearchResult = false) {
+    return `
+        <div class="leaderboard-item" data-user="${user.username}">
+            <span class="rank">#${user.rank}</span>
+            <div class="user-profile">
+                <img src="https://github.com/${user.username}.png" 
+                     alt="${user.username}" 
+                     class="user-img"
+                     onerror="this.src='assets/img/default-avatar.png'">
+                <div class="user-info">
+                    <h4>${user.username}</h4>
+                    <div class="user-stats">
+                        <span class="stat-item">
+                            <i class='bx bx-trophy'></i>
+                            ${user.points}
+                        </span>
+                        <span class="stat-divider">•</span>
+                        <span class="stat-item">
+                            <i class='bx bx-git-merge'></i>
+                            ${user.mergedPRs.length}
+                        </span>
+                    </div>
+                    <div class="badges-container">
+                        ${user.badges.map(badge => `<span class="badge">${badge}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+            ${renderTrendIndicator(user.trend)}
+        </div>
+    `;
 }
 
 function handleLeaderboardError(error) {
@@ -233,6 +285,30 @@ function toggleMerges(id) {
     }
 }
 
+// Initialize leaderboard with simplified UI
+document.addEventListener('DOMContentLoaded', () => {
+    updateGlobalStats();
+    updateLeaderboard();
+
+    const searchInput = document.getElementById('leaderboardSearch');
+    let debounceTimer;
+
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            const searchTerm = e.target.value;
+            const filteredUsers = searchLeaderboard(searchTerm, window.leaderboardUsers || []);
+            updateLeaderboardDisplay(filteredUsers, searchTerm.length > 0);
+        }, 300);
+    });
+
+    // Auto-update every 5 minutes
+    setInterval(() => {
+        updateGlobalStats();
+        updateLeaderboard();
+    }, 5 * 60 * 1000);
+});
+
 // Initialize leaderboard
 document.addEventListener('DOMContentLoaded', () => {
     // Initial updates
@@ -243,19 +319,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterBtns = document.querySelectorAll('.filter-btn');
     const timeRange = document.getElementById('timeRange');
 
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            updateLeaderboard(timeRange.value, btn.dataset.filter);
-        });
-    });
-
-    timeRange.addEventListener('change', () => {
-        const activeFilter = document.querySelector('.filter-btn.active');
-        updateLeaderboard(timeRange.value, activeFilter.dataset.filter);
-    });
-
     // Add search functionality
     const searchInput = document.getElementById('leaderboardSearch');
     let debounceTimer;
@@ -265,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
         debounceTimer = setTimeout(() => {
             const searchTerm = e.target.value;
             const filteredUsers = searchLeaderboard(searchTerm, window.leaderboardUsers || []);
-            updateLeaderboardDisplay(filteredUsers);
+            updateLeaderboardDisplay(filteredUsers, searchTerm.length > 0);
         }, 300);
     });
 

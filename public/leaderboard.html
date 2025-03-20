@@ -65,6 +65,29 @@
 
     <main class="main">
         <section class="section leaderboard-section">
+            <div class="video-background">
+                <div class="video-overlay"></div>
+                <!-- You can rotate between these videos for different effects -->
+                <video autoplay muted loop>
+                    <!-- Choose one of these source options: -->
+
+                    <!-- Option 1: Mystical Particles -->
+                    <!-- <source
+                        src="https://cdn.pixabay.com/video/2021/01/30/63533-507811657_large.mp4"
+                        type="video/mp4"> -->
+
+                    <!-- Option 2: Dark Smoke -->
+                    <source src="https://cdn.pixabay.com/video/2022/11/11/138556-769988117_large.mp4">
+
+                    <!-- Option 3: Purple Space Particles -->
+                    <!-- <source src="https://cdn.pixabay.com/vimeo/433436982/particles-41330.mp4?width=1280&hash=339911e8da1c7d1eb15916bad256791547f0cff0" type="video/mp4"> -->
+
+                    <!-- Option 4: Dark Digital Network -->
+                    <!-- <source src="https://cdn.pixabay.com/vimeo/420786167/digital-38441.mp4?width=640&hash=bee927aef31fb3f1a84c169e826c789819af0ac4" type="video/mp4"> -->
+
+                    Your browser does not support the video tag.
+                </video>
+            </div>
             <div class="container">
                 <header class="section-header">
                     <h2 class="section__title">DevSync Leaderboard</h2>
@@ -104,33 +127,9 @@
                         <h3 class="section-subtitle">Global Rankings</h3>
                         <div class="leaderboard-search">
                             <div class="search-wrapper">
-                                <input type="text" id="leaderboardSearch"
-                                    placeholder="Search by username, repository, or points..." class="search-input">
+                                <input type="text" id="leaderboardSearch" placeholder="Search by username, or points..."
+                                    class="search-input">
                                 <i class='bx bx-search search-icon'></i>
-                            </div>
-                        </div>
-                        <div class="leaderboard-filters">
-                            <div class="filter-group">
-                                <label for="timeRange" class="filter-label">Time Range:</label>
-                                <select id="timeRange" class="filter-select" aria-label="Select time range">
-                                    <option value="all">All Time</option>
-                                    <option value="month">This Month</option>
-                                    <option value="week">This Week</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <span class="filter-label">Sort by:</span>
-                                <div class="filter-buttons" role="group" aria-label="Ranking criteria">
-                                    <button class="filter-btn active" data-filter="points" aria-pressed="true">
-                                        <i class='bx bx-trophy'></i> Points
-                                    </button>
-                                    <button class="filter-btn" data-filter="prs" aria-pressed="false">
-                                        <i class='bx bx-git-pull-request'></i> Pull Requests
-                                    </button>
-                                    <button class="filter-btn" data-filter="repos" aria-pressed="false">
-                                        <i class='bx bx-git-repo-forked'></i> Repositories
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
