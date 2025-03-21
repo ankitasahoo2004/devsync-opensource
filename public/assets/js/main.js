@@ -1,42 +1,37 @@
 /*=============== SHOW MENU ===============*/
-const navMenu = document.querySelector('.nav__menu'),
-    navToggle = document.getElementById('nav-toggle')
+const navMenu = document.getElementById('nav-menu'),
+    navToggle = document.getElementById('nav-toggle'),
+    navClose = document.getElementById('nav-close')
 
-if (navToggle) {
-    navToggle.addEventListener('click', () => {
-        navMenu.classList.toggle('show-menu')
-        navToggle.classList.toggle('active')
+// Single toggle handler with null checks
+if (navToggle && navMenu) {
+    navToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navMenu.classList.toggle('show-menu');
     })
+}
 
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
+// Hide menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (navMenu && navMenu.classList.contains('show-menu')) {
         if (!e.target.closest('.nav__menu') && !e.target.closest('.nav__toggle')) {
             navMenu.classList.remove('show-menu')
-            navToggle.classList.remove('active')
+        }
+    }
+})
+
+// Close menu when clicking menu links
+const navLinks = document.querySelectorAll('.nav__link')
+navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        if (navMenu) {
+            navMenu.classList.remove('show-menu')
         }
     })
-
-    // Add smooth transition when menu items are clicked
-    const navLinks = document.querySelectorAll('.nav__link')
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            navMenu.classList.remove('show-menu')
-            navToggle.classList.remove('active')
-        })
-    })
-}
-
-/*===== MENU SHOW =====*/
-/* Validate if constant exists */
-if (navToggle) {
-    navToggle.addEventListener('click', () => {
-        navMenu.classList.add('show-menu')
-    })
-}
+})
 
 /*===== MENU HIDDEN =====*/
-/* Validate if constant exists */
-if (navClose) {
+if (navClose && navMenu) {
     navClose.addEventListener('click', () => {
         navMenu.classList.remove('show-menu')
     })
@@ -194,23 +189,38 @@ function updateNavigation() {
     fetch('/api/user')
         .then(res => res.json())
         .then(user => {
-            if (user.error) {
-                // Add login button if not logged in
-                nav.innerHTML += `
-                    <li class="nav__item">
-                        <a href="/login" class="nav__link">Login</a>
-                    </li>`;
+            const hasLoginButton = nav.querySelector('a[href="login.html"]');
+            if (user.error || !user || !user.displayName || !user.photos) {
+                // Only add login button if it doesn't exist
+                if (hasLoginButton) {
+                    nav.innerHTML += `
+                        <li class="nav__item">
+                            <a href="/login" class="nav__link">Login</a>
+                        </li>`;
+                    console.log("hello");
+                }
             } else {
-                // Replace login with profile pic and shortened name
-                const displayName = user.displayName.split(' ')[0]; // Show only first name
-                nav.innerHTML = nav.innerHTML.replace(
-                    `<a href="/login" class="nav__link">Login</a>`,
-                    `<a href="/profile" class="nav__profile">
-                        <img src="${user.photos[0].value}" alt="Profile" class="nav__profile-img">
-                        <span class="nav__profile-name">${displayName}</span>
-                    </a>`
-                );
+                try {
+                    // Replace login with profile pic and shortened name
+                    const displayName = (user.displayName || 'User').split(' ')[0];
+                    const profileImg = user.photos[0]?.value || 'assets/img/default-avatar.png';
+
+                    if (hasLoginButton) {
+                        nav.innerHTML = nav.innerHTML.replace(
+                            `<a href="/login" class="nav__link">Login</a>`,
+                            `<a href="/profile" class="nav__profile">
+                                <img src="${profileImg}" alt="Profile" class="nav__profile-img">
+                                <span class="nav__profile-name">${displayName}</span>
+                            </a>`
+                        );
+                    }
+                } catch (err) {
+                    console.error('Error updating navigation:', err);
+                }
             }
+        })
+        .catch(err => {
+            console.error('Error fetching user data:', err);
         });
 }
 
