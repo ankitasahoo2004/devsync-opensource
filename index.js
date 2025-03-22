@@ -13,11 +13,19 @@ const MongoStore = require('connect-mongo');
 const PORT = process.env.PORT || 5500;
 const serverUrl = process.env.SERVER_URL;
 
+const {
+    sendWelcomeEmail,
+    sendLeaderboardUpdate,
+    sendPreEndingNotification,
+    sendCompletionEmails,
+    sendCertificates
+} = require('./services/emailTriggers');
 
 const app = express();
 
 // DevSync program start date - all contributions are tracked from this date
 const PROGRAM_START_DATE = '2025-03-14';
+const PROGRAM_END_DATE = new Date('2025-06-14');
 
 // Create authenticated Octokit instance
 const octokit = new Octokit({
@@ -144,12 +152,14 @@ passport.use(new GitHubStrategy({
                 username: profile.username,
                 displayName: profile.displayName,
                 email: profile.emails?.[0]?.value || '',
-                avatarUrl: profile.photos?.[0]?.value || '',
                 mergedPRs: [],
                 cancelledPRs: [],
                 points: 0,
                 badges: ['Newcomer']
             });
+
+            // Send welcome email to new users
+            await sendWelcomeEmail(user);
         }
 
         return done(null, { ...profile, userData: user });
@@ -956,3 +966,40 @@ async function startServer() {
 
 // Start the server
 startServer();
+
+// Add scheduled tasks for email notifications
+const scheduleEmailTasks = async () => {
+    const now = new Date();
+
+    // Send leaderboard updates daily
+    setInterval(async () => {
+        const users = await User.find({});
+        const rankedUsers = await calculateTrends(users);
+
+        for (const user of rankedUsers) {
+            await sendLeaderboardUpdate(user, user.rank, user.trend);
+        }
+    }, 24 * 60 * 60 * 1000);
+
+    // Check for pre-ending notification daily
+    setInterval(async () => {
+        const users = await User.find({});
+        await sendPreEndingNotification(users);
+    }, 24 * 60 * 60 * 1000);
+
+    // Send completion emails and certificates on end date
+    const endDate = new Date(PROGRAM_END_DATE);
+    if (now >= endDate) {
+        const users = await User.find({});
+        await sendCompletionEmails(users);
+        await sendCertificates(users);
+    }
+};
+
+// Start email scheduling after database connection
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+        console.log('Connected to MongoDB');
+        scheduleEmailTasks();
+    })
+    .catch(err => console.error('MongoDB connection error:', err));
