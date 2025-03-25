@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to DevSync OpenSource</title>
+    <style type="text/css">
+        /* Base styles */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #f9fafb;
+            background: #000000;
+        }
+
+        #bodyTable {
+            width: 100% !important;
+            margin: 0;
+            padding: 0;
+            background: #000000;
+        }
+
+        .emailContainer {
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        img {
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+            -ms-interpolation-mode: bicubic;
+            max-width: 100%;
+        }
+
+        table {
+            border-collapse: collapse !important;
+        }
+
+        /* Mobile styles */
+        @media screen and (max-width: 600px) {
+            .emailContainer {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .responsive-table {
+                width: 100% !important;
+            }
+
+            .mobile-padding {
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+            }
+
+            .mobile-stack {
+                display: block !important;
+                width: 100% !important;
+            }
+
+            .mobile-center {
+                text-align: center !important;
+            }
+
+            .mobile-img {
+                height: auto !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .hide-mobile {
+                display: none !important;
+            }
+
+            .show-mobile {
+                display: block !important;
+            }
+        }
+
+        .highlight-text {
+            background: linear-gradient(135deg, #6ee7b7 0%, #d8b4fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 24px;
+            font-size: 16px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #6ee7b7 0%, #d8b4fe 100%);
+            color: #111827;
+            margin: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 18px 36px;
+            background: linear-gradient(135deg, #6ee7b7 0%, #d8b4fe 100%);
+            color: #111827;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .button:hover {
+            background: linear-gradient(135deg, #4ade80 0%, #c084fc 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .button:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* New styles for modern look */
+        .header-gradient {
+            background: linear-gradient(135deg, #f0fdf4 0%, #f5f5f5 100%);
+            border-radius: 24px 24px 0 0;
+            padding-bottom: 20px;
+        }
+
+        .main-content-gradient {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border-radius: 0 0 24px 24px;
+            padding-bottom: 30px;
+        }
+
+        .section-heading {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            text-align: center;
+            margin-bottom: 28px;
+            color: #f9fafb;
+        }
+
+        .sub-heading {
+            font-size: 18px;
+            text-align: center;
+            color: #e2e8f0;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            display: block;
+            margin: 0 auto 20px;
+            filter: invert(1);
+        }
+
+        .feature-title {
+            color: #f9fafb;
+            text-align: center;
+            margin: 0 0 16px 0;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .feature-text {
+            color: #cbd5e0;
+            text-align: center;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .badge-text {
+            color: #111827;
+        }
+    </style>
+</head>
+
+<body style="margin: 0; padding: 0; background: #000000;">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" id="bodyTable">
+        <tr>
+            <td align="center" valign="top" style="padding: 40px 0;">
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="650"
+                    class="emailContainer">
+                    <tr>
+                        <td align="center" valign="top" class="header-gradient">
+                            <img src="https://github.com/Sayan-dev731/code_completion/blob/main/Black%20and%20Red%20Bold%20Spooky%20Halloween%20Logo_20250319_231051_0000.png?raw=true"
+                                alt="DevSync" width="200"
+                                style="display: block; margin: 0 auto;  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4)); background-color: black; border-radius: 50%; padding: 8px;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center" valign="top" class="main-content-gradient">
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td align="left" valign="top" style="padding: 50px 40px 30px 40px;"
+                                        class="mobile-padding">
+                                        <h1 class="section-heading">
+                                            Welcome to DevSync 2025
+                                        </h1>
+                                        <p class="sub-heading">
+                                            You're now part of a global community of developers shaping the future of
+                                            open
+                                            source!
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td align="center" valign="top" style="padding: 0 40px 40px 0px;"
+                                        class="mobile-padding">
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0"
+                                            width="100%">
+                                            <tr>
+                                                <td valign="top" class="mobile-stack"
+                                                    style="padding: 20px; width: 33.33%;">
+                                                    <div class="feature-card">
+                                                        <img src="https://img.icons8.com/windows/64/git.png" alt="git"
+                                                            class="feature-icon">
+                                                        <h3 class="feature-title">Contribute</h3>
+                                                        <p class="feature-text">
+                                                            Find projects matching your skills and start contributing
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                                <td valign="top" class="mobile-stack"
+                                                    style="padding: 20px; width: 33.33%;">
+                                                    <div class="feature-card">
+                                                        <img src="https://img.icons8.com/badges/48/broadcasting.png"
+                                                            alt="Learn" class="feature-icon">
+                                                        <h3 class="feature-title">Learn</h3>
+                                                        <p class="feature-text">
+                                                            Gain real-world experience through mentored contributions
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                                <td valign="top" class="mobile-stack"
+                                                    style="padding: 20px; width: 33.33%;">
+                                                    <div class="feature-card">
+                                                        <img src="https://img.icons8.com/material-two-tone/48/compare-git.png"
+                                                            alt="Grow" class="feature-icon">
+                                                        <h3 class="feature-title">Grow</h3>
+                                                        <p class="feature-text">
+                                                            Earn badges and build your developer portfolio
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td align="center" valign="middle" style="padding: 20px 40px 40px 40px;"
+                                        class="mobile-padding">
+                                        <h2 class="section-heading" style="text-align: center;">Start Your Journey</h2>
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0"
+                                            width="100%" style="max-width: 500px; margin: 0 auto;">
+                                            <tr>
+                                                <td style="padding: 12px; text-align: center;">
+                                                    <div class="badge" style="display: inline-block;">
+                                                        <span class="badge-text">Newcomer Badge</span>
+                                                    </div>
+                                                    <p
+                                                        style="color: #cbd5e0; margin: 12px auto; font-size: 16px; line-height: 1.7; max-width: 400px;">
+                                                        Create your profile and explore projects
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 12px; text-align: center;">
+                                                    <div class="badge" style="display: inline-block;">
+                                                        <span class="badge-text">First Contribution</span>
+                                                    </div>
+                                                    <p
+                                                        style="color: #cbd5e0; margin: 12px auto; font-size: 16px; line-height: 1.7; max-width: 400px;">
+                                                        Submit your first pull request
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 12px; text-align: center;">
+                                                    <div class="badge" style="display: inline-block;">
+                                                        <span class="badge-text">Active Contributor</span>
+                                                    </div>
+                                                    <p
+                                                        style="color: #cbd5e0; margin: 12px auto; font-size: 16px; line-height: 1.7; max-width: 400px;">
+                                                        Make 5+ successful contributions
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <a href="https://devsync-opensource.onrender.com/projects.html" class="button"
+                                            style="margin: 30px auto 0;">
+                                            Browse Projects
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center" valign="top" style="padding: 30px 0;">
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td align="center" style="padding-bottom: 20px;">
+                                        <a href="https://github.com/devsync-opensource" style="margin: 0 16px;">
+                                            <img src="https://img.icons8.com/fluency/48/github.png" alt="GitHub"
+                                                width="32" style="transition: transform 0.2s ease;">
+                                        </a>
+                                        <a href="https://discord.gg/devsync" style="margin: 0 16px;">
+                                            <img src="https://img.icons8.com/color/48/discord-logo.png" alt="Discord"
+                                                width="32" style="transition: transform 0.2s ease;">
+                                        </a>
+                                        <a href="https://twitter.com/devsync" style="margin: 0 16px;">
+                                            <img src="https://img.icons8.com/fluency/48/twitterx--v1.png" alt="Twitter"
+                                                width="32" style="transition: transform 0.2s ease;">
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="color: #9ca3af; font-size: 14px; line-height: 1.7;">
+                                        <p style="margin: 8px 0;">DevSync Open Source Initiative</p>
+                                        <p style="margin: 8px 0;">Making open source contributions accessible to
+                                            everyone</p>
+                                        <p style="margin: 20px 0 0 0; font-size: 12px;">© 2025 DevSync. All rights
+                                            reserved.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
