@@ -211,12 +211,14 @@
 }
 
 .leaderboard-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
   margin: 2rem 0;
   padding: 0 1rem;
   background: transparent;
+  justify-content: flex-start; /* Align items from left side */
+  width: 100%;
 }
 
 .leaderboard-item {
@@ -228,6 +230,7 @@
   padding: 1.5rem 1rem 1rem;
   margin: 0;
   min-height: 200px;
+  flex: 0 0 calc(20% - 1.5rem); /* Adjust width of each card */
   box-shadow: 0 0 20px rgba(128, 0, 128, 0.1);
   backdrop-filter: blur(10px);
 }
@@ -347,11 +350,12 @@
 
 /* Runners-up Cards Grid */
 .runners-up-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
   margin: 2rem 0;
   padding: 0 1rem;
+  justify-content: flex-start; /* Align items from left side */
 }
 
 .runner-up-card {
@@ -363,6 +367,7 @@
   text-align: center;
   transition: all 0.3s ease;
   min-height: 200px;
+  flex: 0 0 calc(20% - 1.5rem); /* Adjust width of each card */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -450,6 +455,18 @@
 }
 
 /* Responsive Design */
+@media screen and (max-width: 1200px) {
+  .leaderboard-item, .runner-up-card {
+    flex: 0 0 calc(25% - 1.5rem);
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .leaderboard-item, .runner-up-card {
+    flex: 0 0 calc(33.333% - 1.5rem);
+  }
+}
+
 @media screen and (max-width: 768px) {
   .leaderboard-winners {
     flex-direction: row;
@@ -572,6 +589,10 @@
     justify-content: center;
     margin-top: 0.75rem;
   }
+
+  .leaderboard-item, .runner-up-card {
+    flex: 0 0 calc(50% - 1rem);
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -585,5 +606,15 @@
 
   .leaderboard-list {
     grid-template-columns: 1fr;
+  }
+
+  .leaderboard-item, .runner-up-card {
+    flex: 0 0 100%;
+  }
+
+  /* Remove the grid layout for smallest screens */
+  .runners-up-grid, .leaderboard-list {
+    display: flex;
+    flex-direction: column;
   }
 }
