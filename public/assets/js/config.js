@@ -1,1 +1,0 @@
-serverUrl = window.location.origin === "localhost" ? "http://localhost:3000" : "https://devsync-opensource.onrender.com";
