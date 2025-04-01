@@ -10,9 +10,9 @@ const { Octokit } = require('@octokit/rest');
 const User = require('./models/User');
 const Repo = require('./models/Repo');
 const MongoStore = require('connect-mongo');
+const emailService = require('./services/emailService');
 const PORT = process.env.PORT || 5500;
 const serverUrl = process.env.SERVER_URL;
-
 
 const app = express();
 
@@ -133,23 +133,43 @@ app.use(passport.session());
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: process.env.GITHUB_CALLBACK_URL
+    callbackURL: process.env.GITHUB_CALLBACK_URL,
+    scope: ['user', 'user:email']  // Add email scope
 }, async (accessToken, refreshToken, profile, done) => {
     try {
+        // Create Octokit instance with the user's access token
+        const userOctokit = new Octokit({
+            auth: accessToken
+        });
+
+        // Fetch user's emails
+        const { data: emails } = await userOctokit.users.listEmailsForAuthenticated();
+        const primaryEmail = emails.find(email => email.primary)?.email || emails[0]?.email;
+
+        if (!primaryEmail) {
+            throw new Error('No email found for user');
+        }
+
         let user = await User.findOne({ githubId: profile.id });
 
         if (!user) {
+            // Create new user
             user = await User.create({
                 githubId: profile.id,
                 username: profile.username,
                 displayName: profile.displayName,
-                email: profile.emails?.[0]?.value || '',
+                email: primaryEmail,
                 avatarUrl: profile.photos?.[0]?.value || '',
                 mergedPRs: [],
                 cancelledPRs: [],
                 points: 0,
                 badges: ['Newcomer']
             });
+
+            // Send welcome email only for new users
+            await emailService.sendWelcomeEmail(primaryEmail, profile.username);
+            user.welcomeEmailSent = true;
+            await user.save();
         }
 
         return done(null, { ...profile, userData: user });

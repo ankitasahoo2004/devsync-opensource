@@ -11,7 +11,10 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     displayName: String,
-    email: String,
+    email: {
+        type: String,
+        required: true
+    },
     avatarUrl: String,
     mergedPRs: [{
         repoId: String,
@@ -36,6 +39,10 @@ const userSchema = new mongoose.Schema({
     joinedAt: {
         type: Date,
         default: Date.now
+    },
+    welcomeEmailSent: {
+        type: Boolean,
+        default: false
     }
 });
 
