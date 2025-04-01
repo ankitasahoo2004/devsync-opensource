@@ -1,3 +1,11 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const githubLoginButton = document.getElementById('logout-button');
+
+    githubLoginButton.addEventListener('click', () => {
+        window.location.href = `${serverUrl}/logout`;
+    });
+});
+
 async function fetchUserProfile() {
     try {
         const response = await fetch(`${serverUrl}/api/user`, {

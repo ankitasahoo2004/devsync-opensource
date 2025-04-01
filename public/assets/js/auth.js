@@ -9,6 +9,10 @@ async function checkAuthStatus() {
         const data = await response.json();
 
         const loginButton = document.querySelector('.button.button--ghost');
+        if (!loginButton) {
+            console.error('Login button element not found');
+            return;
+        }
 
         if (data.isAuthenticated) {
             // Create a more sophisticated profile button

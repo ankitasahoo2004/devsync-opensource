@@ -1,3 +1,11 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const githubLoginButton = document.getElementById('login__button');
+
+    githubLoginButton.addEventListener('click', () => {
+        window.location.href = `${serverUrl}/auth/github`;
+    });
+});
+
 // Create particles
 function createParticles() {
     const particles = document.querySelector('.particles');
