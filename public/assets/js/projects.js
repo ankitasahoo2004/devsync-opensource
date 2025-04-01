@@ -69,8 +69,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const projects = await response.json();
 
-            // Add search bar
             projectsContainer.innerHTML = `
+                <div class="filter-container">
+                    <button class="filter-btn active" data-filter="all">
+                        <i class='bx bx-list-ul'></i> All
+                    </button>
+                    <button class="filter-btn" data-filter="pending">
+                        <i class='bx bx-time-five'></i> In Review
+                    </button>
+                    <button class="filter-btn" data-filter="accepted">
+                        <i class='bx bx-check-circle'></i> Accepted
+                    </button>
+                    <button class="filter-btn" data-filter="rejected">
+                        <i class='bx bx-x-circle'></i> Rejected
+                    </button>
+                </div>
                 <div class="search-container">
                     <input type="text" 
                            class="search-bar" 
@@ -82,28 +95,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
-            // Add event delegation for view repository buttons
-            projectsContainer.addEventListener('click', (e) => {
-                const viewBtn = e.target.closest('.view-repo');
-                const deleteBtn = e.target.closest('.delete-project');
+            // Add filter functionality
+            const filterBtns = projectsContainer.querySelectorAll('.filter-btn');
+            const projectsGrid = document.getElementById('userProjectsGrid');
 
-                if (viewBtn) {
-                    const repoUrl = viewBtn.dataset.url;
-                    showModal('confirm', 'View Repository', 'Would you like to visit this repository on GitHub?', (confirmed) => {
-                        if (confirmed) {
-                            window.open(repoUrl, '_blank');
-                        }
-                    });
-                }
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const filterValue = btn.dataset.filter;
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
 
-                if (deleteBtn) {
-                    deleteProject(deleteBtn.dataset.id);
-                }
+                    const filteredProjects = filterValue === 'all'
+                        ? projects
+                        : projects.filter(project => project.reviewStatus === filterValue);
+
+                    projectsGrid.innerHTML = renderProjects(filteredProjects);
+                });
             });
 
             // Add search functionality
             const searchBar = document.getElementById('userProjectSearch');
-            const projectsGrid = document.getElementById('userProjectsGrid');
             let debounceTimer;
 
             searchBar.addEventListener('input', (e) => {
@@ -695,8 +706,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const projects = await response.json();
             const adminContainer = document.getElementById('adminContainer');
 
-            // Add search bar for admin section
             adminContainer.innerHTML = `
+                <div class="filter-container">
+                    <button class="filter-btn active" data-filter="all">
+                        <i class='bx bx-list-ul'></i> All
+                    </button>
+                    <button class="filter-btn" data-filter="pending">
+                        <i class='bx bx-time-five'></i> In Review
+                    </button>
+                    <button class="filter-btn" data-filter="accepted">
+                        <i class='bx bx-check-circle'></i> Accepted
+                    </button>
+                    <button class="filter-btn" data-filter="rejected">
+                        <i class='bx bx-x-circle'></i> Rejected
+                    </button>
+                </div>
                 <div class="search-container">
                     <input type="text" 
                            class="search-bar" 
@@ -708,9 +732,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
+            // Add filter functionality
+            const filterBtns = adminContainer.querySelectorAll('.filter-btn');
+            const projectsGrid = document.getElementById('adminProjectsGrid');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const filterValue = btn.dataset.filter;
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    const filteredProjects = filterValue === 'all'
+                        ? projects
+                        : projects.filter(project => project.reviewStatus === filterValue);
+
+                    projectsGrid.innerHTML = renderAdminProjects(filteredProjects);
+                });
+            });
+
             // Add search functionality for admin section
             const searchBar = document.getElementById('adminProjectSearch');
-            const projectsGrid = document.getElementById('adminProjectsGrid');
             let debounceTimer;
 
             searchBar.addEventListener('input', (e) => {
