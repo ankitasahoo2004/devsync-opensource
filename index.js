@@ -142,18 +142,31 @@ passport.use(new GitHubStrategy({
             auth: accessToken
         });
 
-        // Fetch user's emails
-        const { data: emails } = await userOctokit.users.listEmailsForAuthenticated();
-        const primaryEmail = emails.find(email => email.primary)?.email || emails[0]?.email;
+        // Try to get authenticated user's emails with the updated endpoint
+        let primaryEmail;
+        try {
+            const { data: emails } = await userOctokit.rest.users.listEmailsForAuthenticatedUser();
+            primaryEmail = emails.find(email => email.primary)?.email;
+            
+            if (!primaryEmail) {
+                // Fallback to public email if available
+                const { data: userData } = await userOctokit.rest.users.getAuthenticated();
+                primaryEmail = userData.email;
+            }
+        } catch (emailError) {
+            console.error('Error fetching user emails:', emailError);
+            // Fallback to profile email if available
+            primaryEmail = profile.emails?.[0]?.value;
+        }
 
         if (!primaryEmail) {
-            throw new Error('No email found for user');
+            return done(new Error('No email found for user'));
         }
 
         let user = await User.findOne({ githubId: profile.id });
 
         if (!user) {
-            // Create new user
+            // Create new user with verified email
             user = await User.create({
                 githubId: profile.id,
                 username: profile.username,
@@ -167,9 +180,11 @@ passport.use(new GitHubStrategy({
             });
 
             // Send welcome email only for new users
-            await emailService.sendWelcomeEmail(primaryEmail, profile.username);
-            user.welcomeEmailSent = true;
-            await user.save();
+            const emailSent = await emailService.sendWelcomeEmail(primaryEmail, profile.username);
+            if (emailSent) {
+                user.welcomeEmailSent = true;
+                await user.save();
+            }
         }
 
         return done(null, { ...profile, userData: user });
