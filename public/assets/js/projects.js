@@ -1099,6 +1099,68 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('') : '<p class="no-projects">No projects submitted yet.</p>';
     };
 
+    const loadRegisteredUsers = async () => {
+        try {
+            const response = await fetch(`${serverUrl}/api/users`, {
+                credentials: 'include'
+            });
+            const users = await response.json();
+            return users;
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            return [];
+        }
+    };
+
+    const renderUsers = (users) => {
+        const usersGrid = document.querySelector('.users-grid');
+        usersGrid.innerHTML = users.map(user => `
+            <div class="user-card" onclick="window.open('https://github.com/${user.username}', '_blank')">
+                <div class="user-header">
+                    <img src="${user.avatarUrl}" alt="${user.displayName}" class="user-avatar">
+                    <div class="user-info">
+                        <h3>${user.displayName || user.username}</h3>
+                        <p>@${user.username}</p>
+                    </div>
+                </div>
+                <div class="user-details">
+                    <div class="user-detail">
+                        <i class='bx bx-envelope'></i>
+                        <span>${user.email}</span>
+                    </div>
+                    <div class="user-detail">
+                        <i class='bx bx-user-check'></i>
+                        <span class="user-role ${user.isAdmin ? 'admin' : 'contributor'}">
+                            ${user.isAdmin ? 'Admin' : 'Contributor'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    };
+
+    const searchUsers = (users, searchTerm) => {
+        return users.filter(user =>
+            user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (user.displayName && user.displayName.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+    };
+
+    const initializeUsersSection = async () => {
+        const allUsers = await loadRegisteredUsers();
+        renderUsers(allUsers);
+
+        const searchInput = document.querySelector('.users-search input');
+        searchInput.addEventListener('input', (e) => {
+            const filteredUsers = searchUsers(allUsers, e.target.value);
+            renderUsers(filteredUsers);
+        });
+    };
+
     // Start the authentication check process
     checkAuthAndInitialize();
+
+    // Initialize users section
+    initializeUsersSection();
 });
