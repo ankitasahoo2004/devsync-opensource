@@ -129,6 +129,63 @@ class EmailService {
             return false;
         }
     }
+
+    async sendProjectDeletedEmail(userEmail, projectData, deletedBy) {
+        try {
+            const template = await this.loadTemplate('projectDeletedEmail');
+            const repoName = projectData.repoLink.split('/').pop();
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: userEmail,
+                subject: 'Project Deleted - DevSync',
+                html: template({
+                    ownerName: projectData.ownerName,
+                    repoName: repoName,
+                    repoLink: projectData.repoLink,
+                    description: projectData.description,
+                    deletionDate: new Date().toLocaleDateString(),
+                    deletedBy: deletedBy
+                })
+            };
+
+            await this.transporter.sendMail(mailOptions);
+            console.log(`Project deletion email sent to ${userEmail}`);
+            return true;
+        } catch (error) {
+            console.error('Error sending project deletion email:', error);
+            return false;
+        }
+    }
+
+    async sendProjectPointsUpdateEmail(userEmail, projectData, previousPoints, newPoints, updatedBy) {
+        try {
+            const template = await this.loadTemplate('projectPointsUpdateEmail');
+            const repoName = projectData.repoLink.split('/').pop();
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: userEmail,
+                subject: 'Project Points Updated - DevSync',
+                html: template({
+                    ownerName: projectData.ownerName,
+                    repoName: repoName,
+                    repoLink: projectData.repoLink,
+                    previousPoints: previousPoints,
+                    newPoints: newPoints,
+                    updateDate: new Date().toLocaleDateString(),
+                    updatedBy: updatedBy
+                })
+            };
+
+            await this.transporter.sendMail(mailOptions);
+            console.log(`Project points update email sent to ${userEmail}`);
+            return true;
+        } catch (error) {
+            console.error('Error sending project points update email:', error);
+            return false;
+        }
+    }
 }
 
 module.exports = new EmailService();

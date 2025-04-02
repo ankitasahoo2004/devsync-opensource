@@ -6,6 +6,49 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add this at the top level of the DOMContentLoaded callback
     let currentUser = null;
 
+    // Add filter state tracking
+    const filterState = {
+        admin: 'all',
+        view: 'all'
+    };
+
+    // Add refresh function
+    const refreshProjectsView = async (section) => {
+        try {
+            const container = section === 'admin' ?
+                document.getElementById('adminProjectsGrid') :
+                document.getElementById('userProjectsGrid');
+
+            if (!container) return;
+
+            const endpoint = section === 'admin' ?
+                `${serverUrl}/api/admin/projects` :
+                `${serverUrl}/api/projects/${currentUser.id}`;
+
+            const response = await fetch(endpoint, { credentials: 'include' });
+            const projects = await response.json();
+
+            // Apply current filter
+            const filteredProjects = filterState[section] === 'all' ?
+                projects :
+                projects.filter(project => project.reviewStatus === filterState[section]);
+
+            // Update grid with filtered projects
+            container.innerHTML = section === 'admin' ?
+                renderAdminProjects(filteredProjects) :
+                renderProjects(filteredProjects);
+
+            // Update active filter button
+            const filterBtns = container.closest('.projects-container, .admin-container')
+                .querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filterState[section]);
+            });
+        } catch (error) {
+            console.error(`Error refreshing ${section} projects:`, error);
+        }
+    };
+
     // Tab handling
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -23,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Refresh projects when switching to view tab
             if (tabName === 'view' && currentUser) {
-                await displayUserProjects(currentUser.id);
+                await refreshProjectsView('view');
             }
         });
     });
@@ -53,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }, 300);
                     }
                     showModal('success', 'Success', 'Project deleted successfully!');
+                    await refreshProjectsView('view');
                 } else {
                     throw new Error(data.error || 'Failed to delete project');
                 }
@@ -100,16 +144,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const projectsGrid = document.getElementById('userProjectsGrid');
 
             filterBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', async () => {
                     const filterValue = btn.dataset.filter;
+                    filterState.view = filterValue; // Update state
                     filterBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-
-                    const filteredProjects = filterValue === 'all'
-                        ? projects
-                        : projects.filter(project => project.reviewStatus === filterValue);
-
-                    projectsGrid.innerHTML = renderProjects(filteredProjects);
+                    await refreshProjectsView('view');
                 });
             });
 
@@ -158,22 +198,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const reviewProject = async (projectId, status) => {
         try {
+            // Show loading modal first
+            showModal('loading', 'Processing...', 'Sending email notification...');
+
             const response = await fetch(`${serverUrl}/api/admin/projects/${projectId}/review`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ status })
+                body: JSON.stringify({
+                    status,
+                    rejectionReason: status === 'rejected' ?
+                        prompt('Please provide a reason for rejection:') : undefined
+                })
             });
 
             if (!response.ok) {
                 throw new Error('Failed to review project');
             }
 
-            showModal('success', 'Success', `Project ${status} successfully!`);
-            await loadAllProjects(); // Refresh the admin view
+            const data = await response.json();
+
+            // Remove loading modal
+            removeExistingModals();
+
+            // Show success modal
+            if (status === 'accepted') {
+                showModal('success', 'Project Accepted!', 'Project owner has been notified via email.');
+            } else {
+                showModal('success', 'Project Rejected', 'Project owner has been notified via email.');
+            }
+
+            // Refresh both sections with current filters
+            await Promise.all([
+                refreshProjectsView('admin'),
+                refreshProjectsView('view')
+            ]);
         } catch (error) {
+            removeExistingModals();
             showModal('error', 'Error', error.message || 'Failed to review project');
         }
     };
@@ -737,16 +800,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const projectsGrid = document.getElementById('adminProjectsGrid');
 
             filterBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', async () => {
                     const filterValue = btn.dataset.filter;
+                    filterState.admin = filterValue; // Update state
                     filterBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-
-                    const filteredProjects = filterValue === 'all'
-                        ? projects
-                        : projects.filter(project => project.reviewStatus === filterValue);
-
-                    projectsGrid.innerHTML = renderAdminProjects(filteredProjects);
+                    await refreshProjectsView('admin');
                 });
             });
 
@@ -781,113 +840,143 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add this new function to handle admin panel events
     const addAdminEventListeners = (container) => {
+        // Keep track of buttons being processed
+        const processingButtons = new Set();
+
+        // Single event listener for all buttons
         container.addEventListener('click', async (e) => {
             const updatePointsBtn = e.target.closest('.update-points');
+            const deleteBtn = e.target.closest('.delete-project');
+            const acceptBtn = e.target.closest('.accept-project');
+            const rejectBtn = e.target.closest('.reject-project');
+            const viewBtn = e.target.closest('.view-repo');
 
+            // Handle update points
             if (updatePointsBtn) {
+                if (processingButtons.has(updatePointsBtn)) return;
                 const projectId = updatePointsBtn.dataset.id;
                 const successInput = container.querySelector(`.success-points[data-project="${projectId}"]`);
                 const successPoints = parseInt(successInput.value);
 
-                // Validate points
                 if (successPoints < 0 || successPoints > 500) {
                     showModal('error', 'Invalid Points', 'Success points must be between 0 and 500');
                     return;
                 }
 
                 try {
+                    processingButtons.add(updatePointsBtn);
+                    updatePointsBtn.disabled = true;
+                    updatePointsBtn.style.opacity = '0.7';
+                    updatePointsBtn.style.cursor = 'not-allowed';
+
+                    showModal('loading', 'Updating Points...', 'Please wait while we send the notification email...');
+
                     const response = await fetch(`${serverUrl}/api/admin/projects/${projectId}/points`, {
                         method: 'PATCH',
                         credentials: 'include',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({
-                            successPoints
-                        })
+                        body: JSON.stringify({ successPoints })
                     });
 
                     if (!response.ok) {
                         throw new Error('Failed to update points');
                     }
 
-                    showModal('success', 'Success', 'Points updated successfully!');
+                    removeExistingModals();
+                    showModal('success', 'Success', 'Points updated and notification email sent!');
                     successInput.value = successPoints;
 
-                    // Visual feedback
                     const pointsControl = updatePointsBtn.closest('.points-control');
                     pointsControl.style.borderColor = 'var(--first-color)';
                     setTimeout(() => {
                         pointsControl.style.borderColor = 'rgba(255, 255, 255, 0.1)';
                     }, 2000);
 
+                    await refreshProjectsView('admin');
                 } catch (error) {
+                    removeExistingModals();
                     showModal('error', 'Error', 'Failed to update points. Please try again.');
+                } finally {
+                    processingButtons.delete(updatePointsBtn);
+                    updatePointsBtn.disabled = false;
+                    updatePointsBtn.style.opacity = '1';
+                    updatePointsBtn.style.cursor = 'pointer';
                 }
+                return;
             }
-        });
 
-        container.addEventListener('click', async (e) => {
-            const acceptBtn = e.target.closest('.accept-project');
-            const rejectBtn = e.target.closest('.reject-project');
-            const deleteBtn = e.target.closest('.delete-project');
-            const viewBtn = e.target.closest('.view-repo');
+            // Handle other buttons
+            if (deleteBtn) {
+                const projectId = deleteBtn.dataset.id;
+                if (!projectId) return;
+                showModal('confirm', 'Delete Project', 'Are you sure you want to delete this project?', async (confirmed) => {
+                    if (!confirmed) return;
+
+                    try {
+                        showModal('loading', 'Deleting Project...', 'Please wait while we send the notification email...');
+
+                        const response = await fetch(`${serverUrl}/api/projects/${projectId}`, {
+                            method: 'DELETE',
+                            credentials: 'include'
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to delete project');
+                        }
+
+                        removeExistingModals();
+
+                        const projectCard = container.querySelector(`.project-card[data-project-id="${projectId}"]`);
+
+                        if (projectCard) {
+                            showModal('success', 'Success', 'Project deleted and notification email sent!');
+
+                            projectCard.style.transition = 'all 0.3s ease';
+                            projectCard.style.opacity = '0';
+                            projectCard.style.transform = 'scale(0.9)';
+
+                            setTimeout(() => {
+                                projectCard.remove();
+
+                                const projectsGrid = document.getElementById('adminProjectsGrid');
+                                const remainingCards = projectsGrid.querySelectorAll('.project-card');
+
+                                if (remainingCards.length === 0) {
+                                    projectsGrid.innerHTML = '<p class="no-projects">No projects submitted yet.</p>';
+                                }
+                            }, 300);
+                        }
+
+                        // Refresh both sections with current filters
+                        await Promise.all([
+                            refreshProjectsView('admin'),
+                            refreshProjectsView('view')
+                        ]);
+                    } catch (error) {
+                        removeExistingModals();
+                        showModal('error', 'Error', 'Failed to delete project. Please try again.');
+                    }
+                });
+            }
 
             if (acceptBtn) {
                 const projectId = acceptBtn.dataset.id;
-                await reviewProject(projectId, 'accepted');
+                showModal('confirm', 'Accept Project', 'Are you sure you want to accept this project?', async (confirmed) => {
+                    if (confirmed) {
+                        await reviewProject(projectId, 'accepted');
+                    }
+                });
             }
 
             if (rejectBtn) {
                 const projectId = rejectBtn.dataset.id;
-                await reviewProject(projectId, 'rejected');
-            }
-
-            if (deleteBtn) {
-                const projectId = deleteBtn.dataset.id;
-                if (projectId) {
-                    showModal('confirm', 'Delete Project', 'Are you sure you want to delete this project?', async (confirmed) => {
-                        if (!confirmed) return;
-
-                        try {
-                            const response = await fetch(`${serverUrl}/api/projects/${projectId}`, {
-                                method: 'DELETE',
-                                credentials: 'include'
-                            });
-
-                            if (!response.ok) {
-                                throw new Error('Failed to delete project');
-                            }
-
-                            // Get the specific project card using the project ID
-                            const projectCard = container.querySelector(`.project-card[data-project-id="${projectId}"]`);
-
-                            if (projectCard) {
-                                // Add fade out animation
-                                projectCard.style.transition = 'all 0.3s ease';
-                                projectCard.style.opacity = '0';
-                                projectCard.style.transform = 'scale(0.9)';
-
-                                // Remove the card after animation
-                                setTimeout(() => {
-                                    projectCard.remove();
-
-                                    // Check if there are any remaining projects
-                                    const projectsGrid = document.getElementById('adminProjectsGrid');
-                                    const remainingCards = projectsGrid.querySelectorAll('.project-card');
-
-                                    if (remainingCards.length === 0) {
-                                        projectsGrid.innerHTML = '<p class="no-projects">No projects submitted yet.</p>';
-                                    }
-                                }, 300);
-
-                                showModal('success', 'Success', 'Project deleted successfully!');
-                            }
-                        } catch (error) {
-                            showModal('error', 'Error', 'Failed to delete project. Please try again.');
-                        }
-                    });
-                }
+                showModal('confirm', 'Reject Project', 'Are you sure you want to reject this project?', async (confirmed) => {
+                    if (confirmed) {
+                        await reviewProject(projectId, 'rejected');
+                    }
+                });
             }
 
             if (viewBtn) {

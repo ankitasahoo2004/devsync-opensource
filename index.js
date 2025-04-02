@@ -532,7 +532,21 @@ app.delete('/api/projects/:projectId', async (req, res) => {
             return res.status(403).json({ error: 'Not authorized to delete this project' });
         }
 
+        // Find project owner before deletion
+        const projectOwner = await User.findOne({ githubId: project.userId });
+
+        // Delete the project
         await Repo.findByIdAndDelete(req.params.projectId);
+
+        // Send deletion email if deleted by admin
+        if (isAdmin && projectOwner) {
+            await emailService.sendProjectDeletedEmail(
+                projectOwner.email,
+                project,
+                req.user.username
+            );
+        }
+
         res.status(200).json({ message: 'Project deleted successfully' });
     } catch (error) {
         console.error('Error deleting project:', error);
@@ -631,7 +645,7 @@ app.post('/api/admin/projects/:projectId/review', async (req, res) => {
         project.reviewedBy = req.user.username;
 
         if (status === 'accepted') {
-            project.successPoints = project.successPoints || 50; // Default points
+            project.successPoints = project.successPoints || 50;
         }
 
         await project.save();
@@ -646,7 +660,10 @@ app.post('/api/admin/projects/:projectId/review', async (req, res) => {
             }
         }
 
-        res.json(project);
+        res.json({
+            ...project.toObject(),
+            emailSent: true
+        });
     } catch (error) {
         console.error('Error reviewing project:', error);
         res.status(500).json({ error: 'Failed to review project' });
@@ -666,17 +683,26 @@ app.patch('/api/admin/projects/:projectId/points', async (req, res) => {
 
     try {
         const { successPoints } = req.body;
-
-        const project = await Repo.findByIdAndUpdate(
-            req.params.projectId,
-            {
-                successPoints
-            },
-            { new: true }
-        );
+        const project = await Repo.findById(req.params.projectId);
 
         if (!project) {
             return res.status(404).json({ error: 'Project not found' });
+        }
+
+        const previousPoints = project.successPoints || 50;
+        project.successPoints = successPoints;
+        await project.save();
+
+        // Send points update email
+        const projectOwner = await User.findOne({ githubId: project.userId });
+        if (projectOwner) {
+            await emailService.sendProjectPointsUpdateEmail(
+                projectOwner.email,
+                project,
+                previousPoints,
+                successPoints,
+                req.user.username
+            );
         }
 
         res.json(project);

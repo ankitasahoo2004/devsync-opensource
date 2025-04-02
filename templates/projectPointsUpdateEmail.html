@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Points Updated</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.95) 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            padding: 32px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 120px;
+            margin-bottom: 16px;
+        }
+
+        .content {
+            padding: 32px;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .points-badge {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: white !important;
+            padding: 12px 24px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 16px 0;
+            font-weight: 600;
+        }
+
+        .points-update {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 32px;
+            background: rgba(96, 95, 95, 0.3);
+            font-size: 14px;
+            color: #000000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://devsync-opensource.onrender.com/assets/img/logo.png" alt="DevSync" class="logo">
+            <h1>Project Points Updated</h1>
+        </div>
+        <div class="content">
+            <p>Hello {{ownerName}},</p>
+            <p>The success points for your project have been updated. Here are the details:</p>
+
+            <div class="project-card">
+                <h3>{{repoName}}</h3>
+                <p><strong>Repository:</strong> {{repoLink}}</p>
+                <div class="points-update">
+                    <div>
+                        <p><strong>Previous Points:</strong></p>
+                        <div class="points-badge">{{previousPoints}} points</div>
+                    </div>
+                    <div>
+                        <p><strong>Updated Points:</strong></p>
+                        <div class="points-badge">{{newPoints}} points</div>
+                    </div>
+                </div>
+                <p><strong>Updated On:</strong> {{updateDate}}</p>
+                <p><strong>Updated By:</strong> {{updatedBy}}</p>
+            </div>
+
+            <p>These points will be awarded to contributors for each successful pull request merge in your project.</p>
+
+            <a href="https://devsync-opensource.onrender.com/projects.html" class="button">View Your Project</a>
+        </div>
+        <div class="footer">
+            <p>© 2025 DevSync. All rights reserved.</p>
+            <p>Made with ❤️ for open source</p>
+        </div>
+    </div>
+</body>
+
+</html>
