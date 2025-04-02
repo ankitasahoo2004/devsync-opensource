@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Review Update</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.95) 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+            padding: 32px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 120px;
+            margin-bottom: 16px;
+        }
+
+        .content {
+            padding: 32px;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .tech-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
+            font-size: 14px;
+            margin: 4px;
+            color: #818cf8;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 32px;
+            background: rgba(96, 95, 95, 0.3);
+            font-size: 14px;
+            color: #000000;
+        }
+
+        .message-box {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .suggestions {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .suggestion-item {
+            margin: 12px 0;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .suggestion-item:before {
+            content: "•";
+            position: absolute;
+            left: 8px;
+            color: #4f46e5 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://devsync-opensource.onrender.com/assets/img/logo.png" alt="DevSync" class="logo">
+            <h1>Project Review Update</h1>
+        </div>
+        <div class="content">
+            <p>Hello {{ownerName}},</p>
+            <p>Thank you for submitting your project to DevSync. After careful review, we've determined that we cannot
+                accept the project in its current form.</p>
+
+            <div class="project-card">
+                <h3>{{repoName}}</h3>
+                <p><strong>Repository:</strong> <a href="{{repoLink}}" style="color: #818cf8;">{{repoLink}}</a></p>
+                <p><strong>Description:</strong> {{description}}</p>
+                <div>
+                    <strong>Technologies:</strong><br>
+                    {{#each technologies}}
+                    <span class="tech-tag">{{this}}</span>
+                    {{/each}}
+                </div>
+            </div>
+
+            <div class="message-box">
+                <h3>Feedback</h3>
+                <p>{{rejectionReason}}</p>
+
+                <div class="suggestions">
+                    <h4>Common Reasons for Rejection:</h4>
+                    <div class="suggestion-item">Repository doesn't have clear contribution guidelines</div>
+                    <div class="suggestion-item">Project lacks proper documentation</div>
+                    <div class="suggestion-item">Code doesn't follow common best practices</div>
+                    <div class="suggestion-item">Project scope is too limited for collaboration</div>
+                </div>
+            </div>
+
+            <p>We encourage you to make the necessary improvements and submit again. If you have any questions, please
+                don't hesitate to reach out to our team.</p>
+
+            <a href="https://devsync-opensource.onrender.com/projects.html" class="button">Submit Another Project</a>
+        </div>
+        <div class="footer">
+            <p>© 2025 DevSync. All rights reserved.</p>
+            <p>Made with ❤️ for open source</p>
+        </div>
+    </div>
+</body>
+
+</html>

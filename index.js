@@ -147,7 +147,7 @@ passport.use(new GitHubStrategy({
         try {
             const { data: emails } = await userOctokit.rest.users.listEmailsForAuthenticatedUser();
             primaryEmail = emails.find(email => email.primary)?.email;
-            
+
             if (!primaryEmail) {
                 // Fallback to public email if available
                 const { data: userData } = await userOctokit.rest.users.getAuthenticated();
@@ -496,11 +496,17 @@ app.post('/api/projects', async (req, res) => {
         };
 
         const project = await Repo.create(projectData);
-        res.status(200).json({ success: true, project });
 
+        // Send submission confirmation email
+        const user = await User.findOne({ githubId: req.user.id });
+        if (user) {
+            await emailService.sendProjectSubmissionEmail(user.email, project);
+        }
+
+        res.status(201).json(project);
     } catch (error) {
-        console.error('Error saving project:', error);
-        res.status(500).json({ error: 'Failed to save project' });
+        console.error('Error submitting project:', error);
+        res.status(500).json({ error: 'Failed to submit project' });
     }
 });
 
@@ -613,23 +619,31 @@ app.post('/api/admin/projects/:projectId/review', async (req, res) => {
     }
 
     try {
-        const { status } = req.body;
-        if (!['accepted', 'rejected'].includes(status)) {
-            return res.status(400).json({ error: 'Invalid review status' });
-        }
-
-        const project = await Repo.findByIdAndUpdate(
-            req.params.projectId,
-            {
-                reviewStatus: status,
-                reviewedAt: new Date(),
-                reviewedBy: req.user.username
-            },
-            { new: true }
-        );
+        const { status, rejectionReason } = req.body;
+        const project = await Repo.findById(req.params.projectId);
 
         if (!project) {
             return res.status(404).json({ error: 'Project not found' });
+        }
+
+        project.reviewStatus = status;
+        project.reviewedAt = new Date();
+        project.reviewedBy = req.user.username;
+
+        if (status === 'accepted') {
+            project.successPoints = project.successPoints || 50; // Default points
+        }
+
+        await project.save();
+
+        // Send appropriate email based on review status
+        const projectOwner = await User.findOne({ githubId: project.userId });
+        if (projectOwner) {
+            if (status === 'accepted') {
+                await emailService.sendProjectAcceptedEmail(projectOwner.email, project);
+            } else if (status === 'rejected') {
+                await emailService.sendProjectRejectedEmail(projectOwner.email, project, rejectionReason);
+            }
         }
 
         res.json(project);
