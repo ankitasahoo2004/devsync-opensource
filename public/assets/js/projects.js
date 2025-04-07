@@ -198,47 +198,108 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const reviewProject = async (projectId, status) => {
         try {
-            // Show loading modal first
-            showModal('loading', 'Processing...', 'Sending email notification...');
+            if (status === 'rejected') {
+                // Create rejection reason modal
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                const overlay = document.createElement('div');
+                overlay.className = 'modal__overlay';
 
-            const response = await fetch(`${serverUrl}/api/admin/projects/${projectId}/review`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    status,
-                    rejectionReason: status === 'rejected' ?
-                        prompt('Please provide a reason for rejection:') : undefined
-                })
-            });
+                modal.innerHTML = `
+                    <div class="modal__content">
+                        <h3 class="modal__title">Provide Rejection Reason</h3>
+                        <textarea class="modal__textarea" 
+                                placeholder="Please provide a detailed reason for rejection..."
+                                rows="4"></textarea>
+                        <div class="modal__actions">
+                            <button class="modal__button modal__button--confirm">Submit</button>
+                            <button class="modal__button modal__button--cancel">Cancel</button>
+                        </div>
+                    </div>
+                `;
 
-            if (!response.ok) {
-                throw new Error('Failed to review project');
-            }
+                document.body.appendChild(overlay);
+                document.body.appendChild(modal);
 
-            const data = await response.json();
+                setTimeout(() => {
+                    modal.classList.add('show');
+                    overlay.classList.add('show');
+                }, 10);
 
-            // Remove loading modal
-            removeExistingModals();
+                // Handle rejection reason submission
+                return new Promise((resolve, reject) => {
+                    const submitBtn = modal.querySelector('.modal__button--confirm');
+                    const cancelBtn = modal.querySelector('.modal__button--cancel');
+                    const textarea = modal.querySelector('.modal__textarea');
 
-            // Show success modal
-            if (status === 'accepted') {
-                showModal('success', 'Project Accepted!', 'Project owner has been notified via email.');
+                    submitBtn.addEventListener('click', async () => {
+                        const rejectionReason = textarea.value.trim();
+                        if (!rejectionReason) {
+                            textarea.classList.add('error');
+                            return;
+                        }
+                        modal.remove();
+                        overlay.remove();
+                        await processReview(projectId, status, rejectionReason);
+                        resolve();
+                    });
+
+                    cancelBtn.addEventListener('click', () => {
+                        modal.remove();
+                        overlay.remove();
+                        reject(new Error('Review cancelled'));
+                    });
+
+                    textarea.addEventListener('input', () => {
+                        textarea.classList.remove('error');
+                    });
+                });
             } else {
-                showModal('success', 'Project Rejected', 'Project owner has been notified via email.');
+                await processReview(projectId, status);
             }
-
-            // Refresh both sections with current filters
-            await Promise.all([
-                refreshProjectsView('admin'),
-                refreshProjectsView('view')
-            ]);
         } catch (error) {
             removeExistingModals();
             showModal('error', 'Error', error.message || 'Failed to review project');
         }
+    };
+
+    const processReview = async (projectId, status, rejectionReason) => {
+        // Show loading modal
+        showModal('loading', 'Processing...', 'Sending email notification...');
+
+        const response = await fetch(`${serverUrl}/api/admin/projects/${projectId}/review`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                status,
+                rejectionReason
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to review project');
+        }
+
+        const data = await response.json();
+
+        // Remove loading modal
+        removeExistingModals();
+
+        // Show success modal
+        if (status === 'accepted') {
+            showModal('success', 'Project Accepted!', 'Project owner has been notified via email.');
+        } else {
+            showModal('success', 'Project Rejected', 'Project owner has been notified via email.');
+        }
+
+        // Refresh both sections with current filters
+        await Promise.all([
+            refreshProjectsView('admin'),
+            refreshProjectsView('view')
+        ]);
     };
 
     const showProjectForm = () => {
