@@ -34,8 +34,8 @@
   /* Black solid
   Purple to Blue gradient
   Vibrant Pink to Orange gradient */
-  --body-color: Black;
-  --container-color: linear-gradient(135deg, #7634b3, #1d0d4a);
+  --body-color: linear-gradient(135deg, #2a1240, #28106b);
+  --container-color: linear-gradient(135deg, #21162b, #280e6f);
 
   /*========== Font and typography ==========*/
   --body-font: "Creepster", sans-serif;
@@ -2828,7 +2828,7 @@ button {
   outline: none;
 }
 
-.users-search input:focus + i {
+.users-search input:focus+i {
   color: rgba(255, 255, 255, 0.8);
 }
 
