@@ -186,6 +186,68 @@ class EmailService {
             return false;
         }
     }
+
+    async sendLeaderboardUpdateEmail(userEmail, userData) {
+        try {
+            const template = await this.loadTemplate('leaderboardUpdateEmail');
+
+            // Calculate trends and directions
+            const isRankUp = userData.rankChange > 0;
+            const isPointsUp = userData.pointsChange > 0;
+            const isPRUp = userData.prChange > 0;
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: userEmail,
+                subject: '📈 Your DevSync Leaderboard Update',
+                html: template({
+                    username: userData.username,
+                    rank: userData.currentRank,
+                    rankChange: Math.abs(userData.rankChange),
+                    rankTrend: isRankUp ? 'up' : 'down',
+                    isRankUp,
+                    points: userData.points,
+                    pointsChange: Math.abs(userData.pointsChange),
+                    pointsTrend: isPointsUp ? 'up' : 'down',
+                    isPointsUp,
+                    totalPRs: userData.totalPRs,
+                    prChange: Math.abs(userData.prChange),
+                    prTrend: isPRUp ? 'up' : 'down',
+                    isPRUp,
+                    streak: userData.streak || 0
+                })
+            };
+
+            await this.transporter.sendMail(mailOptions);
+            console.log(`Leaderboard update email sent to ${userEmail}`);
+            return true;
+        } catch (error) {
+            console.error('Error sending leaderboard update email:', error);
+            return false;
+        }
+    }
+
+    async sendBulkLeaderboardUpdates(usersData) {
+        try {
+            const results = await Promise.allSettled(
+                usersData.map(userData =>
+                    this.sendLeaderboardUpdateEmail(userData.email, userData)
+                )
+            );
+
+            const summary = {
+                total: results.length,
+                successful: results.filter(r => r.status === 'fulfilled').length,
+                failed: results.filter(r => r.status === 'rejected').length
+            };
+
+            console.log('Bulk leaderboard update summary:', summary);
+            return summary;
+        } catch (error) {
+            console.error('Error in bulk leaderboard update:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = new EmailService();

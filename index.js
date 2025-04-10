@@ -11,6 +11,7 @@ const User = require('./models/User');
 const Repo = require('./models/Repo');
 const MongoStore = require('connect-mongo');
 const emailService = require('./services/emailService');
+const schedulerService = require('./services/schedulerService');
 const PORT = process.env.PORT || 5500;
 const serverUrl = process.env.SERVER_URL;
 
@@ -1034,6 +1035,7 @@ async function startServer() {
         app.listen(PORT, () => {
             console.log(`Server running on http://localhost:${PORT}`);
             console.log('Serving frontend from', path.join(__dirname, 'public'));
+            schedulerService.startHourlyUpdates();
         }).on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
                 console.error(`Port ${PORT} is already in use`);
@@ -1041,6 +1043,13 @@ async function startServer() {
             } else {
                 throw err;
             }
+        });
+
+        // Handle graceful shutdown
+        process.on('SIGTERM', () => {
+            schedulerService.stopHourlyUpdates();
+            console.log('Server shutting down gracefully');
+            process.exit(0);
         });
     } catch (error) {
         console.error('Failed to start server:', error);
