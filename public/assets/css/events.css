@@ -1,0 +1,339 @@
+/*=============== EVENTS ===============*/
+.events__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+.event__card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.event__card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    border-color: var(--first-color);
+}
+
+.event__header {
+    margin-bottom: 1rem;
+}
+
+.event__tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--first-color);
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.event__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--title-color);
+    margin-bottom: 0.5rem;
+}
+
+.event__date {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-color-light);
+}
+
+.event__description {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.event__details {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+}
+
+.event__slots,
+.event__duration {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.speakers__stack {
+    display: flex;
+    align-items: center;
+}
+
+.speaker__link {
+    margin-right: -1rem;
+    border-radius: 50%;
+    border: 2px solid var(--container-color);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.speaker__link:hover {
+    transform: translateY(-5px);
+    z-index: 2;
+}
+
+.speaker__link img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.speaker__link::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5rem 1rem;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.speaker__link:hover::before {
+    opacity: 1;
+    visibility: visible;
+    bottom: 120%;
+}
+
+.event__speakers {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.event__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+}
+
+.event__button i {
+    transition: transform 0.3s ease;
+}
+
+.event__button:hover i {
+    transform: translateX(5px);
+}
+
+/*=============== EVENTS ADMIN ===============*/
+.admin-section {
+    margin-bottom: 2rem;
+}
+
+.admin-container {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 1rem;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+}
+
+.unauthorized-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+    background: rgba(255, 0, 0, 0.1);
+    border-radius: 1rem;
+    gap: 1rem;
+}
+
+.unauthorized-message i {
+    font-size: 3rem;
+    color: #ff4757;
+}
+
+.unauthorized-message h3 {
+    color: #ff4757;
+    font-size: 1.5rem;
+}
+
+.admin-welcome {
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.admin-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 3px solid var(--first-color);
+}
+
+.admin-info h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.admin-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: rgba(var(--first-color-rgb), 0.2);
+    color: var(--first-color);
+    border-radius: 2rem;
+    font-size: 0.875rem;
+}
+
+.admin-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.admin-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+}
+
+.admin-button i {
+    font-size: 1.25rem;
+}
+
+.event-management {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+}
+
+.event-management h4 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--title-color);
+}
+
+/* Admin Event Management Styles */
+.event-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.event-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--title-color);
+}
+
+.event-form input,
+.event-form textarea,
+.event-form select {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    color: var(--title-color);
+}
+
+.speaker-input {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.remove-speaker {
+    background: rgba(255, 71, 87, 0.2);
+    color: #ff4757;
+    border: none;
+    border-radius: 0.5rem;
+    width: 36px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.remove-speaker:hover {
+    background: rgba(255, 71, 87, 0.3);
+}
+
+.add-speaker {
+    margin-top: 0.5rem;
+    background: rgba(var(--first-color-rgb), 0.2);
+    color: var(--first-color);
+}
+
+.admin-event-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.admin-event-header h3 {
+    font-size: 1.1rem;
+    color: var(--title-color);
+}
+
+.delete-event {
+    background: rgba(255, 71, 87, 0.2);
+    color: #ff4757;
+    border: none;
+    border-radius: 0.5rem;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.delete-event:hover {
+    background: rgba(255, 71, 87, 0.3);
+}
+
+.admin-event-details {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: var(--text-color-light);
+}
+
+.event-type {
+    color: var(--first-color);
+    font-weight: 500;
+}
+
+.button--small {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
