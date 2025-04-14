@@ -66,16 +66,32 @@
     <main class="main">
         <!-- Admin Panel Section -->
         <section class="admin-section section" id="adminSection">
-            <div class="admin-container container" style="display: none;">
-                <h2 class="section__title">Events Admin Panel</h2>
-                <div id="adminContent" class="admin-content">
-                    <!-- Admin content will be loaded here -->
+            <div class="admin-container container">
+                <div class="admin-welcome" id="adminWelcome" style="display: none;">
+                    <div class="admin-header">
+                        <img src="assets/img/admin-avatar.png" alt="Admin" class="admin-avatar" id="adminAvatar">
+                        <div class="admin-info">
+                            <h3 id="adminName">Welcome, Admin</h3>
+                            <span class="admin-badge">Administrator</span>
+                        </div>
+                    </div>
+                    <div class="admin-controls">
+                        <button class="button admin-button" id="createEventBtn">
+                            <i class='bx bx-plus-circle'></i> Create Event
+                        </button>
+                        <button class="button admin-button" id="manageEventsBtn">
+                            <i class='bx bx-calendar-edit'></i> Manage Events
+                        </button>
+                    </div>
+                    <div class="event-management" id="eventManagement">
+                        <!-- Event management form will be loaded here -->
+                    </div>
                 </div>
-            </div>
-            <div id="unauthorizedMessage" class="unauthorized-message" style="display: none;">
-                <i class='bx bx-lock-alt'></i>
-                <h3>Unauthorized Access</h3>
-                <p>You don't have permission to access this area.</p>
+                <div id="unauthorizedMessage" class="unauthorized-message">
+                    <i class='bx bx-lock-alt'></i>
+                    <h3>Unauthorized Access</h3>
+                    <p>You need administrator privileges to access this area.</p>
+                </div>
             </div>
         </section>
 
