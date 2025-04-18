@@ -91,8 +91,9 @@
     opacity: 0;
     width: 88%;
     left: 50%;
-    transform: translateX(-50%);
+    /* transform: translateX(50%); */
     top: -100%;
+    /* padding: 2rem; */
     background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -113,6 +114,7 @@
     align-items: center;
     row-gap: 1.5rem;
     width: 100%;
+    padding: 1rem;
   }
 
   .nav__close {
@@ -202,10 +204,12 @@
 }
 
 @media screen and (min-width: 1080px) {
+
   .nav__close,
   .nav__img {
     display: none;
   }
+
 }
 
 @media screen and (max-width: 977px) {
@@ -220,6 +224,7 @@
     z-index: var(--z-fixed);
     border-radius: 0 0 1.5rem 1.5rem;
   }
+
 }
 
 .nav__img {
@@ -297,6 +302,13 @@
   .nav__profile-name {
     display: block;
   }
+
+  .button--ghost {
+    border: 2px solid;
+    background-color: transparent;
+    border-radius: 3rem;
+    padding: 0.4rem 1.5rem;
+  }
 }
 
 @media screen and (min-width: 1024px) {
@@ -328,7 +340,8 @@
 .scroll-header {
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Add shadow for floating effect */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  /* Add shadow for floating effect */
   border-radius: 0 0 1rem 1rem;
 }
 
@@ -367,5 +380,15 @@
 
   .nav__buttons {
     margin-left: 2rem;
+  }
+}
+
+@media screen and (max-width: 320px) {
+
+  .button--ghost {
+    border: 2px solid;
+    background-color: transparent;
+    border-radius: 3rem;
+    padding: 0.4rem 1.5rem;
   }
 }
