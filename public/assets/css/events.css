@@ -220,9 +220,11 @@
 
 .events__filters {
     display: flex;
+    justify-content: center;
     gap: 1rem;
     margin-bottom: 2rem;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .filter-btn {

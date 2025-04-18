@@ -140,6 +140,7 @@ button {
   font-size: var(--h2-font-size);
   margin-bottom: var(--mb-2);
   text-align: center;
+  width: 100%;
 }
 
 /*=============== LAYOUT ===============*/
