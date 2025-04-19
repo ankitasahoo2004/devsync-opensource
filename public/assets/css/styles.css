@@ -148,6 +148,7 @@ button {
   max-width: 968px;
   margin-left: var(--mb-1-5);
   margin-right: var(--mb-1-5);
+  padding: 1rem;
 }
 
 .grid {
@@ -351,9 +352,8 @@ button {
 /*=============== PROCESS ===============*/
 .process__container {
   display: flex;
-  flex-direction: column;
   align-items: center;
-
+  justify-items: center;
   margin-top: 2rem;
   padding: 2rem;
   background: rgba(0, 0, 0, 0.7);
@@ -2965,4 +2965,13 @@ button {
   .user-details {
     text-align: left;
   }
+}
+
+.process__container {
+  display: flex;
+  justify-items: center;
+  width: 100%;
+  align-content: center;
+  height: 100%;
+  align-items: center;
 }
