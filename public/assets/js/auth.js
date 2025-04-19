@@ -1,4 +1,4 @@
-const serverUrl = 'https://devsync-opensource.onrender.com';
+const serverUrl = 'https://devsync-opensource.tech';
 // const serverUrl = 'http://localhost:3000';
 
 async function checkAuthStatus() {
