@@ -746,7 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </span>`
             ).join('')}
                     </div>
-                    <div class="project-actions">
+                    <div class="project-actions accepted-projects-button">
                         <button class="repo-link view-repo" data-url="${project.repoLink}">
                             <i class='bx bxl-github'></i>
                             View Repository
@@ -1075,7 +1075,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             </span>`
             ).join('')}
                     </div>
-                    <div class="project-actions">
+                    <div class="project-new">
+                    <div class="project-actions project-buttons">
                         <button class="repo-link view-repo" data-url="${project.repoLink}">
                             <i class='bx bxl-github'></i>
                             View Repository
@@ -1087,8 +1088,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             </button>
                         ` : ''}
                     </div>
-                </div>
-            `).join('') : '<p class="no-projects">No projects submitted yet.</p>';
+                    </div>
+                    </div>
+                    `).join('') : '<p class="no-projects">No projects submitted yet.</p>';
     };
 
     const renderAdminProjects = (projects) => {
@@ -1114,6 +1116,37 @@ document.addEventListener('DOMContentLoaded', () => {
                         </span>`
         ).join('')}
                 </div>
+                ${project.reviewStatus === 'pending' ? `
+                    <div class="review-buttons">
+                        <button class="accept-project" data-id="${project._id}">
+                            <i class='bx bx-check'></i>
+                            Accept
+                        </button>
+                        <button class="reject-project" data-id="${project._id}">
+                            <i class='bx bx-x'></i>
+                            Reject
+                        </button>
+                    </div>
+                ` : ''}
+                ${project.reviewStatus === 'accepted' ? `
+                    <div class="points-control">
+                        <div class="points-field">
+                            <label class="success-font">Success Points (earned for successful merge)</label>
+                            <input type="number" 
+                                   class="points-input success-points" 
+                                   value="${project.successPoints || 50}" 
+                                   min="0" 
+                                   max="500"
+                                   step="5"
+                                   data-project="${project._id}">
+                        </div>
+                        <button class="update-points" data-id="${project._id}">
+                            <i class='bx bx-save'></i>
+                            Update Project Points
+                        </button>
+                    </div>
+                ` : ''}
+                <div class="project-action-buttons">
                 <div class="project-actions">
                     <div class="action-buttons">
                         <button class="repo-link view-repo" data-url="${project.repoLink}">
@@ -1125,36 +1158,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             Delete
                         </button>
                     </div>
-                    ${project.reviewStatus === 'pending' ? `
-                        <div class="review-buttons">
-                            <button class="accept-project" data-id="${project._id}">
-                                <i class='bx bx-check'></i>
-                                Accept
-                            </button>
-                            <button class="reject-project" data-id="${project._id}">
-                                <i class='bx bx-x'></i>
-                                Reject
-                            </button>
-                        </div>
-                    ` : ''}
-                    ${project.reviewStatus === 'accepted' ? `
-                        <div class="points-control">
-                            <div class="points-field">
-                                <label>Success Points (earned for successful merge)</label>
-                                <input type="number" 
-                                       class="points-input success-points" 
-                                       value="${project.successPoints || 50}" 
-                                       min="0" 
-                                       max="500"
-                                       step="5"
-                                       data-project="${project._id}">
-                            </div>
-                            <button class="update-points" data-id="${project._id}">
-                                <i class='bx bx-save'></i>
-                                Update Project Points
-                            </button>
-                        </div>
-                    ` : ''}
+                </div>
                 </div>
             </div>
         `).join('') : '<p class="no-projects">No projects submitted yet.</p>';

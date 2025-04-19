@@ -402,20 +402,25 @@
 }
 
 .repo-link:hover {
-    transform: translateX(5px);
+    transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(var(--first-color-rgb), 0.3);
 }
 
 .project-actions {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
     align-items: center;
     margin-top: 1rem;
+    gap: 5rem;
 }
 
 .delete-project {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    width: 200px;
+    text-align: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
     background: linear-gradient(45deg, #ff4757, #ff6b81);
@@ -639,6 +644,9 @@
     padding-top: 1.5rem;
     /* Increased spacing */
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.action-buttons {
+    gap: 0.4rem;
 }
 
 .admin-project-card .action-buttons {
@@ -961,7 +969,16 @@
 }
 
 /* Points Control Styling */
+.success-font {
+    text-align: center;
+}
+
 .points-control {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 16px;
     padding: 1.5rem;
@@ -977,6 +994,7 @@
     flex-direction: column;
     gap: 0.5rem;
     margin-bottom: 1rem;
+    width: 100%;
 }
 
 .points-field label {
@@ -987,7 +1005,7 @@
 
 .points-input {
     width: 100%;
-    max-width: 200px;
+    /* max-width: 200px; */
     padding: 0.75rem 1rem;
     background: rgba(255, 255, 255, 0.07);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1008,7 +1026,7 @@
 
 .update-points {
     width: 100%;
-    max-width: 200px;
+    /* max-width: 200px; */
     padding: 0.75rem 1rem;
     background: linear-gradient(135deg, var(--first-color) 0%, #4FACFE 100%);
     color: #fff;
@@ -1047,6 +1065,29 @@
 @media screen and (max-width: 480px) {
     .points-control {
         padding: 1rem;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        padding: 2rem;
+    }
+
+    .project-action-buttons {
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        margin: 2rem;
+    }
+
+    .action-buttons {
+        gap: 0.4rem;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .repo-link {
+        width: 200px;
     }
 
     .points-field {
