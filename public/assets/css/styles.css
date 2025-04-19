@@ -351,7 +351,7 @@ button {
 
 /*=============== PROCESS ===============*/
 .process__container {
-  display: flex;
+  /* display: flex; */
   align-items: center;
   justify-items: center;
   margin-top: 2rem;
@@ -2965,13 +2965,4 @@ button {
   .user-details {
     text-align: left;
   }
-}
-
-.process__container {
-  display: flex;
-  justify-items: center;
-  width: 100%;
-  align-content: center;
-  height: 100%;
-  align-items: center;
 }
