@@ -324,6 +324,10 @@
     padding: 2rem;
     width: 92%;
   }
+.nav__profile{
+  padding: 0.2rem;
+  margin-top: 0.4rem;
+}
 
   .nav__profile-name {
     display: block;
