@@ -750,10 +750,9 @@ button {
 
 /*===============  BREAKPOINTS ===============*/
 /* For small devices */
-@media screen and (max-width: 320px) {
+@media screen and (min-width: 320px) {
   .container {
-    margin-left: var(--mb-1);
-    margin-right: var(--mb-1);
+    padding: 1.5rem;
   }
 
   .home__img {
@@ -771,6 +770,10 @@ button {
     grid-template-columns: 0.8fr;
     justify-content: center;
   }
+
+  .button--ghost {
+    padding: 0.4rem 1.5rem;
+  }
 }
 
 /* For medium devices */
@@ -778,6 +781,13 @@ button {
   .about__container {
     grid-template-columns: 0.8fr;
     justify-content: center;
+  }
+
+  .container {
+    padding: 1.5rem;
+    justify-content: space-between;
+    align-items: center;
+    justify-items: center;
   }
 
   .newsletter__container {
@@ -790,6 +800,7 @@ button {
     padding: 0 3rem;
   }
 }
+
 
 @media screen and (min-width: 977px) {
   body {
@@ -1010,7 +1021,7 @@ button {
   }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (max-width: 1200px) {
   .home__img {
     height: 420px;
   }
