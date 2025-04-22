@@ -26,46 +26,50 @@
 </head>
 
 <body>
+  <!--==================== HEADER ====================-->
   <header class="header" id="header">
     <nav class="nav container">
-      <a href="index.html" class="nav__logo">
-        <img src="assets/img/logo.png" alt="" class="nav__logo-img">
-        DevSync
-      </a>
+        <a href="index.html" class="nav__logo">
+            <img src="assets/img/logo.png" alt="" class="nav__logo-img">
+            DevSync
+        </a>
 
-      <img src="assets/img/nav-img.png" alt="spider" class="nav__spider">
+        <div class="nav__menu" id="nav-menu">
+            <!-- Add close button inside menu -->
+            <div class="nav__close" id="nav-close">
+                <i class='bx bx-x'></i>
+            </div>
 
-      <div class="nav__menu">
-        <ul class="nav__list">
-          <li class="nav__item">
-            <a href="index.html" class="nav__link">Home</a>
-          </li>
-          <li class="nav__item">
-            <a href="projects.html" class="nav__link">Projects</a>
-          </li>
-          <li class="nav__item">
-            <a href="team.html" class="nav__link active-link">Team</a>
-          </li>
-          <li class="nav__item">
-            <a href="events.html" class="nav__link">Schedule</a>
-          </li>
-          <li class="nav__item">
-            <a href="process.html" class="nav__link">Process</a>
-          </li>
-          <li class="nav__item">
-            <a href="leaderboard.html" class="nav__link">Leaderboard</a>
-          </li>
-        </ul>
-      </div>
-
-      <div class="nav__buttons">
-        <div class="nav__toggle" id="nav-toggle">
-          <i class='bx bx-menu'></i>
+            <ul class="nav__list">
+                <li class="nav__item">
+                    <a href="index.html" class="nav__link">Home</a>
+                </li>
+                <li class="nav__item">
+                    <a href="projects.html" class="nav__link">Projects</a>
+                </li>
+                <li class="nav__item">
+                    <a href="team.html" class="nav__link active-link">Team</a>
+                </li>
+                <li class="nav__item">
+                    <a href="events.html" class="nav__link">Schedule</a>
+                </li>
+                <li class="nav__item">
+                    <a href="process.html" class="nav__link">Process</a>
+                </li>
+                <li class="nav__item">
+                    <a href="leaderboard.html" class="nav__link">Leaderboard</a>
+                </li>
+            </ul>
         </div>
-        <a href="login.html" class="button button--ghost">Login</a>
-      </div>
+
+        <div class="nav__buttons">
+            <div class="nav__toggle" id="nav-toggle">
+                <i class='bx bx-menu'></i>
+            </div>
+            <a href="login.html" class="button button--ghost">Login</a>
+        </div>
     </nav>
-  </header>
+</header>
   <div class="container">
     <!-- Add Full Team heading -->
     <h2 class="text-[36px]/[36px] md:text-[85px]/[96px] font-sans tracking-tight mb-16 mt-10">A conference for builders
