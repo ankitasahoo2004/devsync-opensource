@@ -20,14 +20,20 @@
 
 <body>
     <!--==================== HEADER ====================-->
+    <!--==================== HEADER ====================-->
     <header class="header" id="header">
         <nav class="nav container">
             <a href="index.html" class="nav__logo">
                 <img src="assets/img/logo.png" alt="" class="nav__logo-img">
-                Halloween
+                DevSync
             </a>
 
-            <div class="nav__menu">
+            <div class="nav__menu" id="nav-menu">
+                <!-- Add close button inside menu -->
+                <div class="nav__close" id="nav-close">
+                    <i class='bx bx-x'></i>
+                </div>
+
                 <ul class="nav__list">
                     <li class="nav__item">
                         <a href="index.html" class="nav__link">Home</a>
@@ -48,21 +54,16 @@
                         <a href="leaderboard.html" class="nav__link">Leaderboard</a>
                     </li>
                 </ul>
+            </div>
 
-                <div class="nav__close" id="nav-close">
-                    <i class='bx bx-x'></i>
+            <div class="nav__buttons">
+                <div class="nav__toggle" id="nav-toggle">
+                    <i class='bx bx-menu'></i>
                 </div>
-
-                <img src="assets/img/nav-img.png" alt="" class="nav__img">
+                <a href="login.html" class="button button--ghost">Login</a>
             </div>
-
-            <div class="nav__toggle" id="nav-toggle">
-                <i class='bx bx-grid-alt'></i>
-            </div>
-
         </nav>
     </header>
-
     <main class="main">
         <section class="profile section">
             <div class="profile__container container">

@@ -17,6 +17,7 @@
 
 <body>
     <!-- Same header as other pages -->
+    <!--==================== HEADER ====================-->
     <header class="header" id="header">
         <nav class="nav container">
             <a href="index.html" class="nav__logo">
@@ -24,15 +25,18 @@
                 DevSync
             </a>
 
-            <img src="assets/img/nav-img.png" alt="spider" class="nav__spider">
+            <div class="nav__menu" id="nav-menu">
+                <!-- Add close button inside menu -->
+                <div class="nav__close" id="nav-close">
+                    <i class='bx bx-x'></i>
+                </div>
 
-            <div class="nav__menu">
                 <ul class="nav__list">
                     <li class="nav__item">
                         <a href="index.html" class="nav__link">Home</a>
                     </li>
                     <li class="nav__item">
-                        <a href="projects.html" class="nav__link active-link">Projects</a>
+                        <a href="projects.html" class="nav__link  active-link">Projects</a>
                     </li>
                     <li class="nav__item">
                         <a href="team.html" class="nav__link">Team</a>
