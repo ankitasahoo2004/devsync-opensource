@@ -52,6 +52,14 @@ function updateProfileInfo(data) {
     document.getElementById('profile-img').src = data.avatar_url;
     document.getElementById('profile-name').textContent = data.name || data.login;
     document.getElementById('profile-bio').textContent = data.bio || '';
+
+    // Add banner customization
+    const bannerElement = document.querySelector('.profile__cover-wrapper');
+    const currentBanner = localStorage.getItem('profileBanner') || 'banner1.jpg';
+    document.getElementById('profile-cover').src = `assets/img/banners/${currentBanner}`;
+
+    // Add click handler for banner customization
+    bannerElement.addEventListener('click', openBannerSidebar);
     document.getElementById('profile-location').textContent = data.location || 'Not specified';
     document.getElementById('profile-company').textContent = data.company || 'Not specified';
     document.getElementById('profile-blog').href = data.blog;
@@ -91,6 +99,94 @@ function updateProfileInfo(data) {
     }
 }
 
+function openBannerSidebar() {
+    const sidebar = document.createElement('div');
+    sidebar.className = 'banner-sidebar';
+
+    const banners = [
+        { id: 'banner1.png', name: 'Dark Forest' },
+        { id: 'banner2.png', name: 'Mystic Night' },
+        { id: 'banner3.png', name: 'Haunted Castle' },
+        { id: 'banner4.png', name: 'Spooky Woods' }
+    ];
+
+    sidebar.innerHTML = `
+        <div class="banner-sidebar__content">
+            <div class="banner-sidebar__header">
+                <h3>Choose Banner</h3>
+                <button class="banner-sidebar__close">&times;</button>
+            </div>
+            <div class="banner-sidebar__banners">
+                ${banners.map(banner => `
+                    <div class="banner-option" data-banner="${banner.id}">
+                        <img src="assets/img/banners/${banner.id}" alt="${banner.name}">
+                        <span>${banner.name}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(sidebar);
+    setTimeout(() => sidebar.classList.add('show'), 10);
+
+    // Close sidebar handler
+    sidebar.querySelector('.banner-sidebar__close').addEventListener('click', () => {
+        sidebar.classList.remove('show');
+        setTimeout(() => sidebar.remove(), 300);
+    });
+
+    // Banner selection handler
+    sidebar.querySelectorAll('.banner-option').forEach(option => {
+        option.addEventListener('click', () => {
+            const bannerId = option.dataset.banner;
+            document.getElementById('profile-cover').src = `assets/img/banners/${bannerId}`;
+            localStorage.setItem('profileBanner', bannerId);
+
+            // Show toast notification
+            showToast('Banner updated successfully!');
+
+            // Close sidebar
+            sidebar.classList.remove('show');
+            setTimeout(() => sidebar.remove(), 300);
+        });
+    });
+}
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'profile-toast';
+    toast.innerHTML = `
+        <div class="toast-content">
+            <div class="toast-icon">
+                <i class='bx bx-check'></i>
+                <div class="check-overlay"></div>
+            </div>
+            <div class="toast-message">
+                <span class="text">${message}</span>
+                <div class="progress-bar"></div>
+            </div>
+            <button class="toast-close" onclick="this.parentElement.parentElement.remove()">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(toast);
+    // Sequential animations
+    requestAnimationFrame(() => {
+        toast.classList.add('show');
+        const progressBar = toast.querySelector('.progress-bar');
+        progressBar.style.animation = 'progress 3s linear forwards';
+        toast.querySelector('.check-overlay').style.animation = 'checkmark 0.4s ease-in-out 0.2s forwards';
+    });
+
+    setTimeout(() => {
+        toast.classList.add('hide');
+        toast.addEventListener('animationend', () => toast.remove());
+    }, 3000);
+}
+
 function showBadgePreview(badgeElement) {
     const popup = document.createElement('div');
     popup.className = 'badge-preview-popup';
@@ -100,15 +196,39 @@ function showBadgePreview(badgeElement) {
 
     popup.innerHTML = `
         <div class="badge-preview-content">
-            <img src="${badgeImg}" alt="${badgeName}" class="badge-preview-img">
-            <h3 class="badge-preview-title">${badgeName}</h3>
-            <p class="badge-preview-desc">${badgeDesc}</p>
-            <button class="close-preview" onclick="this.parentElement.parentElement.remove()">&times;</button>
+            <div class="badge-preview-img-wrapper">
+                <div class="badge-glow"></div>
+                <img src="${badgeImg}" alt="${badgeName}" class="badge-preview-img">
+                <div class="badge-sparkles">
+                    ${Array.from({ length: 5 }, () => '<div class="sparkle"></div>').join('')}
+                </div>
+            </div>
+            <div class="badge-preview-info">
+                <h3 class="badge-preview-title">${badgeName}</h3>
+                <p class="badge-preview-desc">${badgeDesc}</p>
+            </div>
+            <button class="close-preview" onclick="this.parentElement.parentElement.remove()">
+                <i class='bx bx-x'></i>
+            </button>
         </div>
     `;
 
     document.body.appendChild(popup);
-    setTimeout(() => popup.classList.add('show'), 10);
+    requestAnimationFrame(() => {
+        popup.classList.add('show');
+        const sparkles = popup.querySelectorAll('.sparkle');
+        sparkles.forEach((sparkle, i) => {
+            sparkle.style.animation = `sparkle 1.5s ease-in-out ${i * 0.15}s infinite`;
+        });
+    });
+
+    // Close on background click
+    popup.addEventListener('click', (e) => {
+        if (e.target === popup) {
+            popup.classList.remove('show');
+            popup.addEventListener('transitionend', () => popup.remove());
+        }
+    });
 }
 
 function getLevelBadges(badges) {
