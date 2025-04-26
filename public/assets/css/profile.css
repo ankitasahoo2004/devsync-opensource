@@ -178,3 +178,139 @@
         transform: translateY(0) rotateX(0);
     }
 }
+
+/* Add responsive styles */
+@media screen and (max-width: 1200px) {
+    .profile__container {
+        padding: 1.5rem;
+    }
+
+    .profile__header {
+        padding: 3rem 2rem;
+    }
+
+    .profile__name {
+        font-size: 3rem;
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .profile__stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .profile__header {
+        padding: 2.5rem 1.5rem;
+    }
+
+    .profile__name {
+        font-size: 2.5rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .profile__container {
+        padding: 1rem;
+    }
+
+    .profile__header {
+        padding: 2rem 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .profile__user-info {
+        gap: 2rem;
+    }
+
+    .profile__img {
+        width: 150px;
+        height: 150px;
+    }
+
+    .profile__name {
+        font-size: 2rem;
+    }
+
+    .profile__stats {
+        margin: 2rem 0;
+        grid-template-columns: 1fr;
+    }
+
+    .stat {
+        padding: 1.5rem;
+    }
+
+    .stat:hover {
+        transform: translateY(-8px) translateZ(10px);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .profile__header {
+        padding: 1.5rem 1rem;
+        border-radius: 24px;
+    }
+
+    .profile__img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .profile__name {
+        font-size: 1.75rem;
+    }
+
+    .profile__header:hover {
+        transform: translateY(-4px) rotateX(1deg);
+    }
+
+    .stat {
+        padding: 1.25rem;
+    }
+
+    .badge__item {
+        flex-direction: column;
+        text-align: center;
+        padding: 0.75rem;
+    }
+
+    .badge__info {
+        align-items: center;
+    }
+}
+
+@media screen and (max-width: 350px) {
+    .profile__container {
+        padding: 0.5rem;
+    }
+
+    .profile__header {
+        padding: 1rem;
+        border-radius: 16px;
+    }
+
+    .profile__img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile__name {
+        font-size: 1.5rem;
+    }
+}
+
+/* Add hover state disabling for touch devices */
+@media (hover: none) {
+
+    .profile__header:hover,
+    .profile__img:hover,
+    .stat:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .profile__header::before {
+        display: none;
+    }
+}
