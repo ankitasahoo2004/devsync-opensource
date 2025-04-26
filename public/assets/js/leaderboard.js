@@ -138,6 +138,7 @@ function renderTopWinners(winners) {
 }
 
 function renderWinnerCard(user, position, rank) {
+    const essentialBadges = getEssentialBadges(user.badges);
     return `
         <div class="winner-card ${position}" data-user="${user.username}">
             <div class="winner-medal">
@@ -161,7 +162,7 @@ function renderWinnerCard(user, position, rank) {
                     </div>
                 </div>
                 <div class="badges">
-                    ${user.badges.map(badge => `<span class="badge">${badge}</span>`).join('')}
+                    ${essentialBadges.map(badge => `<span class="badge">${badge.split('|')[0]}</span>`).join('')}
                 </div>
             </div>
             ${renderTrendIndicator(user.trend)}
@@ -199,7 +200,7 @@ function renderLeaderboardList(users) {
                             </span>
                         </div>
                         <div class="badges-container">
-                            ${user.badges.map(badge => `<span class="badge">${badge}</span>`).join('')}
+                            ${getEssentialBadges(user.badges).map(badge => `<span class="badge">${badge.split('|')[0]}</span>`).join('')}
                         </div>
                     </div>
                     ${renderTrendIndicator(user.trend)}
@@ -235,7 +236,7 @@ function renderLeaderboardItem(user, isSearchResult = false) {
                         </span>
                     </div>
                     <div class="badges-container">
-                        ${user.badges.map(badge => `<span class="badge">${badge}</span>`).join('')}
+                        ${getEssentialBadges(user.badges).map(badge => `<span class="badge">${badge.split('|')[0]}</span>`).join('')}
                     </div>
                 </div>
             </div>
@@ -285,7 +286,119 @@ function toggleMerges(id) {
     }
 }
 
-// Initialize leaderboard with simplified UI
+// Add helper functions
+function getEssentialBadges(badges) {
+    const levelBadge = badges.find(badge => badge.includes('|'));
+    const contributionBadge = badges.find(badge =>
+        ['First Contribution', 'Active Contributor', 'Super Contributor'].includes(badge)
+    );
+    return [levelBadge, contributionBadge].filter(Boolean);
+}
+
+function getLevelImage(levelBadge) {
+    if (!levelBadge || !levelBadge.includes('|')) return null;
+    const badgeName = levelBadge.split('|')[0].trim();
+    const levelMap = {
+        'Cursed Newbie': 'level1',
+        'Graveyard Shifter': 'level2',
+        'Night Stalker': 'level3',
+        'Skeleton of Structure': 'level4',
+        'Phantom Architect': 'level5',
+        'Haunted Debugger': 'level6',
+        'Lord of Shadows': 'level7',
+        'Dark Sorcerer': 'level8',
+        'Demon Crafter': 'level9',
+        'Eternal Revenge': 'level10'
+    };
+    return levelMap[badgeName] ? `assets/img/badges/levels/${levelMap[badgeName]}.png` : null;
+}
+
+function createBadgePreviewPopup(badgeImage, badgeName) {
+    const popup = document.createElement('div');
+    popup.className = 'badge-preview-popup';
+    popup.innerHTML = `
+        <div class="badge-preview-content">
+            <img src="${badgeImage}" alt="${badgeName}" class="badge-preview-img">
+            <h3 class="badge-preview-title">${badgeName}</h3>
+            <button class="close-popup close-preview">&times;</button>
+        </div>
+    `;
+    return popup;
+}
+
+function createUserDetailPopup(user) {
+    const popup = document.createElement('div');
+    popup.className = 'badge-popup user-detail-popup';
+    popup.innerHTML = `
+        <div class="badge-popup-content">
+            <div class="badge-popup-header">
+                <div class="user-header-info">
+                    <img src="https://github.com/${user.username}.png" 
+                         alt="${user.username}" 
+                         class="popup-user-img"
+                         onerror="this.src='assets/img/default-avatar.png'">
+                    <div class="user-header-text">
+                        <h3>${user.username}</h3>
+                        <div class="user-stats-summary">
+                            <span><i class='bx bx-trophy'></i> ${user.points} points</span>
+                            <span><i class='bx bx-git-merge'></i> ${user.mergedPRs.length} merges</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="close-popup">&times;</button>
+            </div>
+            
+            <div class="user-detail-content">
+                <div class="badges-section">
+                    <h4>Achievements</h4>
+                    <div class="badge-grid">
+                        ${user.badges.map(badge => {
+        const [name, description] = badge.split('|').map(s => s.trim());
+        const levelImage = getLevelImage(badge);
+        return `
+                                <div class="badge-item ${levelImage ? 'level-badge' : 'contrib-badge'}">
+                                    ${levelImage ?
+                `<img src="${levelImage}" 
+                                             alt="${name}" 
+                                             class="badge-icon"
+                                             onclick="event.stopPropagation(); 
+                                                     const preview = createBadgePreviewPopup('${levelImage}', '${name}');
+                                                     document.body.appendChild(preview);
+                                                     setTimeout(() => preview.classList.add('show'), 10);"
+                                             style="cursor: pointer">` :
+                `<i class='bx bx-medal'></i>`
+            }
+                                    <div class="badge-info">
+                                        <span class="badge-name">${name}</span>
+                                        ${description ? `<span class="badge-description">${description}</span>` : ''}
+                                    </div>
+                                </div>
+                            `;
+    }).join('')}
+                    </div>
+                </div>
+
+                <div class="prs-section">
+                    <h4>Recent Contributions</h4>
+                    <div class="pr-grid">
+                        ${user.mergedPRs.slice(0, 5).map(pr => `
+                            <div class="pr-item">
+                                <div class="pr-header">
+                                    <i class='bx bx-git-pull-request'></i>
+                                    <span class="pr-date">${new Date(pr.mergedAt).toLocaleDateString()}</span>
+                                </div>
+                                <div class="pr-title">${pr.title}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    return popup;
+}
+
+// Modify the click event listener to handle badge preview popup closing
 document.addEventListener('DOMContentLoaded', () => {
     updateGlobalStats();
     updateLeaderboard();
@@ -306,7 +419,27 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(() => {
         updateGlobalStats();
         updateLeaderboard();
-    }, 5 * 60 * 1000);
+    }, 10 * 60 * 1000);
+
+    // Add user detail popup functionality
+    document.addEventListener('click', (e) => {
+        const userCard = e.target.closest('.winner-card, .leaderboard-item, .runner-up-card');
+        if (userCard) {
+            const username = userCard.dataset.user;
+            const user = window.leaderboardUsers.find(u => u.username === username);
+            if (user) {
+                const popup = createUserDetailPopup(user);
+                document.body.appendChild(popup);
+                setTimeout(() => popup.classList.add('show'), 10);
+            }
+        }
+
+        if (e.target.classList.contains('close-popup') || e.target.classList.contains('close-preview')) {
+            const popup = e.target.closest('.badge-popup, .badge-preview-popup');
+            popup.classList.remove('show');
+            setTimeout(() => popup.remove(), 300);
+        }
+    });
 });
 
 // Initialize leaderboard
