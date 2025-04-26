@@ -18,16 +18,30 @@ async function fetchUserProfile() {
             return;
         }
 
-        // Fetch comprehensive profile data
-        const profileResponse = await fetch(`${serverUrl}/api/user/profile/${data.user.username}`, {
-            credentials: 'include'
-        });
-        const profileData = await profileResponse.json();
+        // Fetch both profile and stats data
+        const [profileResponse, statsResponse] = await Promise.all([
+            fetch(`${serverUrl}/api/user/profile/${data.user.username}`, {
+                credentials: 'include'
+            }),
+            fetch(`${serverUrl}/api/user/stats`, {
+                credentials: 'include'
+            })
+        ]);
 
-        // Update profile information
-        updateProfileInfo(profileData);
-        updateProfileStats(profileData);
-        displayPullRequests(profileData.pullRequests);
+        const profileData = await profileResponse.json();
+        const statsData = await statsResponse.json();
+
+        // Combine the data
+        const combinedData = {
+            ...profileData,
+            points: statsData.points,
+            badges: statsData.badges
+        };
+
+        // Update profile information with combined data
+        updateProfileInfo(combinedData);
+        updateProfileStats(combinedData);
+        displayPullRequests(combinedData.pullRequests);
 
     } catch (error) {
         console.error('Failed to load profile:', error);
@@ -43,6 +57,93 @@ function updateProfileInfo(data) {
     document.getElementById('profile-blog').href = data.blog;
     document.getElementById('profile-blog').textContent = data.blog || 'Not specified';
     document.getElementById('profile-twitter').textContent = data.twitter_username || 'Not specified';
+
+    // Add points display
+    const pointsDisplay = document.createElement('div');
+    pointsDisplay.className = 'profile__points';
+    pointsDisplay.innerHTML = `
+        <div class="points-value">${data.points || 0}</div>
+        <div class="points-label">Total Points</div>
+    `;
+
+    // Add only level badges display
+    if (data.badges) {
+        const levelBadges = getLevelBadges(data.badges);
+        if (levelBadges.length > 0) {
+            const badgesContainer = document.createElement('div');
+            badgesContainer.className = 'profile__badges';
+            badgesContainer.innerHTML = levelBadges.map(badge => {
+                const [name, description] = badge.split('|').map(s => s.trim());
+                return `
+                    <div class="level-badge" onclick="showBadgePreview(this)" 
+                         data-badge-name="${name}" data-badge-desc="${description}">
+                        <img src="assets/img/badges/levels/${getLevelImage(badge)}" 
+                             alt="${name}"
+                             class="level-badge__img">
+                    </div>
+                `;
+            }).join('');
+
+            const bio = document.getElementById('profile-bio');
+            bio.parentNode.insertBefore(pointsDisplay, bio.nextSibling);
+            bio.parentNode.insertBefore(badgesContainer, pointsDisplay.nextSibling);
+        }
+    }
+}
+
+function showBadgePreview(badgeElement) {
+    const popup = document.createElement('div');
+    popup.className = 'badge-preview-popup';
+    const badgeName = badgeElement.dataset.badgeName;
+    const badgeDesc = badgeElement.dataset.badgeDesc;
+    const badgeImg = badgeElement.querySelector('img')?.src || '';
+
+    popup.innerHTML = `
+        <div class="badge-preview-content">
+            <img src="${badgeImg}" alt="${badgeName}" class="badge-preview-img">
+            <h3 class="badge-preview-title">${badgeName}</h3>
+            <p class="badge-preview-desc">${badgeDesc}</p>
+            <button class="close-preview" onclick="this.parentElement.parentElement.remove()">&times;</button>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+    setTimeout(() => popup.classList.add('show'), 10);
+}
+
+function getLevelBadges(badges) {
+    return badges.filter(badge => {
+        const badgeName = badge.split('|')[0].trim();
+        return [
+            'Cursed Newbie',
+            'Graveyard Shifter',
+            'Night Stalker',
+            'Skeleton of Structure',
+            'Phantom Architect',
+            'Haunted Debugger',
+            'Lord of Shadows',
+            'Dark Sorcerer',
+            'Demon Crafter',
+            'Eternal Revenge'
+        ].includes(badgeName);
+    });
+}
+
+function getLevelImage(badge) {
+    const badgeName = badge.split('|')[0].trim();
+    const levelMap = {
+        'Cursed Newbie': 'level1.png',
+        'Graveyard Shifter': 'level2.png',
+        'Night Stalker': 'level3.png',
+        'Skeleton of Structure': 'level4.png',
+        'Phantom Architect': 'level5.png',
+        'Haunted Debugger': 'level6.png',
+        'Lord of Shadows': 'level7.png',
+        'Dark Sorcerer': 'level8.png',
+        'Demon Crafter': 'level9.png',
+        'Eternal Revenge': 'level10.png'
+    };
+    return levelMap[badgeName];
 }
 
 function updateProfileStats(data) {

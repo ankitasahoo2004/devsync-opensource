@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(() => {
         updateGlobalStats();
         updateLeaderboard();
-    }, 10 * 60 * 1000);
+    }, 60 * 60 * 1000);
 
     // Add user detail popup functionality
     document.addEventListener('click', (e) => {

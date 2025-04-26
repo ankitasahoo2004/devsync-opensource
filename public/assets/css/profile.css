@@ -179,7 +179,164 @@
     }
 }
 
-/* Add responsive styles */
+.profile__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+    padding: 2rem 0;
+}
+
+.level-badge {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.level-badge__img {
+    width: 84px;
+    height: 84px;
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem;
+    backdrop-filter: blur(5px);
+}
+
+.level-badge:hover .level-badge__img {
+    border-color: var(--first-color);
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.level-badge__tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(0, 0, 0, 0.9);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    width: max-content;
+    max-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    pointer-events: none;
+}
+
+.level-badge:hover .level-badge__tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.level-badge__tooltip strong {
+    color: var(--first-color);
+    font-size: 0.9rem;
+}
+
+.level-badge__tooltip span {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.8rem;
+}
+
+.badge-preview-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.badge-preview-popup.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.badge-preview-content {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    padding: 3rem;
+    border-radius: 24px;
+    text-align: center;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.badge-preview-popup.show .badge-preview-content {
+    transform: scale(1);
+}
+
+.badge-preview-img {
+    width: 180px;
+    height: 180px;
+    margin-bottom: 1.5rem;
+    border-radius: 24px;
+    border: 3px solid var(--first-color);
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.badge-preview-title {
+    font-size: 1.5rem;
+    color: var(--first-color);
+    margin-bottom: 0.5rem;
+}
+
+.badge-preview-desc {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+}
+
+.close-preview {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.close-preview:hover {
+    color: var(--first-color);
+}
+
+@media screen and (max-width: 768px) {
+    .level-badge__img {
+        width: 72px;
+        height: 72px;
+    }
+
+    .badge-preview-img {
+        width: 140px;
+        height: 140px;
+    }
+
+    .badge-preview-content {
+        padding: 2rem;
+        margin: 1rem;
+    }
+}
+
 @media screen and (max-width: 1200px) {
     .profile__container {
         padding: 1.5rem;
@@ -298,6 +455,55 @@
     .profile__name {
         font-size: 1.5rem;
     }
+}
+
+.profile__points {
+    text-align: center;
+    margin: 2rem 0;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.points-value {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--first-color) 0%, #ffffff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.points-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+}
+
+.contrib-badge {
+    position: relative;
+    cursor: pointer;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.contrib-badge:hover {
+    transform: translateY(-5px);
+    border-color: var(--first-color);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.contrib-badge__icon {
+    font-size: 2rem;
+    color: var(--first-color);
 }
 
 /* Add hover state disabling for touch devices */
