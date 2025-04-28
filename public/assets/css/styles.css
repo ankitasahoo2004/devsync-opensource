@@ -267,6 +267,7 @@ button {
 
 /*=============== BUTTONS ===============*/
 .button {
+  
   display: inline-block;
   background-color: var(--first-color);
   color: var(--title-color);
