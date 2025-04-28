@@ -365,7 +365,7 @@ function createUserDetailPopup(user) {
                                                      const preview = createBadgePreviewPopup('${levelImage}', '${name}');
                                                      document.body.appendChild(preview);
                                                      setTimeout(() => preview.classList.add('show'), 10);"
-                                             style="cursor: pointer">` :
+                                             style=" ">` :
                 `<i class='bx bx-medal'></i>`
             }
                                     <div class="badge-info">

@@ -58,7 +58,6 @@
 .nav__toggle {
   display: none;
   font-size: 1.5rem;
-  cursor: pointer;
   color: var(--title-color);
 }
 
@@ -125,7 +124,6 @@
     right: 1.5rem;
     font-size: 1.5rem;
     color: var(--title-color);
-    cursor: pointer;
   }
 
   .nav__list {
@@ -164,7 +162,6 @@
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(5px);
     border-radius: 0.5rem;
-    cursor: pointer;
     transition: all 0.3s ease;
     order: 2;
   }
@@ -264,7 +261,6 @@
   position: absolute;
   top: 0.5rem;
   right: 0.7rem;
-  cursor: pointer;
 }
 
 .nav__list {

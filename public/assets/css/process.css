@@ -1,13 +1,16 @@
 .process__container {
+    display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 2rem;
+    margin-top: 16rem;
     padding: 2rem;
     background: rgba(0, 0, 0, 0.7);
     border-radius: 1rem;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
     color: #fff;
+    height: 100%;
+    justify-content: center;
 }
 
 .process__title {
@@ -71,5 +74,18 @@
 @media screen and (max-width:576px) {
     .process__card {
         min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-content: middle;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .process__container {
+        margin-top: 6rem;
+        padding: 3rem;
+    }
+    .process__steps {
+        padding: 0rem 2rem;
     }
 }

@@ -452,7 +452,7 @@ function initializePRAnimations() {
         const winScroll = document.documentElement.scrollTop;
         const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
         const scrolled = (winScroll / height) * 100;
-        document.documentElement.style.setProperty('--scroll-percent', `${scrolled}%`);
+        document.document.setProperty('--scroll-percent', `${scrolled}%`);
     });
 
     // Initialize Intersection Observer for PR cards

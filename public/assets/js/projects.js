@@ -963,7 +963,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     processingButtons.delete(updatePointsBtn);
                     updatePointsBtn.disabled = false;
                     updatePointsBtn.style.opacity = '1';
-                    updatePointsBtn.style.cursor = 'pointer';
+                    updatePointsBtn.style
                 }
                 return;
             }

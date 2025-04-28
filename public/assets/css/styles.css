@@ -4,6 +4,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;900&display=swap");
 
+
+/* CUSTOM CURSOR */
+* {
+  cursor: url("../img/arrowhead.png"),auto;
+}
+
+body {
+  cursor: url("../img/arrowhead.png"), auto;
+}
+
 /*=============== VARIABLES CSS ===============*/
 :root {
   --header-height: 2.5rem;
@@ -126,7 +136,6 @@ input {
 }
 
 button {
-  cursor: pointer;
   font-family: var(--body-font);
   font-size: var(--normal-font-size);
 }
@@ -268,6 +277,7 @@ button {
 
 /*=============== BUTTONS ===============*/
 .button {
+
   display: inline-block;
   background-color: var(--first-color);
   color: var(--title-color);
@@ -276,6 +286,7 @@ button {
   font-weight: var(--font-medium);
   transition: 0.3s;
 }
+
 
 .button:hover {
   background-color: var(--first-color-alt);
@@ -1339,7 +1350,6 @@ button {
   background: var(--container-color);
   color: var (--text-color);
   border: none;
-  cursor: pointer;
   transition: 0.3s;
 }
 
@@ -2842,7 +2852,6 @@ button {
   border-radius: 12px;
   padding: 1.5rem;
   transition: all 0.3s ease;
-  cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
