@@ -1,0 +1,22 @@
+    LEVEL           POINTS REQUIRED      BADGE NAME                    TAG 
+     
+    Level 1            0-99               Cursed Newbie              Just awakened.....
+    
+    Level 2            100-249            Graveyard Shifter          Lost but curious
+
+    Level 3            250-499            Night Stalker              Shadows are friends
+
+    Level 4            500-999            Skeleton of Structure      Casts magic on code
+
+    Level 5            1000-1999          Phantom Architect          Builds from beyond
+
+    Level 6            2000-3499          Haunted Debugger            Haunting every broken line
+
+    Level 7            3500-4999          Lord of Shadows             Master of the unseen
+
+    Level 8            5000-7499          Dark Sorcerer               Controls the dark arts
+   
+    Level 9            7500-9999          Demon Crafter               Shapes the cursed world
+
+    Level 10           10000+             Eternal Revenge             Undying ghost
+          
