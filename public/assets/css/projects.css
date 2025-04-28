@@ -23,6 +23,9 @@
         transform: translateY(-20px) rotate(5deg);
     }
 }
+* {
+    cursor: url("../img/arrowhead.png");
+}
 
 .section__title {
     font-size: 3.5rem;

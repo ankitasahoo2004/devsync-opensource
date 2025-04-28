@@ -189,7 +189,6 @@
 
 .level-badge {
     position: relative;
-    cursor: pointer;
     transition: transform 0.3s ease;
 }
 
@@ -272,7 +271,6 @@
 
 .contrib-badge {
     position: relative;
-    cursor: pointer;
     padding: 1rem;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 16px;
@@ -349,7 +347,6 @@
     border: none;
     color: var(--text-color);
     font-size: 2rem;
-    cursor: pointer;
     padding: 0.5rem;
     transition: color 0.3s ease;
 }
@@ -364,7 +361,6 @@
 }
 
 .banner-option {
-    cursor: pointer;
     padding: 0.5rem;
     border-radius: 12px;
     border: 2px solid transparent;
@@ -468,7 +464,6 @@
     border: none;
     color: #fff;
     opacity: 0.8;
-    cursor: pointer;
     transition: opacity 0.3s ease;
     padding: 0.25rem;
 }
