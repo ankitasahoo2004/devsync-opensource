@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const overlay = document.createElement('div');
         overlay.className = 'loading-overlay';
-        overlay.style.cursor = 'pointer';
+        overlay.style
 
         document.body.appendChild(overlay);
         document.body.appendChild(popup);

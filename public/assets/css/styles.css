@@ -126,7 +126,6 @@ input {
 }
 
 button {
-  cursor: pointer;
   font-family: var(--body-font);
   font-size: var(--normal-font-size);
 }
@@ -275,6 +274,9 @@ button {
   border-radius: 0.5rem;
   font-weight: var(--font-medium);
   transition: 0.3s;
+}
+a{
+  cursor: default !important;
 }
 
 .button:hover {
@@ -1339,7 +1341,6 @@ button {
   background: var(--container-color);
   color: var (--text-color);
   border: none;
-  cursor: pointer;
   transition: 0.3s;
 }
 
@@ -2844,7 +2845,6 @@ button {
   border-radius: 12px;
   padding: 1.5rem;
   transition: all 0.3s ease;
-  cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
