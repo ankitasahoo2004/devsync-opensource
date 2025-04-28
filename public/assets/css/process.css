@@ -62,30 +62,12 @@
     color: #ccc;
 }
 
-.navbar__container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    background: rgba(0, 0, 0, 0.7);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
 @media screen and (max-width:576px) {
-    .process__card {
-        min-height: 200px;
-        display: flex;
-        flex-direction: column;
-        align-content: middle;
-        justify-content: center;
-        margin-top: 1rem;
-    }
-
     .process__container {
-        margin-top: 6rem;
-        padding: 3rem;
+        margin-top: 5rem;
     }
     .process__steps {
-        padding: 0rem 2rem;
+        padding: 0rem 3rem;
     }
+
 }
