@@ -62,11 +62,34 @@ async function checkBadges(mergedPRs, points) {
         const validMergedPRsCount = mergedPRs.filter(pr => registeredRepoIds.includes(pr.repoId)).length;
 
         const badges = ['Newcomer'];
+
+        // Contribution badges
         if (validMergedPRsCount >= 1) badges.push('First Contribution');
         if (validMergedPRsCount >= 5) badges.push('Active Contributor');
         if (validMergedPRsCount >= 10) badges.push('Super Contributor');
-        if (points >= 100) badges.push('Point Master');
-        if (points >= 500) badges.push('DevSync Champion');
+
+        // Level badges
+        if (points >= 0 && points <= 99) {
+            badges.push('Cursed Newbie | Just awakened.....');
+        } else if (points >= 100 && points <= 249) {
+            badges.push('Graveyard Shifter | Lost but curious');
+        } else if (points >= 250 && points <= 499) {
+            badges.push('Night Stalker | Shadows are friends');
+        } else if (points >= 500 && points <= 999) {
+            badges.push('Skeleton of Structure | Casts magic on code');
+        } else if (points >= 1000 && points <= 1999) {
+            badges.push('Phantom Architect | Builds from beyond');
+        } else if (points >= 2000 && points <= 3499) {
+            badges.push('Haunted Debugger | Haunting every broken line');
+        } else if (points >= 3500 && points <= 4999) {
+            badges.push('Lord of Shadows | Master of the unseen');
+        } else if (points >= 5000 && points <= 7499) {
+            badges.push('Dark Sorcerer | Controls the dark arts');
+        } else if (points >= 7500 && points <= 9999) {
+            badges.push('Demon Crafter | Shapes the cursed world');
+        } else if (points >= 10000) {
+            badges.push('Eternal Revenge | Undying ghost');
+        }
 
         return badges;
     } catch (error) {
