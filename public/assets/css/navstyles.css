@@ -202,6 +202,51 @@
   }
 }
 
+@media screen and (max-width: 960px) {
+  .nav {
+    flex-direction: row;
+    /* align-items: flex-start; */
+    padding: 1rem;
+    height: 60px;
+    width: 94%;
+  }
+
+  .nav__toggle {
+    display: flex;
+    font-size: 1.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    align-self: flex-end;
+  }
+
+  .nav__menu {
+    visibility: hidden;
+    width: 100%;
+    background: transparent;
+    gap: 1rem;
+  }
+
+  .nav__menu.show-menu {
+    visibility: visible;
+    opacity: 1;
+    max-height: 500px;
+  }
+
+  .nav__list {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .nav__link {
+    width: 100%;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+  }
+}
+
+
 @media screen and (min-width: 1080px) {
 
   .nav__close,
@@ -212,6 +257,89 @@
 }
 
 @media screen and (max-width: 977px) {
+  .nav__menu {
+    position: fixed;
+    width: 100%;
+    background: var(--container-color);
+    top: -150%;
+    left: 0;
+    padding: 3.5rem 0;
+    transition: 0.4s;
+    z-index: var(--z-fixed);
+    border-radius: 0 0 1.5rem 1.5rem;
+  }
+
+  .nav {
+    padding: 2rem;
+  }
+
+}
+
+@media screen and (max-width: 576px) {
+  .nav {
+    padding: 1.5rem;
+  }
+
+  .nav__toggle {
+    margin-bottom: -0.4rem;
+  }
+
+}
+@media screen and (max-width: 960px) {
+  .nav {
+    flex-direction: row;
+    /* align-items: flex-start; */
+    padding: 1rem;
+    height: 60px;
+    width: 94%;
+  }
+
+  .nav__toggle {
+    display: flex;
+    font-size: 1.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    align-self: flex-end;
+  }
+
+  .nav__menu {
+    visibility: hidden;
+    width: 100%;
+    background: transparent;
+    gap: 1rem;
+  }
+
+  .nav__menu.show-menu {
+    visibility: visible;
+    opacity: 1;
+    max-height: 500px;
+  }
+
+  .nav__list {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .nav__link {
+    width: 100%;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+  }
+}
+
+
+@media screen and (min-width: 1080px) {
+
+  .nav__close,
+  .nav__img {
+    display: none;
+  }
+
+}
+
+@media screen and (max-width: 1077px) {
   .nav__menu {
     position: fixed;
     width: 100%;
