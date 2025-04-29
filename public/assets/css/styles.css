@@ -2376,10 +2376,11 @@ body.login-body {
 .leaderboard-winners {
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   gap: 2rem;
   margin-bottom: 4rem;
-  padding: 2rem 0;
+  padding: 2rem;
+  margin: 2rem;
 }
 
 .winner-card {
