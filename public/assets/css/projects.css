@@ -23,6 +23,7 @@
         transform: translateY(-20px) rotate(5deg);
     }
 }
+
 * {
     cursor: url("../img/arrowhead.png");
 }
@@ -655,6 +656,7 @@
 
 .action-buttons {
     gap: 0.4rem;
+    display: flex;
 }
 
 .admin-project-card .action-buttons {
@@ -835,6 +837,10 @@
 
     .projects-grid {
         grid-template-columns: 1fr;
+    }
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
     }
 }
 
