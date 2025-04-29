@@ -53,10 +53,32 @@ function updateProfileInfo(data) {
     document.getElementById('profile-name').textContent = data.name || data.login;
     document.getElementById('profile-bio').textContent = data.bio || '';
 
-    // Add banner customization
+    // Add banner customization with dynamic update handling
     const bannerElement = document.querySelector('.profile__cover-wrapper');
-    const currentBanner = localStorage.getItem('profileBanner') || 'banner1.jpg';
-    document.getElementById('profile-cover').src = `assets/img/banners/${currentBanner}`;
+    const coverImage = document.getElementById('profile-cover');
+    
+    const updateBanner = (bannerId) => {
+        const newImage = new Image();
+        newImage.onload = () => {
+            coverImage.style.opacity = '0';
+            setTimeout(() => {
+                coverImage.src = newImage.src;
+                requestAnimationFrame(() => {
+                    coverImage.style.opacity = '1';
+                });
+            }, 300);
+        };
+        newImage.src = `assets/img/banners/${bannerId}`;
+    };
+
+    // Initialize banner
+    const currentBanner = localStorage.getItem('profileBanner');
+    if (currentBanner) {
+        updateBanner(currentBanner);
+    } else {
+        const defaultBanner = 'banner1.png';
+        updateBanner(defaultBanner);
+    }
 
     // Add click handler for banner customization
     bannerElement.addEventListener('click', openBannerSidebar);
@@ -100,6 +122,13 @@ function updateProfileInfo(data) {
 }
 
 function openBannerSidebar() {
+    const overlay = document.createElement('div');
+    overlay.className = 'banner-sidebar-overlay';
+    document.body.appendChild(overlay);
+
+    // Add show class after a short delay to trigger transition
+    setTimeout(() => overlay.classList.add('show'), 10);
+
     const sidebar = document.createElement('div');
     sidebar.className = 'banner-sidebar';
 
@@ -176,14 +205,35 @@ function openBannerSidebar() {
     // Close sidebar handler
     sidebar.querySelector('.banner-sidebar__close').addEventListener('click', () => {
         sidebar.classList.remove('show');
-        setTimeout(() => sidebar.remove(), 300);
+        overlay.classList.remove('show');
+        setTimeout(() => {
+            sidebar.remove();
+            overlay.remove();
+        }, 300);
     });
 
     // Update banner selection handler
     sidebar.querySelectorAll('.banner-option.unlocked').forEach(option => {
         option.addEventListener('click', () => {
             const bannerId = option.dataset.banner;
-            document.getElementById('profile-cover').src = `assets/img/banners/${bannerId}`;
+            const coverImage = document.getElementById('profile-cover');
+            
+            // Add fade out effect
+            coverImage.style.transition = 'opacity 0.3s ease';
+            coverImage.style.opacity = '0';
+            
+            // Load new image
+            const newImage = new Image();
+            newImage.onload = () => {
+                setTimeout(() => {
+                    coverImage.src = newImage.src;
+                    requestAnimationFrame(() => {
+                        coverImage.style.opacity = '1';
+                    });
+                }, 300);
+            };
+            newImage.src = `assets/img/banners/${bannerId}`;
+            
             localStorage.setItem('profileBanner', bannerId);
 
             // Add selection effect
@@ -197,7 +247,11 @@ function openBannerSidebar() {
             // Close sidebar with delay for visual feedback
             setTimeout(() => {
                 sidebar.classList.remove('show');
-                setTimeout(() => sidebar.remove(), 300);
+                overlay.classList.remove('show');
+                setTimeout(() => {
+                    sidebar.remove();
+                    overlay.remove();
+                }, 300);
             }, 500);
         });
     });
