@@ -360,31 +360,136 @@
     gap: 1rem;
 }
 
-.banner-option {
-    padding: 0.5rem;
+.banner-sidebar__info {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: rgba(255, 255, 255, 0.03);
     border-radius: 12px;
-    border: 2px solid transparent;
+}
+
+.banner-unlock-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    color: var(--text-color);
+}
+
+.banner-unlock-progress .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.banner-unlock-progress .progress {
+    height: 100%;
+    background: linear-gradient(90deg, var(--first-color), #ffffff);
+    transition: width 0.3s ease;
+}
+
+.banner-option {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
     transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.banner-option:hover {
-    border-color: var(--first-color);
-    transform: translateY(-2px);
+.banner-option.unlocked:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.08);
 }
 
-.banner-option img {
+.banner-option.selected {
+    border: 2px solid var(--first-color);
+}
+
+.banner-preview {
+    position: relative;
     width: 100%;
     height: 100px;
-    object-fit: fill;
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
+    overflow: hidden;
 }
 
-.banner-option span {
-    display: block;
+.banner-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.banner-option.unlocked:hover .banner-preview img {
+    transform: scale(1.05);
+}
+
+.lock-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
     color: var(--text-color);
+}
+
+.lock-overlay i {
+    font-size: 2rem;
+    color: var(--text-color-light);
+}
+
+.banner-info {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.banner-name {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.banner-theme {
     font-size: 0.9rem;
-    text-align: center;
+    color: var(--text-color-light);
+}
+
+.banner-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.banner-status.unlocked {
+    color: #2ed573;
+}
+
+.banner-status.locked {
+    color: var(--text-color-light);
+}
+
+.banner-option.locked {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.banner-option.locked:hover::after {
+    content: attr(data-unlock-level);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    white-space: nowrap;
 }
 
 /* Enhanced Toast Notification */

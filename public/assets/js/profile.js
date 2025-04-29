@@ -104,11 +104,20 @@ function openBannerSidebar() {
     sidebar.className = 'banner-sidebar';
 
     const banners = [
-        { id: 'banner1.png', name: 'Dark Forest' },
-        { id: 'banner2.png', name: 'Mystic Night' },
-        { id: 'banner3.png', name: 'Haunted Castle' },
-        { id: 'banner4.png', name: 'Spooky Woods' }
+        { id: 'banner1.png', name: 'Dark Forest', requiredLevel: 1, theme: 'Mystical' },
+        { id: 'banner2.png', name: 'Mystic Night', requiredLevel: 2, theme: 'Enchanted' },
+        { id: 'banner3.png', name: 'Haunted Castle', requiredLevel: 3, theme: 'Gothic' },
+        { id: 'banner4.png', name: 'Spooky Woods', requiredLevel: 4, theme: 'Horror' },
+        { id: 'banner5.png', name: 'Shadow Realm', requiredLevel: 5, theme: 'Dark' },
+        { id: 'banner6.png', name: 'Phantom Palace', requiredLevel: 6, theme: 'Royal' },
+        { id: 'banner7.png', name: 'Dragon\'s Lair', requiredLevel: 7, theme: 'Epic' },
+        { id: 'banner8.png', name: 'Void Gateway', requiredLevel: 8, theme: 'Cosmic' },
+        { id: 'banner9.png', name: 'Demon\'s Court', requiredLevel: 9, theme: 'Infernal' },
+        { id: 'banner10.png', name: 'Eternal Darkness', requiredLevel: 10, theme: 'Ultimate' }
     ];
+
+    // Get user's current level from badges
+    const userLevel = getUserLevel();
 
     sidebar.innerHTML = `
         <div class="banner-sidebar__content">
@@ -116,13 +125,47 @@ function openBannerSidebar() {
                 <h3>Choose Banner</h3>
                 <button class="banner-sidebar__close">&times;</button>
             </div>
-            <div class="banner-sidebar__banners">
-                ${banners.map(banner => `
-                    <div class="banner-option" data-banner="${banner.id}">
-                        <img src="assets/img/banners/${banner.id}" alt="${banner.name}">
-                        <span>${banner.name}</span>
+            <div class="banner-sidebar__info">
+                <div class="banner-unlock-progress">
+                    <span>Level ${userLevel}</span>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: ${(userLevel / 10) * 100}%"></div>
                     </div>
-                `).join('')}
+                    <span>${10 - userLevel} levels to unlock all</span>
+                </div>
+            </div>
+            <div class="banner-sidebar__banners">
+                ${banners.map(banner => {
+        const isUnlocked = userLevel >= banner.requiredLevel;
+        return `
+                        <div class="banner-option ${isUnlocked ? 'unlocked' : 'locked'}" 
+                             data-banner="${banner.id}"
+                             ${isUnlocked ? '' : 'disabled'}>
+                            <div class="banner-preview">
+                                <img src="assets/img/banners/${banner.id}" alt="${banner.name}">
+                                ${!isUnlocked ? `
+                                    <div class="lock-overlay">
+                                        <i class='bx bx-lock'></i>
+                                        <span>Unlock at Level ${banner.requiredLevel}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="banner-info">
+                                <span class="banner-name">${banner.name}</span>
+                                <span class="banner-theme">${banner.theme}</span>
+                                ${isUnlocked ? `
+                                    <span class="banner-status unlocked">
+                                        <i class='bx bx-check'></i> Unlocked
+                                    </span>
+                                ` : `
+                                    <span class="banner-status locked">
+                                        <i class='bx bx-lock-alt'></i> Level ${banner.requiredLevel}
+                                    </span>
+                                `}
+                            </div>
+                        </div>
+                    `;
+    }).join('')}
             </div>
         </div>
     `;
@@ -136,21 +179,54 @@ function openBannerSidebar() {
         setTimeout(() => sidebar.remove(), 300);
     });
 
-    // Banner selection handler
-    sidebar.querySelectorAll('.banner-option').forEach(option => {
+    // Update banner selection handler
+    sidebar.querySelectorAll('.banner-option.unlocked').forEach(option => {
         option.addEventListener('click', () => {
             const bannerId = option.dataset.banner;
             document.getElementById('profile-cover').src = `assets/img/banners/${bannerId}`;
             localStorage.setItem('profileBanner', bannerId);
 
+            // Add selection effect
+            sidebar.querySelectorAll('.banner-option').forEach(opt =>
+                opt.classList.remove('selected'));
+            option.classList.add('selected');
+
             // Show toast notification
             showToast('Banner updated successfully!');
 
-            // Close sidebar
-            sidebar.classList.remove('show');
-            setTimeout(() => sidebar.remove(), 300);
+            // Close sidebar with delay for visual feedback
+            setTimeout(() => {
+                sidebar.classList.remove('show');
+                setTimeout(() => sidebar.remove(), 300);
+            }, 500);
         });
     });
+}
+
+function getUserLevel() {
+    const levelBadges = document.querySelectorAll('.level-badge');
+    const levelMap = {
+        'Cursed Newbie': 1,
+        'Graveyard Shifter': 2,
+        'Night Stalker': 3,
+        'Skeleton of Structure': 4,
+        'Phantom Architect': 5,
+        'Haunted Debugger': 6,
+        'Lord of Shadows': 7,
+        'Dark Sorcerer': 8,
+        'Demon Crafter': 9,
+        'Eternal Revenge': 10
+    };
+
+    let highestLevel = 0;
+    levelBadges.forEach(badge => {
+        const badgeName = badge.dataset.badgeName;
+        if (levelMap[badgeName] > highestLevel) {
+            highestLevel = levelMap[badgeName];
+        }
+    });
+
+    return highestLevel;
 }
 
 function showToast(message) {
