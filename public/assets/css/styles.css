@@ -801,8 +801,12 @@ button {
   }
 
   .container {
+    display: flex;
     padding: 1.5rem;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 3rem;
+    padding: 1.5rem;
+    /* justify-content: space-between; */
   }
 
   .newsletter__container {
@@ -916,7 +920,7 @@ button {
   .footer__img-two {
     right: initial;
     bottom: 0;
-    left: 15%;
+    /* left: 15%; */
   }
 }
 
@@ -1053,6 +1057,19 @@ button {
     width: 180px;
     top: 30%;
     left: -3%;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .footer__img-two {
+    width: 180px;
+    top: 30%;
+    left: -3%;
+    opacity: 0.2;
+  }
+
+  .footer__img-one {
+    opacity: 0.2;
   }
 }
 
@@ -1398,6 +1415,7 @@ body.login-body {
 
 .footer__links {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   gap: 5px;
 }
