@@ -63,8 +63,8 @@
 .leaderboard-winners {
   display: flex;
   justify-content: center;
-  align-items: flex-end;
-  gap: 3rem;
+  align-items: center;
+  gap: 2rem;
   margin: 6rem 0;
   padding: 2rem;
   position: relative;
@@ -211,10 +211,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
-  margin: 2rem 0;
-  padding: 0 1rem;
+  /* margin: 2rem 0; */
+  /* padding: 0 1rem; */
   background: transparent;
-  justify-content: flex-start;
+  justify-content: center;
   /* Align items from left side */
   width: 100%;
 }
@@ -350,7 +350,7 @@
 /* Runners-up Cards Grid */
 .runners-up-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   margin: 2rem 0;
   padding: 0 1rem;
@@ -373,7 +373,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 220px;
+  width: 200px;
   box-shadow: 0 0 20px rgba(128, 0, 128, 0.1);
   backdrop-filter: blur(10px);
 }
@@ -471,7 +471,8 @@
   }
 }
 
-@media screen and (max-width: 768px) {
+
+@media screen and (max-width: 771px) {
   .leaderboard-winners {
     flex-direction: row;
     flex-wrap: wrap;
@@ -559,6 +560,11 @@
     right: auto;
   }
 
+  .runner-up-card {
+    width: 224px;
+  }
+
+
   .leaderboard-list {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -597,6 +603,14 @@
   .leaderboard-item,
   .runner-up-card {
     flex: 0 0 calc(50% - 1rem);
+  }
+
+  .runners-up-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0;
+    margin: 0;
+    ;
   }
 }
 
