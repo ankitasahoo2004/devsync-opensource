@@ -166,7 +166,7 @@ function updateNavigation() {
                 if (hasLoginButton) return;
                 nav.innerHTML += `
                         <li class="nav__item">
-                            <a href="/login" class="nav__link">Login</a>
+                        <a href="/login" class="nav__link">Login</a>
                         </li>`;
             } else {
                 const displayName = (user.displayName || 'User').split(' ')[0];
