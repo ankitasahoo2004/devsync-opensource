@@ -787,6 +787,12 @@ button {
   }
 }
 
+@media screen and (max-width:540px) {
+  .nav__close {
+    margin-bottom: 2.5rem;
+  }
+}
+
 /* For medium devices */
 @media screen and (min-width: 576px) {
   .about__container {
