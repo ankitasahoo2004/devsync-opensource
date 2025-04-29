@@ -138,7 +138,7 @@ function renderTopWinners(winners) {
 }
 
 function renderWinnerCard(user, position, rank) {
-    const essentialBadges = getEssentialBadges(user.badges);
+    const essentialBadges = getEssentialBadges(user.badges, false); // Show only newest badges
     return `
         <div class="winner-card ${position}" data-user="${user.username}">
             <div class="winner-medal">
@@ -236,7 +236,7 @@ function renderLeaderboardItem(user, isSearchResult = false) {
                         </span>
                     </div>
                     <div class="badges-container">
-                        ${getEssentialBadges(user.badges).map(badge => `<span class="badge">${badge.split('|')[0]}</span>`).join('')}
+                        ${getEssentialBadges(user.badges, false).map(badge => `<span class="badge">${badge.split('|')[0]}</span>`).join('')}
                     </div>
                 </div>
             </div>
@@ -287,12 +287,29 @@ function toggleMerges(id) {
 }
 
 // Add helper functions
-function getEssentialBadges(badges) {
-    const levelBadge = badges.find(badge => badge.includes('|'));
-    const contributionBadge = badges.find(badge =>
+function getNewestBadges(badges) {
+    // Get the highest level badge (last one from level badges)
+    const levelBadges = badges.filter(badge => badge.includes('|'));
+    const newestLevelBadge = levelBadges[levelBadges.length - 1];
+
+    // Get the highest contribution badge (last one from contribution badges)
+    const contributionBadges = badges.filter(badge =>
         ['First Contribution', 'Active Contributor', 'Super Contributor'].includes(badge)
     );
-    return [levelBadge, contributionBadge].filter(Boolean);
+    const newestContributionBadge = contributionBadges[contributionBadges.length - 1];
+
+    return [newestLevelBadge, newestContributionBadge].filter(Boolean);
+}
+
+function getEssentialBadges(badges, showAll = false) {
+    if (showAll) {
+        const levelBadges = badges.filter(badge => badge.includes('|'));
+        const contributionBadge = badges.find(badge =>
+            ['First Contribution', 'Active Contributor', 'Super Contributor'].includes(badge)
+        );
+        return [...levelBadges, contributionBadge].filter(Boolean);
+    }
+    return getNewestBadges(badges);
 }
 
 function getLevelImage(levelBadge) {
@@ -472,5 +489,5 @@ document.addEventListener('DOMContentLoaded', () => {
             timeRange.value,
             document.querySelector('.filter-btn.active').dataset.filter
         );
-    }, 5 * 60 * 1000);
+    }, 60 * 60 * 1000);
 });

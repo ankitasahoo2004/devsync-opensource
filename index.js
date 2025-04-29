@@ -62,36 +62,26 @@ async function checkBadges(mergedPRs, points) {
         const validMergedPRsCount = mergedPRs.filter(pr => registeredRepoIds.includes(pr.repoId)).length;
 
         const badges = ['Newcomer'];
+        const levelBadges = [];
 
         // Contribution badges
         if (validMergedPRsCount >= 1) badges.push('First Contribution');
         if (validMergedPRsCount >= 5) badges.push('Active Contributor');
         if (validMergedPRsCount >= 10) badges.push('Super Contributor');
 
-        // Level badges
-        if (points >= 0 && points <= 99) {
-            badges.push('Cursed Newbie | Just awakened.....');
-        } else if (points >= 100 && points <= 249) {
-            badges.push('Graveyard Shifter | Lost but curious');
-        } else if (points >= 250 && points <= 499) {
-            badges.push('Night Stalker | Shadows are friends');
-        } else if (points >= 500 && points <= 999) {
-            badges.push('Skeleton of Structure | Casts magic on code');
-        } else if (points >= 1000 && points <= 1999) {
-            badges.push('Phantom Architect | Builds from beyond');
-        } else if (points >= 2000 && points <= 3499) {
-            badges.push('Haunted Debugger | Haunting every broken line');
-        } else if (points >= 3500 && points <= 4999) {
-            badges.push('Lord of Shadows | Master of the unseen');
-        } else if (points >= 5000 && points <= 7499) {
-            badges.push('Dark Sorcerer | Controls the dark arts');
-        } else if (points >= 7500 && points <= 9999) {
-            badges.push('Demon Crafter | Shapes the cursed world');
-        } else if (points >= 10000) {
-            badges.push('Eternal Revenge | Undying ghost');
-        }
+        // Level badges - add all badges up to current points level
+        if (points >= 0) levelBadges.push('Cursed Newbie | Just awakened.....');
+        if (points >= 100) levelBadges.push('Graveyard Shifter | Lost but curious');
+        if (points >= 250) levelBadges.push('Night Stalker | Shadows are friends');
+        if (points >= 500) levelBadges.push('Skeleton of Structure | Casts magic on code');
+        if (points >= 1000) levelBadges.push('Phantom Architect | Builds from beyond');
+        if (points >= 2000) levelBadges.push('Haunted Debugger | Haunting every broken line');
+        if (points >= 3500) levelBadges.push('Lord of Shadows | Master of the unseen');
+        if (points >= 5000) levelBadges.push('Dark Sorcerer | Controls the dark arts');
+        if (points >= 7500) levelBadges.push('Demon Crafter | Shapes the cursed world');
+        if (points >= 10000) levelBadges.push('Eternal Revenge | Undying ghost');
 
-        return badges;
+        return [...badges, ...levelBadges];
     } catch (error) {
         console.error('Error checking badges:', error);
         return ['Newcomer'];
