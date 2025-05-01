@@ -44,8 +44,8 @@ body {
   /* Black solid
   Purple to Blue gradient
   Vibrant Pink to Orange gradient */
-  --body-color: linear-gradient(135deg, #2a1240, #28106b);
-  --container-color: linear-gradient(135deg, #21162b, #280e6f);
+  --body-color: linear-gradient(135deg, #000000, #181818);
+  --container-color: linear-gradient(135deg, #000000, #181818);
 
   /*========== Font and typography ==========*/
   --body-font: "Creepster", sans-serif;
@@ -277,9 +277,8 @@ button {
 
 /*=============== BUTTONS ===============*/
 .button {
-
   display: inline-block;
-  background-color: var(--first-color);
+  /* background-color: var(--first-color); */
   color: var(--title-color);
   padding: 1rem 1.75rem;
   border-radius: 0.5rem;
@@ -800,6 +799,7 @@ button {
     grid-template-columns: 0.8fr;
     justify-content: center;
   }
+
   /* do not touch */
   .container {
     padding: 1.5rem;
@@ -3077,6 +3077,12 @@ body.login-body {
 .user-role.contributor {
   background: rgba(46, 213, 115, 0.15);
   color: #2ed573;
+}
+
+.new__img {
+  height: 150px;
+  width: 150px;
+  object-fit: contain;
 }
 
 /* Responsive updates */
