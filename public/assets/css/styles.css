@@ -3078,6 +3078,12 @@ body.login-body {
   color: #2ed573;
 }
 
+.new__img {
+  height: 150px;
+  width: 150px;
+  object-fit: contain;
+}
+
 /* Responsive updates */
 @media screen and (max-width: 768px) {
   .users-header {
