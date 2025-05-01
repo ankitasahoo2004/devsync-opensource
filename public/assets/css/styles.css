@@ -154,7 +154,7 @@ button {
 
 /*=============== LAYOUT ===============*/
 .container {
-  max-width: 968px;
+  max-width: 1400px;
   margin-left: var(--mb-1-5);
   margin-right: var(--mb-1-5);
   padding: 1rem;
