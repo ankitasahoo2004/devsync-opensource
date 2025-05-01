@@ -4,9 +4,8 @@
   top: 1rem;
   left: 50%;
   transform: translateX(-50%);
-  width: 98%;
   max-width: 98vw;
-  min-width: min(1400px, 98vw);
+  min-width: min(1400px, 85vw);
   height: var(--header-height);
   display: flex;
   justify-content: space-between;
