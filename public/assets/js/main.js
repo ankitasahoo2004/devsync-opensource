@@ -1,4 +1,3 @@
-
 /*=============== SHOW MENU ===============*/
 const navMenu = document.getElementById('nav-menu'),
     navToggle = document.getElementById('nav-toggle'),
@@ -158,28 +157,36 @@ sr.reveal(`.about__img, .discount__data`, { origin: 'right' });
 /*=============== UPDATE NAV BASED ON LOGIN ===============*/
 function updateNavigation() {
     const nav = document.querySelector('.nav__list');
+    const navButtons = document.querySelector('.nav__buttons');
+    
     fetch('/api/user')
         .then(res => res.json())
         .then(user => {
-            const hasLoginButton = nav.querySelector('a[href="/login"]');
             if (user.error || !user.displayName || !user.photos) {
-                if (hasLoginButton) return;
-                nav.innerHTML += `
-                        <li class="nav__item">
-                        <a href="/login" class="nav__link">Login</a>
-                        </li>`;
+                // User is not logged in, ensure only one login button exists
+                const hasNavListLogin = nav.querySelector('a[href="/login"]');
+                if (hasNavListLogin) {
+                    hasNavListLogin.parentElement.remove();
+                }
             } else {
+                // User is logged in, replace login button with profile
                 const displayName = (user.displayName || 'User').split(' ')[0];
                 const profileImg = user.photos[0]?.value || 'assets/img/default-avatar.png';
+                const hasNavListLogin = nav.querySelector('a[href="/login"]');
+                
+                if (hasNavListLogin) {
+                    hasNavListLogin.parentElement.remove();
+                }
 
-                if (hasLoginButton) {
-                    nav.innerHTML = nav.innerHTML.replace(
-                        `<a href="/login" class="nav__link">Login</a>`,
-                        `<a href="/profile" class="nav__profile">
-                                <img src="${profileImg}" alt="Profile" class="nav__profile-img">
-                                <span class="nav__profile-name">${displayName}</span>
-                            </a>`
-                    );
+                // Replace the login button in nav__buttons with profile link
+                const loginButton = navButtons.querySelector('a[href="login.html"]');
+                if (loginButton) {
+                    loginButton.href = "profile.html";
+                    loginButton.className = "nav__profile";
+                    loginButton.innerHTML = `
+                        <img src="${profileImg}" alt="Profile" class="nav__profile-img">
+                        <span class="nav__profile-name">${displayName}</span>
+                    `;
                 }
             }
         }).catch(err => console.error('Error fetching user data:', err));
