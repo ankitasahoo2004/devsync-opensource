@@ -154,7 +154,7 @@ button {
 
 /*=============== LAYOUT ===============*/
 .container {
-  max-width: 968px;
+  max-width: 1400px;
   margin-left: var(--mb-1-5);
   margin-right: var(--mb-1-5);
   padding: 1rem;
@@ -607,6 +607,7 @@ button {
 .newsletter__form {
   background: var(--container-color);
   padding: 1rem;
+  margin-top: 1rem;
   display: flex;
   justify-content: space-between;
   border-radius: 0.75rem;
