@@ -137,6 +137,11 @@ button {
     overflow: visible;
 }
 
+.devsync, #time, #date {
+    color: #F4420B;
+    font-weight: bold;
+}
+
 button,
 select {
     text-transform: none;
@@ -4514,7 +4519,7 @@ blockquote {
     width: 60px;
     transition: opacity .2s;
     top: auto;
-    bottom: 20%;
+    bottom: 1rem;
     left: 20px;
     right: auto;
 }
@@ -4534,7 +4539,7 @@ blockquote {
 
 .right-arrow {
     top: auto;
-    bottom: 20%;
+    bottom: 1rem;
     left: 80px;
     right: auto;
 }
