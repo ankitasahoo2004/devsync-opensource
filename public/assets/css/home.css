@@ -137,6 +137,11 @@ button {
     overflow: visible;
 }
 
+.devsync, #time, #date {
+    color: #F4420B;
+    font-weight: bold;
+}
+
 button,
 select {
     text-transform: none;
