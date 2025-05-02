@@ -5,6 +5,9 @@ const navMenu = document.getElementById('nav-menu'),
 
 // console.log(navMenu, navToggle, navClose)
 
+const date = document.getElementById("date")
+date.innerHTML = new Date().toDateString()
+
 if (navToggle && navMenu) {
     navToggle.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -158,7 +161,7 @@ sr.reveal(`.about__img, .discount__data`, { origin: 'right' });
 function updateNavigation() {
     const nav = document.querySelector('.nav__list');
     const navButtons = document.querySelector('.nav__buttons');
-    
+
     fetch('/api/user')
         .then(res => res.json())
         .then(user => {
@@ -173,7 +176,7 @@ function updateNavigation() {
                 const displayName = (user.displayName || 'User').split(' ')[0];
                 const profileImg = user.photos[0]?.value || 'assets/img/default-avatar.png';
                 const hasNavListLogin = nav.querySelector('a[href="/login"]');
-                
+
                 if (hasNavListLogin) {
                     hasNavListLogin.parentElement.remove();
                 }
