@@ -3,12 +3,8 @@ const navMenu = document.getElementById('nav-menu'),
     navToggle = document.getElementById('nav-toggle'),
     navClose = document.getElementById('nav-close')
 
-// console.log(navMenu, navToggle, navClose)
+    if (navToggle && navMenu) {
 
-const date = document.getElementById("date")
-date.innerHTML = new Date().toDateString()
-
-if (navToggle && navMenu) {
     navToggle.addEventListener('click', (e) => {
         e.stopPropagation();
         navMenu.classList.toggle('show-menu');
