@@ -357,6 +357,9 @@
   .nav {
     padding: 1.5rem;
   }
+  .container {
+    justify-content: space-between;
+  }
 }
 
 .nav__buttons {
@@ -435,8 +438,8 @@
 
 @media screen and (max-width: 768px) {
   .nav {
-    padding: 2rem;
     width: 92%;
+    justify-content: space-between;
   }
 
   .nav__profile {
@@ -450,6 +453,7 @@
 
   .container {
     padding: 2rem;
+    justify-content: space-between;
   }
 
 }
