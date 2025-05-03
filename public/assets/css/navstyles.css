@@ -349,6 +349,7 @@
 
   .nav {
     padding: 2rem;
+    justify-content: space-between;
   }
 
 }
@@ -357,6 +358,7 @@
   .nav {
     padding: 1.5rem;
   }
+
   .container {
     justify-content: space-between;
   }
