@@ -12,6 +12,9 @@ const Repo = require('./models/Repo');
 const Event = require('./models/Event');
 const MongoStore = require('connect-mongo');
 const emailService = require('./services/emailService');
+const compression = require('compression');
+const serveStatic = require('serve-static');
+const sharp = require('sharp');
 const PORT = process.env.PORT || 5500;
 const serverUrl = process.env.SERVER_URL;
 
@@ -142,6 +145,45 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Add compression middleware
+app.use(compression());
+
+// Configure static file serving with caching
+const staticOptions = {
+    maxAge: '1y',
+    setHeaders: (res, path) => {
+        // Enable caching for images
+        if (path.endsWith('.jpg') || path.endsWith('.png')) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000');
+        }
+    }
+};
+
+// Serve optimized images
+app.get('/assets/img/:image', async (req, res, next) => {
+    try {
+        const imagePath = path.join(__dirname, 'public/assets/img', req.params.image);
+        const acceptedFormats = req.accepts(['webp', 'jpeg', 'png']);
+
+        let imageBuffer = await sharp(imagePath)
+            .resize(800) // Set reasonable max width
+            .jpeg({ quality: 80 }); // Compress quality
+
+        if (acceptedFormats === 'webp') {
+            imageBuffer = imageBuffer.webp({ quality: 80 });
+            res.setHeader('Content-Type', 'image/webp');
+        }
+
+        const optimizedImage = await imageBuffer.toBuffer();
+        res.send(optimizedImage);
+    } catch (err) {
+        next(); // Fall back to original file if optimization fails
+    }
+});
+
+// Serve static files with caching
+app.use(serveStatic(path.join(__dirname, 'public'), staticOptions));
 
 // Passport configuration
 passport.use(new GitHubStrategy({
