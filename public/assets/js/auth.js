@@ -1,5 +1,5 @@
-// const serverUrl = 'https://devsync-opensource.tech';
-const serverUrl = 'http://localhost:3000';
+const serverUrl = 'https://devsync-opensource.tech';
+// const serverUrl = 'http://localhost:3000';
 
 async function checkAuthStatus() {
     try {
@@ -21,7 +21,6 @@ async function checkAuthStatus() {
                 <img src="${data.user.photos[0].value}" 
                      alt="Profile" 
                      class="nav__profile-img">
-                <span class="nav__profile-name">${data.user.displayName}</span>
             `;
             loginButton.href = 'profile.html';
         } else {

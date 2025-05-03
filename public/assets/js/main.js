@@ -184,7 +184,6 @@ function updateNavigation() {
                     loginButton.className = "nav__profile";
                     loginButton.innerHTML = `
                         <img src="${profileImg}" alt="Profile" class="nav__profile-img">
-                        <span class="nav__profile-name">${displayName}</span>
                     `;
                 }
             }
