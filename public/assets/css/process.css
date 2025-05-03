@@ -5608,6 +5608,10 @@ blockquote {
         overflow: hidden;
     }
 
+    #w-node-d8807348-6236-99d5-2c84-2c2b529f713a-950c39d3 {
+        z-index: 100;
+    }
+
     .container {
         padding: 1em;
         justify-content: space-between;
@@ -5792,6 +5796,7 @@ blockquote {
     .road-map-card-container {
         margin-right: 12px;
         padding: 19px 20px 19px 41px;
+        width: 350px;
     }
 
     .road-map-holder {
