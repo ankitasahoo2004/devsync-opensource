@@ -154,7 +154,7 @@ button {
 
 /*=============== LAYOUT ===============*/
 .container {
-  max-width: 1400px;
+  max-width: 1700px;
   margin-left: var(--mb-1-5);
   margin-right: var(--mb-1-5);
   padding: 1rem;
@@ -763,7 +763,8 @@ button {
 /* For small devices */
 @media screen and (min-width: 320px) {
   .container {
-    padding: 1.5rem;
+    /* padding: 1.5rem; */
+    justify-content: space-between;
   }
 
   .home__img {
