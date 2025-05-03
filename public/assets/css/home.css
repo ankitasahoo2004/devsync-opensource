@@ -6110,13 +6110,14 @@ blockquote {
     #w-node-_882890c5-196d-24e0-9efb-c63fb7559b66-e57186d1 {
         grid-column: span 3 / span 3;
         height: 500px;
+        width: 380px;
     }
 
     #w-node-_5030b210-fdcc-5999-e746-b071ea88002c-e57186d1,
     #w-node-_21e77d05-a753-99e4-c89f-b113def05f8c-e57186d1 {
         grid-area: span 1 / span 4 / span 1 / span 4;
         height: 500px;
-        width: 400px;
+        width: 380px;
     }
 
     #w-node-_51c01e78-abf5-e5ef-ed11-76e160aec539-457186d5 {
