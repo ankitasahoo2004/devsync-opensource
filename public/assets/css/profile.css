@@ -119,6 +119,10 @@
     animation-delay: 0.2s;
 }
 
+.road-map-description {
+    width: 400px;
+}
+
 .stat:nth-child(3) {
     animation-delay: 0.4s;
 }
