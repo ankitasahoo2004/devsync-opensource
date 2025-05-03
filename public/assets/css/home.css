@@ -137,7 +137,9 @@ button {
     overflow: visible;
 }
 
-.devsync, #time, #date {
+.devsync,
+#time,
+#date {
     color: #F4420B;
     font-weight: bold;
 }
@@ -5778,7 +5780,7 @@ blockquote {
 
     .left-arrow,
     .right-arrow {
-        bottom: 47%;
+        top: 55%;
     }
 
     .sticky-image-container {
@@ -5874,7 +5876,7 @@ blockquote {
 
 .badge-level:hover {
     color: #f4420b;
-     }
+}
 
 #w-node-_34606e73-8297-7b25-2883-d16ee7dd680d-e57186d1 {
     grid-area: 1 / 1 / 3 / 2;
@@ -6101,16 +6103,22 @@ blockquote {
 @media screen and (max-width: 479px) {
     #w-node-_3dfc59ed-4d1a-8cb4-718f-7ab9b0671a91-e57186d1 {
         grid-column: span 2 / span 2;
+        height: 500px;
+        width: 400px;
     }
 
     #w-node-eed2fcb8-0a93-2a1f-600f-0d4f4bc3e329-e57186d1,
     #w-node-_882890c5-196d-24e0-9efb-c63fb7559b66-e57186d1 {
         grid-column: span 3 / span 3;
+        height: 500px;
+        width: 400px;
     }
 
     #w-node-_5030b210-fdcc-5999-e746-b071ea88002c-e57186d1,
     #w-node-_21e77d05-a753-99e4-c89f-b113def05f8c-e57186d1 {
         grid-area: span 1 / span 4 / span 1 / span 4;
+        height: 500px;
+        width: 400px;
     }
 
     #w-node-_51c01e78-abf5-e5ef-ed11-76e160aec539-457186d5 {
