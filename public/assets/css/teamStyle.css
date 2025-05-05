@@ -19,10 +19,21 @@ body {
   max-width: 98vw;
   width: 98%;
   margin: 0 auto;
-  padding: 2rem 4rem;
+  padding: 2rem 4.5rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  min-width: min(1400px, 98vw); /* Add minimum width */
-  transition: none; /* Prevent any automatic transitions */
+  min-width: min(1400px, 98vw);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 92%;
+    min-width: unset;
+    padding: 1rem 1.5rem;
+    margin: 1rem auto;
+  }
 }
 
 /* Add heading styles */
@@ -34,12 +45,6 @@ body {
 }
 
 @media (max-width: 768px) {
-  .container {
-    width: 95%;
-    min-width: unset;
-    padding: 1rem;
-    margin: 1rem auto;
-  }
   .container h1 {
     font-size: 48px;
     line-height: 1;
@@ -56,7 +61,14 @@ body {
 }
 
 .image {
-  transition: all 0.3s var(--ease-out-circ);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: grayscale(50%);
+}
+
+.image:hover,
+.image.selected {
+  filter: grayscale(0%);
+  transform: scale(1.02);
 }
 
 /* Remove old hover styles */
@@ -84,13 +96,71 @@ body {
 }
 
 .team_member {
-  cursor: default;
+  cursor: pointer;
+  padding: 16px 24px;
+  border-radius: 16px;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.team_member::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.05),
+      transparent);
+  transform: translateX(-100%);
+  transition: transform 0.8s ease;
+}
+
+.team_member:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(12px) scale(1.02);
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.1),
+    0 3px 6px rgba(0, 0, 0, 0.05);
+}
+
+.team_member:hover::before {
+  transform: translateX(100%);
+}
+
+.team_member:active {
+  transform: translateX(8px) scale(0.98);
+  background: rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease;
+}
+
+.team_member.active {
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0.05));
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 15px 25px rgba(0, 0, 0, 0.15),
+    0 5px 10px rgba(0, 0, 0, 0.08);
+}
+
+.team_member::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 100%);
+  opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-.team_member.active,
-.team_member:hover {
-  opacity: 1 !important;
+.team_member:hover::after {
+  opacity: 1;
 }
 
 /* Add new hover effect styles */
@@ -159,6 +229,107 @@ body {
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
   transition: all 0.3s ease;
+}
+
+/* Active member styling */
+.team_member.active-member {
+  color: rgba(255, 255, 255, 0.9);
+  transform: translateX(8px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.team_member.active-member::before {
+  content: '';
+  position: absolute;
+  left: -1rem;
+  top: 50%;
+  width: 2px;
+  height: 60%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translateY(-50%);
+}
+
+.team_member.active-member span:first-child {
+  opacity: 1;
+  text-shadow: 0 0 20px rgba(var(--first-color-rgb), 0.5);
+}
+
+/* Card active styling */
+.relative.active-card {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(var(--first-color-rgb), 0.3);
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.relative.active-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(45deg,
+      transparent,
+      rgba(var(--first-color-rgb), 0.3),
+      transparent);
+  border-radius: inherit;
+  z-index: -1;
+  animation: borderGlow 2s linear infinite;
+}
+
+/* Sticky area scroll customization */
+.col-span-4 .sticky {
+  height: 85vh;
+  overflow-y: auto;
+  padding-right: 20px;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scroll-behavior: smooth;
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  padding: 20px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.col-span-4 .sticky::-webkit-scrollbar {
+  display: none;
+}
+
+/* Add new animations */
+@keyframes expandBar {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+
+  to {
+    height: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes borderGlow {
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 /* Mobile Responsive Styles */
