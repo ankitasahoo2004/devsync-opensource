@@ -3930,7 +3930,7 @@ blockquote {
 }
 
 .footer-flex-container {
-    grid-column-gap: 30px;
+    grid-column-gap: 380px;
     grid-row-gap: 30px;
     text-align: left;
     grid-template-rows: auto;
@@ -5480,6 +5480,7 @@ blockquote {
 
     h3 {
         font-size: 32px;
+        text-align: center;
     }
 
     h4 {

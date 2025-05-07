@@ -221,17 +221,20 @@
 
 .leaderboard-item {
   position: relative;
+  text-align: center;
+  min-height: 215px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  padding: 1.5rem 1rem 1rem;
-  margin: 0;
-  min-height: 200px;
-  flex: 0 0 calc(20% - 1.5rem);
-  /* Adjust width of each card */
-  box-shadow: 0 0 20px rgba(128, 0, 128, 0.1);
+  justify-content: center;
+  width: 198px;
+  box-shadow: rgba(128, 0, 128, 0.1) 0px 0px 20px;
   backdrop-filter: blur(10px);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 1rem;
+  padding: 1.5rem 1rem 1rem;
+  transition: 0.3s;
 }
 
 .leaderboard-item:hover {
@@ -274,8 +277,8 @@
 }
 
 .user-img {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   border: 2px solid var(--card-border);
 }
@@ -288,7 +291,6 @@
 }
 
 .user-info h4 {
-  font-size: 1.25rem;
   margin-bottom: 0.5rem;
 }
 
@@ -477,8 +479,10 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
     gap: 1rem;
     padding: 3rem 1rem 1rem;
+    width: 224px;
   }
 
   .winner-card {
@@ -491,14 +495,17 @@
     width: 100%;
     transform: none;
     order: -1;
+    width: 300px;
   }
 
   .winner-card.second {
     order: 0;
+    width: 300px;
   }
 
   .winner-card.third {
     order: 1;
+    width: 300px;
   }
 
   .winner-img {
@@ -630,6 +637,7 @@
   .leaderboard-item,
   .runner-up-card {
     flex: 0 0 100%;
+    width: 250px;
   }
 
   /* Remove the grid layout for smallest screens */
