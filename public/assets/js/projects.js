@@ -139,6 +139,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
+            // Add event delegation for view repository buttons
+            projectsContainer.addEventListener('click', (e) => {
+                const viewBtn = e.target.closest('.view-repo');
+                if (viewBtn) {
+                    const repoUrl = viewBtn.dataset.url;
+                    showModal('confirm', 'View Repository', 'Would you like to visit this repository on GitHub?', (confirmed) => {
+                        if (confirmed) {
+                            window.open(repoUrl, '_blank');
+                        }
+                    });
+                }
+            });
+
             // Add filter functionality
             const filterBtns = projectsContainer.querySelectorAll('.filter-btn');
             const projectsGrid = document.getElementById('userProjectsGrid');
