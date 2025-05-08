@@ -198,17 +198,15 @@ function renderLeaderboardList(users) {
                                 <i class='bx bx-git-merge'></i>
                                 ${user.mergedPRs.length}
                             </span>
-                        </div>
-                        <div class="badges-container">
+                            </div>
+                            <div class="badges-container">
                             ${getEssentialBadges(user.badges).map(badge => `<span class="badge">${badge.split('|')[0]}</span>`).join('')}
-                        </div>
-                    </div>
-                    ${renderTrendIndicator(user.trend)}
-                </div>
-            `).join('')}
-        </div>
-        <div class="leaderboard-list">
-            ${remainingUsers.map(user => renderLeaderboardItem(user)).join('')}
+                            </div>
+                            </div>
+                            ${renderTrendIndicator(user.trend)}
+                            </div>
+                            `).join('')}
+                            ${remainingUsers.map(user => renderLeaderboardItem(user)).join('')}
         </div>
     `;
 }

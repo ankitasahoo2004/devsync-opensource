@@ -478,8 +478,8 @@
 }
 
 .review-status {
-    position: absolute;
     margin-top: 16px;
+    margin-bottom: 0.5rem;
     top: 15px;
     padding: 1rem;
     font-weight: 400;

@@ -5631,6 +5631,13 @@ blockquote {
         font-size: 14px;
     }
 
+    .slider-grid-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
     .section.overlay-hidden-mobile {
         overflow: hidden;
     }
@@ -5800,7 +5807,7 @@ blockquote {
 
     .left-arrow,
     .right-arrow {
-        top: 55%;
+        top: 50%;
     }
 
     .sticky-image-container {
@@ -6126,11 +6133,8 @@ blockquote {
         height: 500px;
     }
 
-    #w-node-eed2fcb8-0a93-2a1f-600f-0d4f4bc3e329-e57186d1,
     #w-node-_882890c5-196d-24e0-9efb-c63fb7559b66-e57186d1 {
-        grid-column: span 3 / span 3;
         height: 500px;
-        width: 380px;
     }
 
     #w-node-_5030b210-fdcc-5999-e746-b071ea88002c-e57186d1,
