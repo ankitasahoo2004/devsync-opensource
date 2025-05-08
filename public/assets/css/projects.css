@@ -25,7 +25,7 @@
 }
 
 * {
-    cursor: url("../img/arrowhead.png");
+    cursor: url("../img/arrowhead.png"), auto;
 }
 
 .section__title {

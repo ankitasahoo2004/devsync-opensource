@@ -289,7 +289,6 @@ body {
 
 /* Sticky area scroll customization */
 .col-span-4 .sticky {
-  height: 85vh;
   overflow-y: auto;
   padding-right: 20px;
   scrollbar-width: none;
