@@ -4202,6 +4202,7 @@ blockquote {
     filter: grayscale(100%) brightness(1000%);
 }
 
+
 .hero-top-sectioncontainer {
     z-index: 2;
     position: relative;
@@ -5708,6 +5709,7 @@ blockquote {
     .footer-heading {
         margin-top: 20px;
     }
+
 
     .made-by-section {
         flex-direction: column;
