@@ -95,6 +95,101 @@ function initializeTeamInteractions() {
     });
 }
 
+function initializeModal() {
+    const modal = document.getElementById('user-modal');
+    const modalContent = modal.querySelector('.modal-content');
+    const closeBtn = document.getElementById('close-modal');
+
+    const teamCards = document.querySelectorAll('[id^="member-"]');
+
+    const teamData = {
+        'member-ankita': {
+            name: 'Ankita Priyadarshini Sahoo',
+            role: 'Founder & Frontend Developer',
+            description: `<p>Creative and detail-oriented frontend developer with expertise in creating responsive and user-friendly web interfaces. Passionate about crafting elegant solutions and staying current with the latest web technologies.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/ankita-priyadarshini-sahoo-529517291/',
+            github: 'https://github.com/ankitasahoo2004',
+            instagram: 'https://www.instagram.com/_.ankitasahoo._/'
+        },
+        'member-shubham': {
+            name: 'Shubham Kumar',
+            role: 'Founder & Mern Stack Developer',
+            description: `<p>Enthusiastic frontend developer with a knack for creating visually appealing and user-friendly web applications. Committed to delivering high-quality code and continuously learning new technologies.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/shubham-kumar-0b1a1a1b8/',
+            github: 'https://github.com/Shubham66020',
+            instagram: 'https://www.instagram.com/shubhamkumar_0b1a1a1b8/'
+        },
+        'member-sayan': {
+            name: 'Sayan Karmakar',
+            role: 'Founder & Backend Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/sayan-karmakar-01239a242/',
+            github: 'https://github.com/Sayan-dev731',
+            instagram: 'https://www.instagram.com/code_it884/'
+        }
+        // Add more team member data as needed
+    };
+
+    function openModal(memberId) {
+        const data = teamData[memberId] || {
+            name: 'Team Member',
+            role: 'Developer',
+            description: '<p>Team member description coming soon...</p>',
+            linkedin: '#',
+            github: '#',
+            instagram: '#'
+        };
+
+        const img = document.querySelector(`#${memberId} img`);
+
+        document.getElementById('modal-image').src = img.src;
+        document.getElementById('modal-name').textContent = data.name;
+        document.getElementById('modal-role').textContent = data.role;
+        document.getElementById('modal-description').innerHTML = data.description;
+        document.getElementById('modal-linkedin').href = data.linkedin;
+        document.getElementById('modal-github').href = data.github;
+        document.getElementById('modal-instagram').href = data.instagram;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                modalContent.classList.add('show');
+            });
+        });
+    }
+
+    function closeModal() {
+        modalContent.classList.remove('show');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 300);
+    }
+
+    teamCards.forEach(card => {
+        const img = card.querySelector('img');
+        if (img) {
+            img.addEventListener('click', () => openModal(card.id));
+        }
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+            closeModal();
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initializeTeamInteractions();
 
@@ -146,4 +241,6 @@ document.addEventListener('DOMContentLoaded', () => {
     grid.addEventListener('mouseout', () => {
         grid.classList.remove('has-hover');
     });
+
+    initializeModal();
 });

@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="assets/css/navstyles.css">
   <link rel="stylesheet" href="assets/css/styles.css">
   <link rel="stylesheet" href="assets/css/teamStyle.css">
+  <link rel="stylesheet" href="assets/css/modal.css">
   <title>Teams Section</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -302,8 +303,8 @@
                 <span class="text-md relative top-[1px] font-mono uppercase opacity-60">
                   <a href="#" rel="noopener noreferrer" target="_blank"
                     class="username-link inline-flex items-center whitespace-nowrap font-mono text-sm uppercase"
-                    data-single="https://www.linkedin.com/in/aditya-kumar-46bb7524b/"
-                    data-double="https://github.com/" data-triple="https://www.instagram.com/">
+                    data-single="https://www.linkedin.com/in/aditya-kumar-46bb7524b/" data-double="https://github.com/"
+                    data-triple="https://www.instagram.com/">
                     <span>@aditya</span>
                   </a>
                 </span>
@@ -518,8 +519,8 @@
                 <span class="text-md relative top-[1px] font-mono uppercase opacity-60">
                   <a href="#" rel="noopener noreferrer" target="_blank"
                     class="username-link inline-flex items-center whitespace-nowrap font-mono text-sm uppercase"
-                    data-single="https://www.linkedin.com/feed/"
-                    data-double="https://github.com/" data-triple="https://www.instagram.com/__.livas?igsh=MTI2M3ludWY3YXQ3bw%3D%3D">
+                    data-single="https://www.linkedin.com/feed/" data-double="https://github.com/"
+                    data-triple="https://www.instagram.com/__.livas?igsh=MTI2M3ludWY3YXQ3bw%3D%3D">
                     <span>@livas</span>
                   </a>
                 </span>
@@ -534,8 +535,8 @@
                 <span class="text-md relative top-[1px] font-mono uppercase opacity-60">
                   <a href="#" rel="noopener noreferrer" target="_blank"
                     class="username-link inline-flex items-center whitespace-nowrap font-mono text-sm uppercase"
-                    data-single="https://www.linkedin.com/feed/"
-                    data-double="https://github.com/niteshraj2310" data-triple="https://www.instagram.com/nitesh.svg">
+                    data-single="https://www.linkedin.com/feed/" data-double="https://github.com/niteshraj2310"
+                    data-triple="https://www.instagram.com/nitesh.svg">
                     <span>@nitesh</span>
                   </a>
                 </span>
@@ -569,7 +570,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Ankita Priyadarshini Sahoo" id="member-ankita" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Ankita.jpg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -581,7 +582,8 @@
                 Priyadarshini Sahoo</span>
             </div>
             <div class="my-5 flex items-center gap-2 xl:hidden">
-              <a href="https://www.linkedin.com/in/ankita-priyadarshini-sahoo-529517291/" rel="noopener noreferrer" target="_blank"
+              <a href="https://www.linkedin.com/in/ankita-priyadarshini-sahoo-529517291/" rel="noopener noreferrer"
+                target="_blank"
                 class="inline-flex items-center whitespace-nowrap font-mono text-sm uppercase text-gray-1000">
                 <img alt="" loading="lazy" class="relative z-[5] h-8 w-8 rounded-full border border-gray-900"
                   src="assets/img/avatars/image1x1.jpg" />
@@ -594,7 +596,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Shubham Kumar" id="member-shubham" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Shubham.jpg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -619,7 +621,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Sayan Karmakar" id="member-sayan" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Sayan.jpg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -644,7 +646,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Kunal Sharma" id="member-kunal" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Kunal.jpg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -669,7 +671,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Susmita Mahato" id="member-susmita" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Susmita Mahato.jpg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -694,7 +696,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Aditya Sinha" id="member-aditya" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Aditya Sinha.jpeg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -719,7 +721,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Ansh Raj" id="member-ansh" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Ansh.jpg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -744,7 +746,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Riya Ghosh" id="member-riya" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Riya Ghosh.jpg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -769,7 +771,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Shubham Raj" id="member-shubhamR" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Shubham Raj.jpeg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -794,7 +796,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Tripti Kumari" id="member-tripti" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Tripti.jpeg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -819,7 +821,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="A B Subhalaxmi" id="member-ab" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/A B SUBHALAXMI.jpg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -844,7 +846,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Shahanwaz" id="member-shahanwaz" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=500&h=500&fit=crop" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -867,7 +869,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Aditya Kumar" id="member-adityaK" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="https://media.licdn.com/dms/image/v2/D4D03AQERV2FwUZu47g/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1725171654575?e=1747267200&v=beta&t=NOsLu8YPQ_jS_9Y88Kw7dzxZgJkxOi-QcC2G7T6enKg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -892,7 +894,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Tisha Jeswani" id="member-tisha" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Tisha Jeswani.jpg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -918,7 +920,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Umang Bhasin" id="member-umang" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="https://media.licdn.com/dms/image/v2/D4D03AQEyP-R0TQAZSQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1681757853146?e=1747872000&v=beta&t=6NgA-tvOIWpuZZB-eGwIQqF3fWvBOTs4E4oM7hAtN6I" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -944,7 +946,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Samriddhi Chandak" id="member-samriddhi" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Samriddhi Chandak.jpg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -956,7 +958,8 @@
                 Chandak</span>
             </div>
             <div class="my-5 flex items-center gap-2 xl:hidden">
-              <a href="https://www.linkedin.com/in/samriddhi-chandak-19b40430b/" rel="noopener noreferrer" target="_blank"
+              <a href="https://www.linkedin.com/in/samriddhi-chandak-19b40430b/" rel="noopener noreferrer"
+                target="_blank"
                 class="inline-flex items-center whitespace-nowrap font-mono text-sm uppercase text-gray-1000">
                 <img alt="" loading="lazy" class="relative z-[5] h-8 w-8 rounded-full border border-gray-900"
                   src="assets/img/avatars/image2x2.jpg" />
@@ -970,7 +973,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Rishikesh Raj" id="member-rishikesh" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Rishikesh Raj.jpg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -996,7 +999,7 @@
             data-member="Bhavya
           Priyadarshini" id="member-bhavya" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Bhavya.jpeg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -1008,7 +1011,8 @@
                 Priyadarshini</span>
             </div>
             <div class="my-5 flex items-center gap-2 xl:hidden">
-              <a href="https://www.linkedin.com/in/bhavya-priyadarshani-ab127928a/" rel="noopener noreferrer" target="_blank"
+              <a href="https://www.linkedin.com/in/bhavya-priyadarshani-ab127928a/" rel="noopener noreferrer"
+                target="_blank"
                 class="inline-flex items-center whitespace-nowrap font-mono text-sm uppercase text-gray-1000">
                 <img alt="" loading="lazy" class="relative z-[5] h-8 w-8 rounded-full border border-gray-900"
                   src="assets/img/avatars/image3x1.jpg" />
@@ -1022,7 +1026,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Rishi Soni" id="member-rishi" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Rishi Soni.png" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -1048,7 +1052,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Vineet Dubey" id="member-vineet" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Vineet Dubey.jpg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -1074,7 +1078,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Rudra Prakash Sahu" id="member-rudra" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=500&h=500&fit=crop" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -1086,7 +1090,8 @@
                 Prakash Sahu</span>
             </div>
             <div class="my-5 flex items-center gap-2 xl:hidden">
-              <a href="https://www.linkedin.com/in/rudra-prakash-sahu-981b90315/" rel="noopener noreferrer" target="_blank"
+              <a href="https://www.linkedin.com/in/rudra-prakash-sahu-981b90315/" rel="noopener noreferrer"
+                target="_blank"
                 class="inline-flex items-center whitespace-nowrap font-mono text-sm uppercase text-gray-1000">
                 <img alt="" loading="lazy" class="relative z-[5] h-8 w-8 rounded-full border border-gray-900"
                   src="assets/img/avatars/image4x2.jpg" />
@@ -1101,7 +1106,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Karthik Gupta" id="member-karthik" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="https://media.licdn.com/dms/imge/v2/D5603AQEUKE86bKPmcw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1729712003998?e=1747267200&v=beta&t=R3DaXHnAPVuGokaMdinVgL2Q0zVIfL7_mEt3RarOm2o" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -1126,7 +1131,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Raunit Kumar" id="member-raunit" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="https://media.licdn.com/dms/image/v2/D4D03AQFKpN8odRVOdw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1729790108852?e=1747267200&v=beta&t=sSK2SQy3w4cZA7t6cvsx-_6Xoz5IjDWnvZcteZ9TT9k" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -1151,7 +1156,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Aryan Baibhav" id="member-aryan" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Aryan baibhav.jpg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -1176,7 +1181,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Krish Maurya" id="member-krish" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=500&h=500&fit=crop" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -1201,7 +1206,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="T. Livas" id="member-livas" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -1227,7 +1232,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Nitesh Raj" id="member-nitesh" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="assets/img/team members/Nitesh.jpg" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -1253,7 +1258,7 @@
           <li class="transition-all duration-300 ease-[var(--ease-out-circ)] relative block image opacity-100"
             data-member="Divyanshu" id="member-divyanshu" role="article">
             <div class="relative aspect-[280/304] overflow-hidden border border-dashed border-gray-500">
-              <img alt="" draggable="false" loading="lazy" class="h-full w-full object-cover"
+              <img alt="" id="users-modal-card" draggable="false" loading="lazy" class="h-full w-full object-cover"
                 src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&h=500&fit=crop" />
               <div
                 class="pointer-events-none absolute inset-0 transition-opacity duration-200 opacity-0 flex items-end justify-center pb-8 text-xl font-medium text-white"
@@ -1695,7 +1700,8 @@
                 <a href="#" rel="noopener noreferrer" target="_blank"
                   class="username-link inline-flex items-center whitespace-nowrap font-mono text-sm uppercase"
                   data-single="https://www.linkedin.com/in/krish-maurya-59699732b/"
-                  data-double="https://github.com/krishmaurya21" data-triple="https://www.instagram.com/krrishmaurya21/">
+                  data-double="https://github.com/krishmaurya21"
+                  data-triple="https://www.instagram.com/krrishmaurya21/">
                   <span>@krish</span>
                 </a>
               </span>
@@ -1711,7 +1717,8 @@
                 <a href="#" rel="noopener noreferrer" target="_blank"
                   class="username-link inline-flex items-center whitespace-nowrap font-mono text-sm uppercase"
                   data-single="https://www.linkedin.com/in/ankita-priyadarshini-sahoo-529517291/"
-                  data-double="https://github.com/ankitasahoo2004" data-triple="https://www.instagram.com/__.livas?igsh=MTI2M3ludWY3YXQ3bw%3D%3D">
+                  data-double="https://github.com/ankitasahoo2004"
+                  data-triple="https://www.instagram.com/__.livas?igsh=MTI2M3ludWY3YXQ3bw%3D%3D">
                   <span>@livas</span>
                 </a>
               </span>
@@ -1756,6 +1763,45 @@
       </ul>
     </div>
   </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="user-modal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm transition-all duration-300">
+    <div
+      class="modal-content bg-gray-900 rounded-xl p-8 max-w-2xl w-full mx-4 transform scale-95 opacity-0 transition-all duration-300">
+      <div class="flex justify-end">
+        <button id="close-modal" class="text-gray-400 hover:text-white">
+          <i class='bx bx-x text-3xl'></i>
+        </button>
+      </div>
+      <div class="flex flex-col md:flex-row gap-8">
+        <div class="w-full md:w-1/2">
+          <img id="modal-image" class="w-full h-[400px] object-cover rounded-lg" src="" alt="Team member">
+        </div>
+        <div class="w-full md:w-1/2 text-white">
+          <h3 id="modal-name" class="text-2xl font-bold mb-4"></h3>
+          <p id="modal-role" class="text-lg text-gray-400 mb-6"></p>
+          <div id="modal-description" class="text-gray-300 space-y-4">
+            <!-- Description will be populated by JS -->
+          </div>
+          <div class="flex gap-4 mt-8">
+            <a id="modal-linkedin" href="" target="_blank"
+              class="text-3xl text-gray-400 hover:text-blue-500 transition-colors">
+              <i class='bx bxl-linkedin-square'></i>
+            </a>
+            <a id="modal-github" href="" target="_blank"
+              class="text-3xl text-gray-400 hover:text-purple-500 transition-colors">
+              <i class='bx bxl-github'></i>
+            </a>
+            <a id="modal-instagram" href="" target="_blank"
+              class="text-3xl text-gray-400 hover:text-pink-500 transition-colors">
+              <i class='bx bxl-instagram'></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- <script src="./assets/js/team-interactions.js"></script> -->
