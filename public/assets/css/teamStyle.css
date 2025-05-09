@@ -212,7 +212,7 @@ body {
   position: relative;
   overflow: hidden;
   display: inline-flex;
-  padding: 0.2em 0.4em;
+  /* padding: 0.2em 0.4em; */
 }
 
 .team_member a span {
