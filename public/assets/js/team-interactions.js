@@ -150,7 +150,7 @@ function initializeModal() {
         },
         'member-aditya': {
             name: 'Aditya Sinha',
-            role: 'Founder & Full Stack Developer',
+            role: 'Full Stack Developer',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/aditya-sinha-1952172a0/',
@@ -159,7 +159,7 @@ function initializeModal() {
         },
         'member-ansh': {
             name: 'Ansh Raj',
-            role: 'Founder & Full Stack Developer',
+            role: 'Code Riewer',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/ansh-raj-b66960317/',
