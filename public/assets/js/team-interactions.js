@@ -105,7 +105,7 @@ function initializeModal() {
     const teamData = {
         'member-ankita': {
             name: 'Ankita Priyadarshini Sahoo',
-            role: 'Founder & Frontend Developer',
+            role: 'Founder, Design Lead & Frontend Developer',
             description: `<p>Creative Frontend Developer passionate about building responsive, user-friendly interfaces. I stay up-to-date with the latest technologies to craft elegant digital solutions, currently leading Design and Frontend at DevSync.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/ankita-priyadarshini-sahoo-529517291/',
@@ -150,7 +150,7 @@ function initializeModal() {
         },
         'member-aditya': {
             name: 'Aditya Sinha',
-            role: 'Full Stack Developer',
+            role: 'Founder & Full Stack Developer',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/aditya-sinha-1952172a0/',
