@@ -106,7 +106,7 @@ function initializeModal() {
         'member-ankita': {
             name: 'Ankita Priyadarshini Sahoo',
             role: 'Founder & Frontend Developer',
-            description: `<p>Creative and detail-oriented frontend developer with expertise in creating responsive and user-friendly web interfaces. Passionate about crafting elegant solutions and staying current with the latest web technologies.</p>
+            description: `<p>Creative Frontend Developer passionate about building responsive, user-friendly interfaces. I stay up-to-date with the latest technologies to craft elegant digital solutions, currently leading Design and Frontend at DevSync.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/ankita-priyadarshini-sahoo-529517291/',
             github: 'https://github.com/ankitasahoo2004',
@@ -129,7 +129,232 @@ function initializeModal() {
             linkedin: 'https://www.linkedin.com/in/sayan-karmakar-01239a242/',
             github: 'https://github.com/Sayan-dev731',
             instagram: 'https://www.instagram.com/code_it884/'
-        }
+        },
+        'member-kunal': {
+            name: 'Kunal Sharma',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/kunal-kumar-2ab402263/',
+            github: 'https://github.com/ku12al',
+            instagram: 'https://www.instagram.com/kunal_sharma7739/'
+        },
+        'member-susmita': {
+            name: 'Susmita Mahato',
+            role: 'Graphic Designer',
+            description: `<p>Passionate Graphic Designer with a strong foundation in web technologies, dedicated to creating visually engaging and user-friendly designs. Currently contributing to design and visual strategy at DevSync.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/susmita-mahato-29707b31b/',
+            github: 'https://github.com/SusmitaMahato',
+            instagram: 'https://www.instagram.com/susmita_1282006/'
+        },
+        'member-aditya': {
+            name: 'Aditya Sinha',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/aditya-sinha-1952172a0/',
+            github: 'https://github.com/dev-adityasinha',
+            instagram: 'https://www.instagram.com/id.adityasinha/'
+        },
+        'member-ansh': {
+            name: 'Ansh Raj',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/ansh-raj-b66960317/',
+            github: 'https://github.com/anshraj-21',
+            instagram: 'https://www.instagram.com/ansh_pvtx21?igsh=MTVzYmNmcjhraHloYw%3D%3D'
+        },
+        'member-riya': {
+            name: 'Riya Ghosh',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/riya-ghosh-07b74732a/',
+            github: 'https://github.com/Riya-1606',
+            instagram: 'https://www.instagram.com/riya_160607/'
+        },
+        'member-shubham': {
+            name: 'Shubham Raj',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/shubham-raj-a0a123324/',
+            github: 'https://github.com/Shubham06-Code',
+            instagram: 'https://www.instagram.com/'
+        },
+        'member-tripti': {
+            name: 'Tripti Kumari',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/tripti-kumari-58405632a/',
+            github: 'https://github.com/Tripti-30',
+            instagram: 'https://www.instagram.com/triptik806/'
+        },
+        'member-subhalaxmi': {
+            name: 'A B Subhalaxmi',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/a-b-subhalaxmi-1aa6a5344/',
+            github: 'https://github.com/subhalaxmi2307',
+            instagram: 'https://www.instagram.com/itsjusttt_a.b?igsh=MWZoY2k2amh5c3Z4Nw%3D%3D'
+        },
+        'member-shahanwaz': {
+            name: 'Shahanwaz',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/md-shahanwaz-/',
+            github: 'https://github.com/',
+            instagram: 'https://www.instagram.com/'
+        },
+        'member-aditya': {
+            name: 'Aditya Kumar',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/aditya-kumar-46bb7524b/',
+            github: 'https://github.com/',
+            instagram: 'https://www.instagram.com/'
+        },
+        'member-tisha': {
+            name: 'Tisha Jeswani',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/tisha-jeswani-0a9441342/',
+            github: 'https://github.com/tishajeswani33',
+            instagram: 'https://www.instagram.com/_._tisha_2505/'
+        },
+        'member-umang': {
+            name: 'Umang Bhasin',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/umang-bhasin-b7878a294/',
+            github: 'https://github.com/UmangBhasin',
+            instagram: 'https://www.instagram.com/_umang__11?igsh=NjFudDdrMWY1dmFo'
+        },
+        'member-samriddhi': {
+            name: 'Samriddhi Chandak',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/samriddhi-chandak-19b40430b/',
+            github: 'https://github.com/samm00711',
+            instagram: 'https://www.instagram.com/samriddhi.hie_/'
+        },
+        'member-rishikesh': {
+            name: 'Rishikesh Raj',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/rishikesh-raj-b68642250/',
+            github: 'https://github.com/Rishikesh-001',
+            instagram: 'https://www.instagram.com/_raj_rishikesh'
+        },
+        'member-bhavya': {
+            name: 'Bhavya Priyadarshini',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>A frontend developer who loves turning ideas into clean, creative web experiences. I'm still figuring things out, learning as I go, and having a bit of fun along the way.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/bhavya-priyadarshani-ab127928a/',
+            github: 'https://github.com/05bhavs',
+            instagram: 'https://www.instagram.com/its_.bhavs?igsh=MWo5cmUwcndnODFkeQ%3D%3D&utm_source=qr'
+        },
+        'member-rishi': {
+            name: 'Rishi Soni',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>My name is Rishi, a 2nd-year B.Tech student from a tier 3 college with a strong passion for coding and technology. Founder of The Coding Planet, Tech Lead of Infinity Coders Club, and a Microsoft Beta Student Ambassador. Interests: AI, ML, Java. Projects: Jarvis assistant (Python), GenAI image converter (GANs). Certified in Azure, ML, GenAI, Cloud. Passionate mentor and community builder.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/rishi-soni-28986923b/',
+            github: 'https://github.com/rishi02soni',
+            instagram: 'https://www.instagram.com/rishi.soni03/'
+        },
+        'member-vineet': {
+            name: 'Vineet Dubey',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/vineet-dubey64/',
+            github: 'https://github.com/VineetDubey4',
+            instagram: 'https://www.instagram.com/theonly_vineet/'
+        },
+        'member-rudra': {
+            name: 'Rudra Prakash Sahu',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/rudra-prakash-sahu-981b90315/',
+            github: 'https://github.com/hs-rudra-05',
+            instagram: 'https://www.instagram.com/rudra_prakash005/'
+        },
+        'member-karthik': {
+            name: 'Karthik Gupta',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Hi everyone! I hope you're doing well. I am Karthik. In this DevSync, I'm currently working on testing. I'm focusing on ensuring everything runs smoothly..!</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/kartik-gupta-275873331/',
+            github: 'https://github.com/kartik-gupta-26',
+            instagram: 'https://www.instagram.com/'
+        },
+        'member-aryan': {
+            name: 'Aryan Baibhav',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/aryan-baibhav01/',
+            github: 'https://github.com/Aryanbaibhav',
+            instagram: 'https://www.instagram.com/_aryan_0x0_/'
+        },
+        'member-krish': {
+            name: 'Krish Maurya',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/krish-maurya-59699732b/',
+            github: 'https://github.com/krishmaurya21',
+            instagram: 'https://www.instagram.com/krrishmaurya21/'
+        },
+        'member-livas': {
+            name: 'T. Livas',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/',
+            github: 'https://github.com/',
+            instagram: 'https://www.instagram.com/__.livas?igsh=MTI2M3ludWY3YXQ3bw%3D%3D'
+        },
+        'member-nitesh': {
+            name: 'Nitesh Raj',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/',
+            github: 'https://github.com/niteshraj2310',
+            instagram: 'https://www.instagram.com/nitesh.svg'
+        },
+        'member-amritesh': {
+            name: 'Amritesh Raj',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/amritesh-raj-6710bb328/',
+            github: 'https://github.com/Amritesh-001',
+            instagram: 'https://www.instagram.com/amritesh.4709'
+        },
+        'member-divyanshu': {
+            name: 'Divyanshu Soni',
+            role: 'Founder & Full Stack Developer',
+            description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
+                         <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/divyanshu-soni-938468334/',
+            github: 'https://github.com/DivyanshuXOR',
+            instagram: 'https://www.instagram.com/divyanshu._.soni_22/'
+        },
         // Add more team member data as needed
     };
 
