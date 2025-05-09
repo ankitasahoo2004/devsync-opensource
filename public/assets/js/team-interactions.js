@@ -105,7 +105,7 @@ function initializeModal() {
     const teamData = {
         'member-ankita': {
             name: 'Ankita Priyadarshini Sahoo',
-            role: 'Founder, Design Lead & Frontend Developer',
+            role: 'Founder & Frontend Developer',
             description: `<p>Creative Frontend Developer passionate about building responsive, user-friendly interfaces. I stay up-to-date with the latest technologies to craft elegant digital solutions, currently leading Design and Frontend at DevSync.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/ankita-priyadarshini-sahoo-529517291/',
@@ -150,7 +150,7 @@ function initializeModal() {
         },
         'member-aditya': {
             name: 'Aditya Sinha',
-            role: 'Founder & Full Stack Developer',
+            role: 'Mern Stack Developer, Frontend Lead',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/aditya-sinha-1952172a0/',
@@ -159,7 +159,7 @@ function initializeModal() {
         },
         'member-ansh': {
             name: 'Ansh Raj',
-            role: 'Code Riewer',
+            role: 'Code Reviewer',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/ansh-raj-b66960317/',
@@ -168,7 +168,7 @@ function initializeModal() {
         },
         'member-riya': {
             name: 'Riya Ghosh',
-            role: 'Founder & Full Stack Developer',
+            role: 'Graphic Designer',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/riya-ghosh-07b74732a/',
@@ -177,7 +177,7 @@ function initializeModal() {
         },
         'member-shubham': {
             name: 'Shubham Raj',
-            role: 'Founder & Full Stack Developer',
+            role: 'Developer',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/shubham-raj-a0a123324/',
@@ -186,7 +186,7 @@ function initializeModal() {
         },
         'member-tripti': {
             name: 'Tripti Kumari',
-            role: 'Founder & Full Stack Developer',
+            role: 'Media Scheduling',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/tripti-kumari-58405632a/',
@@ -195,7 +195,7 @@ function initializeModal() {
         },
         'member-subhalaxmi': {
             name: 'A B Subhalaxmi',
-            role: 'Founder & Full Stack Developer',
+            role: 'Design Contributor',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/a-b-subhalaxmi-1aa6a5344/',
@@ -204,7 +204,7 @@ function initializeModal() {
         },
         'member-shahanwaz': {
             name: 'Shahanwaz',
-            role: 'Founder & Full Stack Developer',
+            role: 'Full Stack Developer',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/md-shahanwaz-/',
@@ -213,7 +213,7 @@ function initializeModal() {
         },
         'member-aditya': {
             name: 'Aditya Kumar',
-            role: 'Founder & Full Stack Developer',
+            role: 'API Developer',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/aditya-kumar-46bb7524b/',
@@ -222,7 +222,7 @@ function initializeModal() {
         },
         'member-tisha': {
             name: 'Tisha Jeswani',
-            role: 'Founder & Full Stack Developer',
+            role: 'Sponsorship Outreach',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/tisha-jeswani-0a9441342/',
@@ -231,7 +231,7 @@ function initializeModal() {
         },
         'member-umang': {
             name: 'Umang Bhasin',
-            role: 'Founder & Full Stack Developer',
+            role: 'Sponsorship Outreach',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/umang-bhasin-b7878a294/',
@@ -240,7 +240,7 @@ function initializeModal() {
         },
         'member-samriddhi': {
             name: 'Samriddhi Chandak',
-            role: 'Founder & Full Stack Developer',
+            role: 'Sponsorship Outreach',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/samriddhi-chandak-19b40430b/',
@@ -249,7 +249,7 @@ function initializeModal() {
         },
         'member-rishikesh': {
             name: 'Rishikesh Raj',
-            role: 'Founder & Full Stack Developer',
+            role: 'Team Management',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/rishikesh-raj-b68642250/',
@@ -258,7 +258,7 @@ function initializeModal() {
         },
         'member-bhavya': {
             name: 'Bhavya Priyadarshini',
-            role: 'Founder & Full Stack Developer',
+            role: 'Project Verification',
             description: `<p>A frontend developer who loves turning ideas into clean, creative web experiences. I'm still figuring things out, learning as I go, and having a bit of fun along the way.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/bhavya-priyadarshani-ab127928a/',
@@ -267,7 +267,7 @@ function initializeModal() {
         },
         'member-rishi': {
             name: 'Rishi Soni',
-            role: 'Founder & Full Stack Developer',
+            role: 'AI Developer',
             description: `<p>My name is Rishi, a 2nd-year B.Tech student from a tier 3 college with a strong passion for coding and technology. Founder of The Coding Planet, Tech Lead of Infinity Coders Club, and a Microsoft Beta Student Ambassador. Interests: AI, ML, Java. Projects: Jarvis assistant (Python), GenAI image converter (GANs). Certified in Azure, ML, GenAI, Cloud. Passionate mentor and community builder.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/rishi-soni-28986923b/',
@@ -276,7 +276,7 @@ function initializeModal() {
         },
         'member-vineet': {
             name: 'Vineet Dubey',
-            role: 'Founder & Full Stack Developer',
+            role: 'Developer',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/vineet-dubey64/',
@@ -285,7 +285,7 @@ function initializeModal() {
         },
         'member-rudra': {
             name: 'Rudra Prakash Sahu',
-            role: 'Founder & Full Stack Developer',
+            role: 'Social Media Manager',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/rudra-prakash-sahu-981b90315/',
@@ -294,7 +294,7 @@ function initializeModal() {
         },
         'member-karthik': {
             name: 'Karthik Gupta',
-            role: 'Founder & Full Stack Developer',
+            role: 'Tester',
             description: `<p>Hi everyone! I hope you're doing well. I am Karthik. In this DevSync, I'm currently working on testing. I'm focusing on ensuring everything runs smoothly..!</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/kartik-gupta-275873331/',
@@ -303,7 +303,7 @@ function initializeModal() {
         },
         'member-aryan': {
             name: 'Aryan Baibhav',
-            role: 'Founder & Full Stack Developer',
+            role: 'Outreach Manager',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/aryan-baibhav01/',
@@ -312,7 +312,7 @@ function initializeModal() {
         },
         'member-krish': {
             name: 'Krish Maurya',
-            role: 'Founder & Full Stack Developer',
+            role: 'Lead Editor',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/krish-maurya-59699732b/',
@@ -321,7 +321,7 @@ function initializeModal() {
         },
         'member-livas': {
             name: 'T. Livas',
-            role: 'Founder & Full Stack Developer',
+            role: 'Outreach Manager',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/',
@@ -330,7 +330,7 @@ function initializeModal() {
         },
         'member-nitesh': {
             name: 'Nitesh Raj',
-            role: 'Founder & Full Stack Developer',
+            role: 'Project Reviewer',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/',
@@ -339,7 +339,7 @@ function initializeModal() {
         },
         'member-amritesh': {
             name: 'Amritesh Raj',
-            role: 'Founder & Full Stack Developer',
+            role: 'Graphic Designer',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/amritesh-raj-6710bb328/',
@@ -348,7 +348,7 @@ function initializeModal() {
         },
         'member-divyanshu': {
             name: 'Divyanshu Soni',
-            role: 'Founder & Full Stack Developer',
+            role: 'Discord Moderator',
             description: `<p>Passionate frontend developer with a strong foundation in web technologies. Dedicated to building responsive and interactive web applications that enhance user experience.</p>
                          <p>Skills: HTML5, CSS3, JavaScript, React, UI/UX Design</p>`,
             linkedin: 'https://www.linkedin.com/in/divyanshu-soni-938468334/',
