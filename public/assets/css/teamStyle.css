@@ -31,6 +31,16 @@ body {
   border-radius: 1rem;
 }
 
+.team-profile-img {
+  height: 400px;
+}
+
+@media screen and (max-width:476px) {
+  .team-profile-img {
+    height: 300px;
+  }
+}
+
 @media (max-width: 768px) {
   .container {
     width: 92%;
