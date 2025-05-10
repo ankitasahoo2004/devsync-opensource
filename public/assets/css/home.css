@@ -5796,7 +5796,7 @@ blockquote {
 
     .slider-grey-card.home-page {
         width: 100%;
-        padding-bottom: 110px;
+        padding-bottom: 150px;
     }
 
     .mask {
@@ -6142,7 +6142,7 @@ blockquote {
     #w-node-_5030b210-fdcc-5999-e746-b071ea88002c-e57186d1,
     #w-node-_21e77d05-a753-99e4-c89f-b113def05f8c-e57186d1 {
         grid-area: span 1 / span 4 / span 1 / span 4;
-        height: 500px;
+        height: 550px;
         width: 380px;
     }
 
