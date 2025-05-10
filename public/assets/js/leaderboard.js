@@ -76,7 +76,7 @@ async function updateLeaderboard(timeRange = 'all', filterBy = 'points') {
         const users = await response.json();
 
         // Debug logging
-        console.log('Fetched users:', users);
+        // console.log('Fetched users:', users);
 
         if (!users || users.length === 0) {
             document.getElementById('leaderboardList').innerHTML = `
