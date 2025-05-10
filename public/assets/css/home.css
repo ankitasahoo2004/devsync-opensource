@@ -4257,6 +4257,10 @@ blockquote {
     object-fit: cover;
 }
 
+.new-section-img {
+    object-fit: contain;
+}
+
 .background-gradient {
     height: 60%;
     background-image: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
