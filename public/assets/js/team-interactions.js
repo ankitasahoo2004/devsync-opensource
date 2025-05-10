@@ -211,7 +211,7 @@ function initializeModal() {
             github: 'https://github.com/',
             instagram: 'https://www.instagram.com/'
         },
-        'member-aditya': {
+        'member-adityaK': {
             name: 'Aditya Kumar',
             role: 'API Developer',
             description: `<p>Specialist in designing and implementing robust APIs that serve as the backbone for web and mobile applications. Focuses on creating well-documented, versioned, and secure interfaces.</p>
