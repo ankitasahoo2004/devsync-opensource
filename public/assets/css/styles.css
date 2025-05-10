@@ -44,7 +44,10 @@ body {
   /* Black solid
   Purple to Blue gradient
   Vibrant Pink to Orange gradient */
-  --body-color: linear-gradient(135deg, #000000, #181818);
+  /* OLD COLOR */
+  /* --body-color: linear-gradient(135deg, #000000, #181818); */
+  /* NEW COLOR */
+  --body-color: #000;
   --container-color: linear-gradient(135deg, #000000, #181818);
 
   /*========== Font and typography ==========*/
@@ -839,8 +842,11 @@ button {
   }
 
   .nav__list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-direction: row;
-    column-gap: 3rem;
+    column-gap: 2.5rem;
   }
 
   .nav__link {

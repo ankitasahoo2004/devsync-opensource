@@ -268,7 +268,7 @@ html {
 
 body {
     min-height: 100%;
-    color: #333;
+    color: #000;
     background-color: #fff;
     margin: 0;
     font-family: Arial, sans-serif;
@@ -2246,7 +2246,7 @@ textarea.w-select {
 
 .w-commerce-commercecartcontainerwrapper {
     z-index: 1001;
-    background-color: rgba(0, 0, 0, .8);
+    /* background-color: rgba(0, 0, 0, .8); */
     position: fixed;
     top: 0;
     bottom: 0;
@@ -3469,7 +3469,7 @@ textarea.w-select {
 
 body {
     color: #fff;
-    background-color: #0f0f0f;
+    background-color: #000;
     font-family: Titillium Web, sans-serif;
     font-size: 14px;
     line-height: 1.2;
@@ -3577,13 +3577,13 @@ blockquote {
 
 .section.black-section {
     z-index: 3;
-    background-color: #010101;
+    background-color: #000;
     position: relative;
 }
 
 .section.static {
     z-index: 2;
-    background-color: #0f0f0f;
+    background-color: #000;
     position: relative;
 }
 
@@ -3818,7 +3818,7 @@ blockquote {
 }
 
 .heading-text-container {
-    background-color: #272727;
+    background-color: #000;
     border: 2px solid #525252;
     border-radius: 20px;
     margin-top: 20px;
@@ -3915,7 +3915,7 @@ blockquote {
 
 .footer {
     z-index: 2;
-    background-color: #010101;
+    background-color: #000;
     align-items: flex-start;
     padding-left: 0;
     padding-right: 0;
@@ -3952,11 +3952,11 @@ blockquote {
 }
 
 .dark-color-body {
-    background-color: #161616;
+    background-color: #000;
 }
 
 .grey-block-holder {
-    background-color: #1b1b1b;
+    background-color: #000;
     border-radius: 12px;
     margin-top: 1em;
     padding: 20px;
@@ -3987,7 +3987,7 @@ blockquote {
 .template-hover-state {
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, .64);
+    background-color: rgba(0, 0, 0, 0);
     border-radius: 8px;
     justify-content: center;
     align-items: center;
@@ -4348,7 +4348,7 @@ blockquote {
 }
 
 .card-container.gray {
-    background-color: #171717;
+    background-color: #000;
     flex-direction: column;
     justify-content: flex-end;
     padding: 0;
@@ -4447,7 +4447,7 @@ blockquote {
 .blue-background {
     width: 100%;
     height: 400px;
-    background-color: #1d232b;
+    /* background-color: #1d232b; */
     border-radius: 32px;
     justify-content: center;
     align-items: center;
@@ -4646,7 +4646,7 @@ blockquote {
 }
 
 .road-map-card-container {
-    background-color: #171717;
+    background-color: #000;
     border-radius: 20px;
     margin-top: 60px;
     margin-bottom: 60px;
