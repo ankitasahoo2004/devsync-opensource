@@ -5339,6 +5339,18 @@ blockquote {
     }
 }
 
+@media screen and (max-width:1024px) {
+    .grid-4-col {
+        grid-column-gap: 30px;
+        grid-row-gap: 30px;
+        grid-template-rows: auto;
+        grid-template-columns: 1fr 1fr;
+        grid-auto-columns: 1fr;
+        display: grid;
+        justify-items: center;
+    }
+}
+
 @media screen and (max-width: 991px) {
     h1 {
         font-size: 65px;
