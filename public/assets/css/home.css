@@ -3719,6 +3719,10 @@ blockquote {
     padding-right: 40px;
 }
 
+.level-section-container-text {
+    text-align: center;
+}
+
 .grid-6-col {
     grid-column-gap: 30px;
     grid-row-gap: 30px;
@@ -4485,6 +4489,7 @@ blockquote {
     grid-auto-columns: 1fr;
     display: grid;
     position: relative;
+
 }
 
 .slider-grey-card {
@@ -4530,6 +4535,7 @@ blockquote {
     left: 1rem;
     right: auto;
 }
+
 .left-arrow,
 .right-arrow {
     position: absolute;
