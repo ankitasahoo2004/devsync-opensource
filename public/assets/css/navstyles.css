@@ -102,8 +102,6 @@
 }
 
 .nav__link {
-  text-transform: uppercase;
-  font-weight: var(--font-black);
   transition: 0.4s;
   display: flex;
   align-items: center;
