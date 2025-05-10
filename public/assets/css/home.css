@@ -4761,6 +4761,7 @@ blockquote {
     bottom: 50vh;
     left: auto;
     right: auto;
+    margin-top: 1rem;
 }
 
 .timeline-center {
