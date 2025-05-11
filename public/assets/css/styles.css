@@ -1706,6 +1706,7 @@ body.login-body {
 .profile__list {
   display: grid;
   gap: 1.5rem;
+  margin-left: -2.5rem;
 }
 
 .profile__list li {
