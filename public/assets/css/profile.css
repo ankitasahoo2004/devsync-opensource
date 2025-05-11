@@ -97,7 +97,7 @@
 
 .github__stats {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     perspective: 1000px;
@@ -105,7 +105,7 @@
 
 .profile__stats {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
     perspective: 1000px;
@@ -835,10 +835,19 @@
 
     .stat {
         padding: 1.5rem;
+        width: 400px;
     }
 
     .stat:hover {
         transform: translateY(-8px) translateZ(10px);
+    }
+
+    .github__stats {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        perspective: 1000px;
     }
 }
 
@@ -846,6 +855,14 @@
     .profile__header {
         padding: 1.5rem 1rem;
         border-radius: 24px;
+    }
+
+    .profile__stats {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        perspective: 1000px;
     }
 
     .profile__img {
@@ -863,6 +880,7 @@
 
     .stat {
         padding: 1.25rem;
+        width: 325px;
     }
 
     .badge__item {
