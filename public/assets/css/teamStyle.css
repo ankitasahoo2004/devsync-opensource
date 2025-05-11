@@ -319,6 +319,9 @@ body {
 .col-span-4 .sticky::-webkit-scrollbar {
   display: none;
 }
+.team-number {
+  margin-bottom: 4rem;
+}
 
 /* Add new animations */
 @keyframes expandBar {
