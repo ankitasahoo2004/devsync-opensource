@@ -248,7 +248,7 @@ function initializeModal() {
             instagram: 'https://www.instagram.com/_raj_rishikesh'
         },
         'member-bhavya': {
-            name: 'Bhavya Priyadarshini',
+            name: 'Bhavya Priyadarshani',
             role: 'Project Verification',
             description: `<p>Quality assurance specialist reviewing project deliverables against requirements and standards. Identifies inconsistencies and potential improvements before final release.</p>
                      <p>Skills: Testing Procedures, Requirement Analysis, Feedback Delivery, Documentation Review</p>`,
