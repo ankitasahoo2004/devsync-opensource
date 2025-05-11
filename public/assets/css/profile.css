@@ -95,22 +95,6 @@
     transform: translateX(-50%);
 }
 
-.github__stats {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    perspective: 1000px;
-}
-
-.profile__stats {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    perspective: 1000px;
-}
-
 .stat {
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(10px);
@@ -121,6 +105,22 @@
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
     animation: statsEntrance 0.8s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+.profile__stats {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+}
+
+.github__stats {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* perspective: 1000px; */
 }
 
 .stat:nth-child(2) {
@@ -833,15 +833,6 @@
         grid-template-columns: 1fr;
     }
 
-    .stat {
-        padding: 1.5rem;
-        width: 400px;
-    }
-
-    .stat:hover {
-        transform: translateY(-8px) translateZ(10px);
-    }
-
     .github__stats {
         display: flex;
         flex-direction: column;
@@ -849,20 +840,23 @@
         align-items: center;
         perspective: 1000px;
     }
+
+    .stat {
+        padding: 1.5rem;
+        width: 400px;
+    }
+
+
+    .stat:hover {
+        transform: translateY(-8px) translateZ(10px);
+    }
+
 }
 
 @media screen and (max-width: 480px) {
     .profile__header {
         padding: 1.5rem 1rem;
         border-radius: 24px;
-    }
-
-    .profile__stats {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        perspective: 1000px;
     }
 
     .profile__img {
@@ -881,6 +875,14 @@
     .stat {
         padding: 1.25rem;
         width: 325px;
+    }
+
+    .profile__stats {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        perspective: 1000px;
     }
 
     .badge__item {
