@@ -5326,10 +5326,6 @@ blockquote {
     font-weight: 700;
 }
 
-.profile-details-text {
-    text-align: center;
-}
-
 @media screen and (min-width: 1440px) {
 
     .container,
