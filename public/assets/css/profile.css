@@ -862,7 +862,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        perspective: 1000px;
+        /* perspective: 1000px; */
     }
 
     .profile__img {
