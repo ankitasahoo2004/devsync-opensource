@@ -553,6 +553,7 @@
 
   .winner-card.first {
     transform: none;
+    margin: 1rem;
   }
 
   .leaderboard-item {
