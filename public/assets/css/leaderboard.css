@@ -238,7 +238,7 @@
 }
 
 .leaderboard-item:hover {
-  transform: translateY(10px);
+  transform: translateY(-10px);
   background: var(--hover-bg);
 }
 
