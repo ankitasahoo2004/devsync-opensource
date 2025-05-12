@@ -175,15 +175,6 @@ function initializeModal() {
             github: 'https://github.com/Riya-1606',
             instagram: 'https://www.instagram.com/riya_160607/'
         },
-        'member-shubhamR': {
-            name: 'Shubham Raj',
-            role: 'Developer',
-            description: `<p>Software developer contributing to various aspects of application development. Implements features, fixes bugs, and collaborates with team members to deliver functional and efficient solutions.</p>
-                     <p>Skills: JavaScript, React Basics, Git Version Control, Problem Solving, Agile Methodologies</p>`,
-            linkedin: 'https://www.linkedin.com/in/shubham-raj-a0a123324/',
-            github: 'https://github.com/Shubham06-Code',
-            instagram: 'https://www.instagram.com/'
-        },
         'member-tripti': {
             name: 'Tripti Kumari',
             role: 'Media Scheduling',
@@ -201,15 +192,6 @@ function initializeModal() {
             linkedin: 'https://www.linkedin.com/in/a-b-subhalaxmi-1aa6a5344/',
             github: 'https://github.com/subhalaxmi2307',
             instagram: 'https://www.instagram.com/itsjusttt_a.b?igsh=MWZoY2k2amh5c3Z4Nw%3D%3D'
-        },
-        'member-shahanwaz': {
-            name: 'Shahanwaz',
-            role: 'Full Stack Developer',
-            description: `<p>Versatile developer handling both client-side and server-side programming. Builds complete web applications with attention to security, scalability, and user experience.</p>
-                     <p>Skills: React, Node.js, Database Design, API Integration, Deployment, Docker Basics, JWT</p>`,
-            linkedin: 'https://www.linkedin.com/in/md-shahanwaz-/',
-            github: 'https://github.com/',
-            instagram: 'https://www.instagram.com/'
         },
         'member-tisha': {
             name: 'Tisha Jeswani',
@@ -291,15 +273,6 @@ function initializeModal() {
             linkedin: 'https://www.linkedin.com/in/kartik-gupta-275873331/',
             github: 'https://github.com/kartik-gupta-26',
             instagram: 'https://www.instagram.com/'
-        },
-        'member-aryan': {
-            name: 'Aryan Baibhav',
-            role: 'Outreach Manager',
-            description: `<p>Community engagement specialist building relationships with external stakeholders. Coordinates participation in events and develops strategies to expand organizational reach and impact.</p>
-                     <p>Skills: Public Relations, Event Coordination, Networking, Presentation Skills, CRM Tools</p>`,
-            linkedin: 'https://www.linkedin.com/in/aryan-baibhav01/',
-            github: 'https://github.com/Aryanbaibhav',
-            instagram: 'https://www.instagram.com/_aryan_0x0_/'
         },
         'member-krish': {
             name: 'Krish Maurya',
