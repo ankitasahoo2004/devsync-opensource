@@ -3,7 +3,7 @@ const navMenu = document.getElementById('nav-menu'),
     navToggle = document.getElementById('nav-toggle'),
     navClose = document.getElementById('nav-close')
 
-    if (navToggle && navMenu) {
+if (navToggle && navMenu) {
 
     navToggle.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -216,4 +216,57 @@ if (window.location.pathname === '/profile') {
                     </div>
                 `).join('');
         });
+}
+
+/*=============== REDIRECT POPUP ===============*/
+if (window.location.hostname === 'devsync-opensource.tech') {
+    const createRedirectPopup = () => {
+        const popup = document.createElement('div');
+        popup.className = 'redirect-popup';
+        popup.innerHTML = `
+            <div class="redirect-content">
+                <div class="redirect-header">
+                    <i class='bx bx-navigation'></i>
+                    <h3>Redirecting to our new domain</h3>
+                </div>
+                <p>We've moved to a new home! You'll be redirected to:</p>
+                <div class="new-domain">
+                    <i class='bx bx-globe'></i>
+                    <span>www.devsync.club</span>
+                </div>
+                <div class="redirect-progress">
+                    <div class="progress-bar"></div>
+                </div>
+                <p class="redirect-message">Redirecting in <span class="countdown">3</span> seconds...</p>
+                <button class="redirect-now">Go now</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+
+        // Start countdown
+        let count = 3;
+        const countdownElement = popup.querySelector('.countdown');
+        const progressBar = popup.querySelector('.progress-bar');
+
+        const countdown = setInterval(() => {
+            count--;
+            countdownElement.textContent = count;
+            progressBar.style.width = `${((3 - count) / 3) * 100}%`;
+
+            if (count === 0) {
+                clearInterval(countdown);
+                window.location.href = 'https://www.devsync.club';
+            }
+        }, 1000);
+
+        // Immediate redirect button
+        popup.querySelector('.redirect-now').onclick = () => {
+            clearInterval(countdown);
+            window.location.href = 'https://www.devsync.club';
+        };
+
+        setTimeout(() => popup.classList.add('show'), 100);
+    };
+
+    createRedirectPopup();
 }
