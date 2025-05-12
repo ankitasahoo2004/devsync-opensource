@@ -1,81 +1,62 @@
 document.addEventListener('DOMContentLoaded', function () {
     const teamCards = document.querySelectorAll('[data-member]');
     const teamList = document.querySelector('.col-span-4 .sticky');
+    const gridContainer = document.querySelector('.col-span-6');
 
     // Prevent text selection during scroll
     teamList.addEventListener('selectstart', (e) => e.preventDefault());
 
     const options = {
-        rootMargin: '-15% 0px -15% 0px',
-        threshold: [0.2, 0.5, 0.8]
+        root: gridContainer,
+        rootMargin: '-20% 0px -20% 0px',
+        threshold: [0, 0.25, 0.5, 0.75, 1]
     };
 
     let currentActive = null;
     let scrollTimeout;
     let isScrolling = false;
 
+    function updateActiveState(entry) {
+        const id = entry.target.id;
+        const nameElement = document.querySelector(`[data-controls="${id}"]`);
+        const card = entry.target;
+
+        if (!nameElement) return;
+
+        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+            if (currentActive && currentActive !== nameElement) {
+                currentActive.classList.remove('active-member');
+                currentActive.style.transform = '';
+            }
+            nameElement.classList.add('active-member');
+            nameElement.style.transform = 'translateX(8px)';
+            currentActive = nameElement;
+
+            // Smooth scroll the name into view
+            const listRect = teamList.getBoundingClientRect();
+            const nameRect = nameElement.getBoundingClientRect();
+
+            if (nameRect.top < listRect.top || nameRect.bottom > listRect.bottom) {
+                const scrollTop = nameElement.offsetTop - listRect.height / 2 + nameRect.height / 2;
+                teamList.scrollTo({
+                    top: scrollTop,
+                    behavior: 'smooth'
+                });
+            }
+        } else if (!entry.isIntersecting && currentActive === nameElement) {
+            nameElement.classList.remove('active-member');
+            currentActive = null;
+        }
+    }
+
     const observer = new IntersectionObserver((entries) => {
         if (isScrolling) return;
-
-        entries.forEach(entry => {
-            const id = entry.target.id;
-            const nameElement = document.querySelector(`[data-controls="${id}"]`);
-            const card = entry.target.querySelector('.relative');
-
-            if (entry.isIntersecting) {
-                if (currentActive && currentActive !== nameElement) {
-                    currentActive.classList.remove('active-member');
-                }
-
-                if (nameElement) {
-                    requestAnimationFrame(() => {
-                        nameElement.classList.add('active-member');
-                        currentActive = nameElement;
-
-                        if (window.innerWidth >= 1280) {
-                            clearTimeout(scrollTimeout);
-                            scrollTimeout = setTimeout(() => {
-                                const topOffset = nameElement.offsetTop - teamList.offsetHeight / 3;
-                                teamList.scrollTo({
-                                    top: topOffset,
-                                    behavior: 'smooth'
-                                });
-                            }, 150);
-                        }
-                    });
-                }
-
-                card.style.transform = `translateY(${-5 * entry.intersectionRatio}px) scale(${1 + (entry.intersectionRatio * 0.02)})`;
-                card.classList.add('active-card');
-            } else {
-                if (nameElement === currentActive) {
-                    const stillActive = Array.from(entries)
-                        .some(e => e.isIntersecting && e.target.id !== id);
-
-                    if (!stillActive) {
-                        nameElement.classList.remove('active-member');
-                        currentActive = null;
-                    }
-                }
-
-                card.style.transform = '';
-                card.classList.remove('active-card');
-            }
-        });
+        entries.forEach(updateActiveState);
     }, options);
 
     teamCards.forEach(card => observer.observe(card));
 
-    // Debounce scroll events
-    teamList.addEventListener('scroll', () => {
-        isScrolling = true;
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-            isScrolling = false;
-        }, 100);
-    });
-
-    // Handle click events
+    // Update click handler for smoother scrolling
     document.querySelectorAll('.team_member').forEach(name => {
         name.addEventListener('click', function (e) {
             e.preventDefault();
@@ -83,11 +64,39 @@ document.addEventListener('DOMContentLoaded', function () {
             const targetCard = document.getElementById(targetId);
 
             if (targetCard) {
-                targetCard.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
+                const offset = targetCard.offsetTop - gridContainer.offsetTop - 100;
+                const duration = 1000; // 1 second animation
+                const start = gridContainer.scrollTop;
+                const diff = offset - start;
+
+                const easeInOutCubic = t => t < 0.5
+                    ? 4 * t * t * t
+                    : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+
+                let startTime;
+                function animation(currentTime) {
+                    if (!startTime) startTime = currentTime;
+                    const timeElapsed = currentTime - startTime;
+                    const progress = Math.min(timeElapsed / duration, 1);
+
+                    gridContainer.scrollTop = start + (diff * easeInOutCubic(progress));
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animation);
+                    }
+                }
+
+                requestAnimationFrame(animation);
             }
         });
+    });
+
+    // Debounce scroll handling
+    gridContainer.addEventListener('scroll', () => {
+        isScrolling = true;
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            isScrolling = false;
+        }, 150);
     });
 });

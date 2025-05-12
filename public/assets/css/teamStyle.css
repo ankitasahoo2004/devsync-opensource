@@ -299,6 +299,10 @@ body {
 
 /* Sticky area scroll customization */
 .col-span-4 .sticky {
+  position: sticky;
+  top: 28px;
+  /* Matches the existing top value */
+  max-height: calc(100vh - 100px);
   overflow-y: auto;
   padding-right: 20px;
   scrollbar-width: none;
@@ -315,10 +319,33 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
+/* Add grid scroll container */
+.col-span-6 {
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-right: 20px;
+  scroll-padding: 2rem;
+  scroll-snap-type: y proximity;
+}
+
+[data-member] {
+  scroll-snap-align: start;
+  scroll-margin-top: 2rem;
+}
+
+/* Hide scrollbars but keep functionality */
+.col-span-6::-webkit-scrollbar,
 .col-span-4 .sticky::-webkit-scrollbar {
   display: none;
 }
+
+.col-span-6::-webkit-scrollbar-thumb,
+.col-span-4 .sticky::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
 .team-number {
   margin-bottom: 4rem;
 }
@@ -389,4 +416,10 @@ body {
     padding: 1rem;
     margin: 1rem auto;
   }
+}
+
+/* Add smooth transitions */
+.team_member,
+.image {
+  transition: all 0.6s var(--ease-out-circ);
 }
