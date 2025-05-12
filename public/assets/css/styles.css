@@ -3123,3 +3123,138 @@ body.login-body {
     text-align: left;
   }
 }
+
+/* Redirect Popup Styles */
+.redirect-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.redirect-popup.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.redirect-content {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.redirect-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.redirect-header i {
+  font-size: 2rem;
+  color: var(--first-color);
+}
+
+.redirect-header h3 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.new-domain {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.new-domain i {
+  color: var(--first-color);
+}
+
+.new-domain span {
+  font-family: monospace;
+  font-size: 1.1rem;
+  color: var(--first-color);
+}
+
+.redirect-progress {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  margin: 1.5rem 0;
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: var(--first-color);
+  transition: width 1s linear;
+}
+
+.redirect-message {
+  color: var(--text-color-light);
+  margin-bottom: 1.5rem;
+}
+
+.countdown {
+  color: var(--first-color);
+  font-weight: bold;
+}
+
+.redirect-now {
+  background: var(--first-color);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.redirect-now:hover {
+  transform: translateY(-2px);
+  background: var(--first-color-alt);
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .redirect-content {
+    padding: 1.5rem;
+  }
+
+  .redirect-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
