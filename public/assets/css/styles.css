@@ -2503,7 +2503,7 @@ body.login-body {
 
 .leaderboard-item:hover {
   background: rgba(255, 255, 255, 0.1);
-  transform: translateX(0.5rem);
+  transform: translateY(0.5rem);
 }
 
 .rank {
