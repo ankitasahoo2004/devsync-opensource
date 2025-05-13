@@ -301,6 +301,15 @@ function initializeModal() {
             github: 'https://github.com/Amritesh-001',
             instagram: 'https://www.instagram.com/amritesh.4709'
         },
+        'member-khushboo': {
+            name: 'Khushboo Mahato',
+            role: 'Graphic Designer',
+            description: `<p>Visual designer creating digital assets for web and social media platforms. Develops graphics that communicate brand identity and enhance user engagement across channels.</p>
+                     <p>Skills: Adobe Creative Cloud, Brand Identity, Digital Illustration, Layout Design</p>`,
+            linkedin: 'https://www.linkedin.com/in/khushboo-mahato-6627a6344/',
+            github: 'https://github.com/Khushboo93849',
+            instagram: 'https://www.instagram.com/khushboo_80672?igsh=MWp1aGZjcWJhbG1wNA%3D%3D'
+        },
         'member-divyanshu': {
             name: 'Divyanshu Soni',
             role: 'Discord Moderator',
