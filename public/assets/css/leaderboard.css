@@ -238,7 +238,7 @@
 }
 
 .leaderboard-item:hover {
-  transform: translateX(10px);
+  transform: translateY(-10px);
   background: var(--hover-bg);
 }
 
@@ -382,7 +382,7 @@
 
 .runner-up-card:hover {
   transform: translateY(-5px);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);  
 }
 
 .runner-up-card .user-img {
