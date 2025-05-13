@@ -72,17 +72,28 @@ body {
   grid-template-columns: 1fr 2fr;
   gap: 4rem;
   padding: 1rem;
+  position: relative;
+  overflow: visible;
+  min-height: 100vh;
 }
 
 .image {
   transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   filter: grayscale(50%);
+  opacity: 0.3;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .image:hover,
 .image.selected {
   filter: grayscale(0%);
   transform: scale(1.02);
+}
+
+.image.active {
+  opacity: 1;
+  transform: scale(1.02);
+  filter: grayscale(0%);
 }
 
 /* Remove old hover styles */
@@ -119,6 +130,7 @@ body {
   backdrop-filter: blur(8px);
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  opacity: 0.3;
 }
 
 .team_member::before {
@@ -159,6 +171,8 @@ body {
   box-shadow:
     0 15px 25px rgba(0, 0, 0, 0.15),
     0 5px 10px rgba(0, 0, 0, 0.08);
+  opacity: 1;
+  transform: translateX(12px);
 }
 
 .team_member::after {
@@ -302,9 +316,10 @@ body {
   position: sticky;
   top: 28px;
   /* Matches the existing top value */
-  max-height: calc(100vh - 100px);
-  overflow-y: auto;
-  padding-right: 20px;
+  max-height: none;
+  overflow: visible;
+  scroll-behavior: unset;
+  padding-right: 0;
   scrollbar-width: none;
   /* Firefox */
   -ms-overflow-style: none;
@@ -321,17 +336,17 @@ body {
 
 /* Add grid scroll container */
 .col-span-6 {
-  max-height: calc(100vh - 100px);
-  overflow-y: auto;
-  scroll-behavior: smooth;
-  padding-right: 20px;
-  scroll-padding: 2rem;
-  scroll-snap-type: y proximity;
+  max-height: none;
+  overflow: visible;
+  scroll-behavior: unset;
+  padding-right: 0;
+  scroll-padding: 0;
+  scroll-snap-type: none;
 }
 
 [data-member] {
-  scroll-snap-align: start;
-  scroll-margin-top: 2rem;
+  scroll-snap-align: unset;
+  scroll-margin-top: 0;
 }
 
 /* Hide scrollbars but keep functionality */
