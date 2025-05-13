@@ -283,15 +283,6 @@ function initializeModal() {
             github: 'https://github.com/krishmaurya21',
             instagram: 'https://www.instagram.com/krrishmaurya21/'
         },
-        'member-livas': {
-            name: 'T. Livas',
-            role: 'Outreach Manager',
-            description: `<p>Community relations specialist developing partnerships and engagement opportunities. Identifies collaboration prospects and represents the organization at external events and forums.</p>
-                     <p>Skills: Partnership Development, Public Speaking, Networking Strategies, Brand Advocacy</p>`,
-            linkedin: 'https://www.linkedin.com/in/',
-            github: 'https://github.com/',
-            instagram: 'https://www.instagram.com/__.livas?igsh=MTI2M3ludWY3YXQ3bw%3D%3D'
-        },
         'member-nitesh': {
             name: 'Nitesh Raj',
             role: 'Project Reviewer',
