@@ -238,7 +238,7 @@
 
 .filter-btn.active,
 .filter-btn:hover {
-    background: var(--first-color);
+    background: #e51837;
     color: var(--white-color);
 }
 

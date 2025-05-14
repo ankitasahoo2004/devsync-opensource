@@ -68,7 +68,7 @@
 .profile__img:hover {
     transform:
         translateY(-16px) rotateY(10deg) scale(1.05);
-    border-color: var(--first-color);
+    border-color: #e51837;
 }
 
 .profile__name {
@@ -91,7 +91,7 @@
     width: 60px;
     height: 4px;
     border-radius: 2px;
-    background: linear-gradient(90deg, var(--first-color), transparent);
+    background: linear-gradient(90deg, #e51837, transparent);
     transform: translateX(-50%);
 }
 
