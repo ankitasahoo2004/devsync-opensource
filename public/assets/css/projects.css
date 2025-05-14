@@ -455,9 +455,9 @@
 }
 
 .tab-button.active {
-    background: var(--first-color);
+    background: #e51837;
     color: #fff;
-    border-color: var(--first-color);
+    border-color: #e51837;
 }
 
 .tab-content {
