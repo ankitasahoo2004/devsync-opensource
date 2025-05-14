@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="assets/css/navstyles.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/modal.css">
+    <link rel="stylesheet" href="assets/css/sponsor-form.css">
+    <link rel="stylesheet" href="assets/css/toast.css">
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous" />
     <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js" type="text/javascript"></script>
@@ -48,6 +50,7 @@
 </head>
 
 <body>
+    <div id="toast-container"></div>
     <!-- LOADER -->
     <div class="page-transition">
         <div class="transition-content">
@@ -99,6 +102,42 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Sponsor Form Modal -->
+    <div id="sponsor-form-modal" class="sponsor-form-modal">
+        <div class="sponsor-form-container">
+            <span class="sponsor-form-close">&times;</span>
+            <h2 class="sponsor-form-title">Become a Sponsor</h2>
+            <form id="sponsor-form">
+                <div class="sponsor-form-group">
+                    <label class="sponsor-form-label">Company Name</label>
+                    <input type="text" class="sponsor-form-input" name="company" required>
+                </div>
+                <div class="sponsor-form-group">
+                    <label class="sponsor-form-label">Company Website</label>
+                    <input type="url" class="sponsor-form-input" name="website" required>
+                </div>
+                <div class="sponsor-form-group">
+                    <label class="sponsor-form-label">Contact Email</label>
+                    <input type="email" class="sponsor-form-input" name="email" required>
+                </div>
+                <div class="sponsor-form-group">
+                    <label class="sponsor-form-label">Sponsorship Level</label>
+                    <select class="sponsor-form-input" name="level" required>
+                        <option value="">Select a level</option>
+                        <option value="gold">Gold Sponsor</option>
+                        <option value="silver">Silver Sponsor</option>
+                        <option value="bronze">Bronze Sponsor</option>
+                    </select>
+                </div>
+                <div class="sponsor-form-group">
+                    <label class="sponsor-form-label">Company Description</label>
+                    <textarea class="sponsor-form-textarea" name="description" required></textarea>
+                </div>
+                <button type="submit" class="sponsor-form-submit">Submit Application</button>
+            </form>
         </div>
     </div>
 
@@ -955,6 +994,7 @@
     <script src="https://assets.website-files.com/6227332ffcbe4a03cc7186ba/js/webflow.6794ab93b.js"
         type="text/javascript"></script>
     <script src="assets/js/sponsors.js"></script>
+    <script src="assets/js/sponsor-form.js"></script>
 
 </body>
 

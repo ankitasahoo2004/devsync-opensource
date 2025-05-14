@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
             github: 'https://github.com/unstop'
         },
         {
-            name: 'YMB Labs',
+            name: 'YBM Labs',
             contribution: 'Domain Partner',
             amount: 'Ξ1.20',
             link: 'https://ybmlabs.com/',
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
             name: 'GitHub Education',
             contribution: 'Platform Partner',
             amount: 'Ξ2.50',
-            link: 'https://github.com',
+            link: 'https://github.com/education',
             logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg',
             description: 'GitHub Education helps students, teachers, and schools access the tools and events they need to shape the next generation of software development.',
             twitter: 'https://twitter.com/githubeducation',
@@ -55,8 +55,20 @@ document.addEventListener('DOMContentLoaded', () => {
             twitter: 'https://twitter.com/Azure',
             linkedin: 'https://www.linkedin.com/company/microsoft-azure/',
             github: 'https://github.com/Azure'
+        },
+        {
+            name: 'MLSA',
+            contribution: 'Deployment Partner',
+            amount: 'Ξ0.90',
+            link: 'https://mvp.microsoft.com/',
+            logo: 'assets/img/sponsors/mlsa.png',
+            description: 'MLSA is a community of students who are passionate about technology and want to share their knowledge with others. They organize events, workshops, and hackathons to help students learn and grow in the tech field.',
+            twitter: 'https://twitter.com/Azure',
+            linkedin: 'https://www.linkedin.com/company/microsoft-azure/',
+            github: 'https://github.com/Azure'
         }
     ];
+
 
     function renderSponsors() {
         const sponsorContainer = document.querySelector('.nft-collection-list-wrapper .nft-collection-grid');
