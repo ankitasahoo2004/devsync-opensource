@@ -186,6 +186,42 @@ class EmailService {
             return false;
         }
     }
+
+    async sendSponsorshipInquiryEmail(formData) {
+        try {
+            const template = await this.loadTemplate('sponsorshipInquiryEmail');
+
+            if (!formData.email || !formData.organization || !formData.sponsorshipType) {
+                throw new Error('Missing required fields');
+            }
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: ['sponsors@devsync-opensource.tech', formData.email], // Send to both admin and applicant
+                subject: 'New Sponsorship Inquiry - DevSync',
+                html: template({
+                    organization: formData.organization,
+                    name: formData.name,
+                    email: formData.email,
+                    phone: formData.phone || 'Not provided',
+                    sponsorshipType: formData.sponsorshipType,
+                    message: formData.message
+                })
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+
+            if (!result || !result.messageId) {
+                throw new Error('Email failed to send');
+            }
+
+            console.log(`Sponsorship inquiry email sent from ${formData.email} with messageId: ${result.messageId}`);
+            return true;
+        } catch (error) {
+            console.error('Error sending sponsorship inquiry email:', error);
+            throw error; // Re-throw to handle in the route
+        }
+    }
 }
 
 module.exports = new EmailService();

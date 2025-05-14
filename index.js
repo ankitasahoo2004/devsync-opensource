@@ -1106,6 +1106,35 @@ app.delete('/api/events/:eventId', async (req, res) => {
     }
 });
 
+// Add sponsorship inquiry endpoint
+app.post('/api/sponsorship/inquiry', async (req, res) => {
+    try {
+        if (!req.body.email || !req.body.organization || !req.body.sponsorshipType) {
+            return res.status(400).json({
+                error: 'Missing required fields',
+                details: 'Email, organization name, and sponsorship type are required'
+            });
+        }
+
+        const success = await emailService.sendSponsorshipInquiryEmail(req.body);
+
+        if (success) {
+            res.status(200).json({
+                message: 'Sponsorship inquiry sent successfully',
+                status: 'success'
+            });
+        } else {
+            throw new Error('Failed to send sponsorship inquiry');
+        }
+    } catch (error) {
+        console.error('Error processing sponsorship inquiry:', error);
+        res.status(500).json({
+            error: 'Failed to process sponsorship inquiry',
+            details: error.message
+        });
+    }
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve index.html for all routes to support client-side routing
