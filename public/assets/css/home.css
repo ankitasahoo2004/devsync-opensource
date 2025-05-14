@@ -3934,15 +3934,16 @@ blockquote {
 }
 
 .footer-flex-container {
-    grid-column-gap: 30px;
+    grid-column-gap: 100px;
     grid-row-gap: 30px;
     text-align: left;
     grid-template-rows: auto;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     grid-auto-columns: 1fr;
     justify-content: space-between;
     margin-bottom: 40px;
     display: grid;
+
 }
 
 .footer-heading {
@@ -5630,7 +5631,7 @@ blockquote {
     }
 }
 
-@media screen and (max-width: 479px) {
+@media screen and (max-width: 485px) {
     h1 {
         font-size: 46px;
     }
