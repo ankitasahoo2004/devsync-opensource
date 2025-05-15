@@ -350,7 +350,7 @@
 
 .project-card:hover {
     transform: translateY(-5px);
-    border-color: var(--first-color);
+    border-color: #e51837;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
@@ -754,13 +754,13 @@
 }
 
 .filter-btn:hover {
-    background: var(--first-color);
+    background: #e51837;
     color: #fff;
     transform: translateY(-2px);
 }
 
 .filter-btn.active {
-    background: var(--first-color);
+    background: #e51837;
     color: #fff;
 }
 
