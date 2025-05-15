@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
             amount: 'Ξ1.20',
             link: 'https://ybmlabs.com/',
             logo: 'assets/img/sponsors/Ylabs.png',
-            description: 'YBM Labs specializes in innovative web solutions and domain management services, helping tech events establish their online presence with reliable hosting and cutting-edge technology.',
+            description: 'YBM Labs is the applied AI and automation wing of Zillusion Pvt. Ltd., built to empower organizations through smart, scalable, and strategic technology solutions. We specialize in transforming complex business challenges into streamlined, intelligent systems using the latest in artificial intelligence, machine learning, and workflow automation. From startups to enterprise teams, we partner with forward-thinking businesses to design, build, and deploy custom solutions that optimize operations, reduce manual effort, and unlock new opportunities for growth. Whether it’s automating internal workflows, building AI-powered products, or integrating intelligent APIs, our focus is always on measurable impact and long-term value.',
             twitter: 'https://twitter.com/ymblabs',
             linkedin: 'https://www.linkedin.com/company/ymblabs/',
             github: 'https://github.com/ymblabs'
