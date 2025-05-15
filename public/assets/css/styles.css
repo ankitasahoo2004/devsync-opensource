@@ -2672,7 +2672,7 @@ body.login-body {
 }
 
 .modal__button {
-  background: var(--first-color);
+  background: #e51837;
   color: #fff;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
@@ -2681,7 +2681,7 @@ body.login-body {
 }
 
 .modal__button:hover {
-  background: var(--first-color-alt);
+  background: #e51837;
   transform: translateY(-2px);
 }
 
@@ -3233,7 +3233,7 @@ body.login-body {
 
 .redirect-now:hover {
   transform: translateY(-2px);
-  background: var(--first-color-alt);
+  background: v#e51837);
 }
 
 @keyframes popIn {
