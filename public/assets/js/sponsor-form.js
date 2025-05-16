@@ -43,8 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sponsorButtons.forEach(button => {
         button.addEventListener('click', (e) => {
             e.preventDefault();
-            modal.classList.add('show');
-            document.body.style.overflow = 'hidden';
+            showModal();
         });
     });
 
@@ -124,8 +123,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    function showModal() {
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+
+        // Animate modal content
+        setTimeout(() => {
+            modal.querySelector('.sponsor-form-container').classList.add('show');
+
+            // Animate form elements sequentially
+            const formGroups = modal.querySelectorAll('.sponsor-form-group');
+            formGroups.forEach((group, index) => {
+                setTimeout(() => {
+                    group.classList.add('show');
+                }, 100 * (index + 1));
+            });
+        }, 100);
+    }
+
     function closeModal() {
-        modal.classList.remove('show');
-        document.body.style.overflow = '';
+        // First animate out the content
+        const container = modal.querySelector('.sponsor-form-container');
+        container.classList.remove('show');
+
+        // Wait for content animation then hide modal
+        setTimeout(() => {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+
+            // Reset animations
+            const formGroups = modal.querySelectorAll('.sponsor-form-group');
+            formGroups.forEach(group => group.classList.remove('show'));
+        }, 300);
     }
 });

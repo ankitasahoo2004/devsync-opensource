@@ -9,14 +9,20 @@
     backdrop-filter: blur(8px);
     z-index: 1000;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    visibility: hidden;
+    transform: scale(1);
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .sponsor-form-modal.show {
+    visibility: visible;
     opacity: 1;
+    transform: scale(1);
+    transition-delay: 0s;
     display: flex;
     align-items: center;
     justify-content: center;
+    animation: modalFadeIn 0.3s ease forwards;
 }
 
 .sponsor-form-container {
@@ -26,14 +32,15 @@
     padding: 40px;
     width: 90%;
     max-width: 600px;
-    transform: translateY(30px);
+    transform: scale(0.8) translateY(30px);
     opacity: 0;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 .sponsor-form-modal.show .sponsor-form-container {
-    transform: translateY(0);
+    transform: scale(1) translateY(0);
     opacity: 1;
 }
 
@@ -44,11 +51,21 @@
     color: rgba(255, 255, 255, 0.6);
     cursor: pointer;
     font-size: 24px;
-    transition: color 0.2s ease;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(0deg);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sponsor-form-close:hover {
-    color: #fff;
+    color: #FF4D5A;
+    background: rgba(255, 77, 90, 0.15);
+    transform: rotate(90deg);
 }
 
 .sponsor-form-title {
@@ -60,13 +77,34 @@
 
 .sponsor-form-group {
     margin-bottom: 25px;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sponsor-form-label {
-    display: block;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 8px;
-    font-size: 14px;
+.sponsor-form-modal.show .sponsor-form-group {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.sponsor-form-modal.show .sponsor-form-group:nth-child(1) {
+    transition-delay: 0.1s;
+}
+
+.sponsor-form-modal.show .sponsor-form-group:nth-child(2) {
+    transition-delay: 0.2s;
+}
+
+.sponsor-form-modal.show .sponsor-form-group:nth-child(3) {
+    transition-delay: 0.3s;
+}
+
+.sponsor-form-modal.show .sponsor-form-group:nth-child(4) {
+    transition-delay: 0.4s;
+}
+
+.sponsor-form-modal.show .sponsor-form-group:nth-child(5) {
+    transition-delay: 0.5s;
 }
 
 .sponsor-form-input,
@@ -104,11 +142,65 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sponsor-form-submit:hover {
-    background: #ff3344;
-    transform: translateY(-2px);
+.sponsor-form-modal.show .sponsor-form-submit {
+    transform: translateY(0);
+    opacity: 1;
+    transition-delay: 0.6s;
+}
+
+.sponsor-form-modal::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sponsor-form-modal.show::before {
+    opacity: 1;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0);
+    }
+
+    to {
+        opacity: 1;
+        backdrop-filter: blur(8px);
+    }
+}
+
+@keyframes modalFadeOut {
+    from {
+        opacity: 1;
+        backdrop-filter: blur(8px);
+    }
+
+    to {
+        opacity: 0;
+        backdrop-filter: blur(0);
+    }
+}
+
+.sponsor-form-modal.closing {
+    animation: modalFadeOut 0.3s ease forwards;
+}
+
+.sponsor-form-modal.closing .sponsor-form-container {
+    transform: scale(0.8) translateY(30px);
+    opacity: 0;
 }
 
 @media (max-width: 768px) {
