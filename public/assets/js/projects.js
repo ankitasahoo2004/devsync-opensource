@@ -348,7 +348,16 @@ document.addEventListener('DOMContentLoaded', () => {
                               placeholder="Describe your project and what kind of contributors you're looking for..."></textarea>
                 </div>
 
-                <button type="submit" class="submit-button">
+                <div class="terms-section">
+                    <div class="terms-checkbox-container">
+                        <input type="checkbox" id="termsAccepted" required>
+                        <label for="termsAccepted">I have read and agree to the 
+                            <a href="#" id="showTermsBtn">Terms & Conditions and Project Submission Policy</a>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-button" disabled>
                     <i class='bx bx-upload'></i>
                     Submit Project
                 </button>
@@ -357,6 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Initialize chip input functionality
         initializeTechChips();
+        initializeTermsAndConditions();
 
         // Initialize form submission handler
         document.getElementById('projectForm').addEventListener('submit', handleSubmit);
@@ -593,6 +603,292 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 300);
         }
     };
+
+    const initializeTermsAndConditions = () => {
+        const submitButton = document.querySelector('.submit-button');
+        const termsCheckbox = document.getElementById('termsAccepted');
+        const showTermsBtn = document.getElementById('showTermsBtn');
+
+        // Terms content
+        const terms = {
+            projectPolicy: [
+                "All submitted projects must be public GitHub repositories.",
+                "Projects must have clear documentation and README files.",
+                "Projects must not contain malicious code or violate any laws.",
+                "Submissions must be original work or have proper licenses.",
+                "Project maintainers are responsible for reviewing and managing contributions.",
+                "DevSync reserves the right to remove any project that violates these guidelines."
+            ],
+            participation: [
+                "Contributors must follow the project's code of conduct.",
+                "All contributions must be made through pull requests.",
+                "Participants agree to responsibly handle any security issues.",
+                "DevSync is not liable for any issues arising from project collaboration.",
+                "Points are awarded based on accepted contributions only.",
+                "Harassment or inappropriate behavior will result in immediate removal."
+            ]
+        };
+
+        const showTermsModal = () => {
+            const modal = document.createElement('div');
+            modal.className = 'terms-modal';
+            modal.innerHTML = `
+                <div class="terms-modal__overlay"></div>
+                <div class="terms-modal__content">
+                    <div class="terms-modal__header">
+                        <h3>Terms & Conditions</h3>
+                        <div class="terms-progress">
+                            <div class="terms-progress__bar"></div>
+                            <span class="terms-progress__text">0/5 Accepted</span>
+                        </div>
+                        <button class="terms-modal__close">
+                            <i class='bx bx-x'></i>
+                        </button>
+                    </div>
+                    <div class="terms-modal__body">
+                        <div class="terms-sections">
+                            <div class="terms-section">
+                                <div class="terms-section__header">
+                                    <div class="custom-checkbox">
+                                        <input type="checkbox" id="term1">
+                                        <label for="term1"></label>
+                                    </div>
+                                    <h4>Code Quality Standards</h4>
+                                </div>
+                                <div class="terms-section__content">
+                                    <p>I agree to maintain high code quality standards, including:</p>
+                                    <ul>
+                                        <li>Following project coding conventions</li>
+                                        <li>Writing clean, documented code</li>
+                                        <li>Performing proper testing before submission</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="terms-section">
+                                <div class="terms-section__header">
+                                    <div class="custom-checkbox">
+                                        <input type="checkbox" id="term2">
+                                        <label for="term2"></label>
+                                    </div>
+                                    <h4>Intellectual Property Rights</h4>
+                                </div>
+                                <div class="terms-section__content">
+                                    <p>I confirm that:</p>
+                                    <ul>
+                                        <li>All submitted code is my original work</li>
+                                        <li>I have rights to share this code</li>
+                                        <li>I understand the project's licensing terms</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="terms-section">
+                                <div class="terms-section__header">
+                                    <div class="custom-checkbox">
+                                        <input type="checkbox" id="term3">
+                                        <label for="term3"></label>
+                                    </div>
+                                    <h4>Community Guidelines</h4>
+                                </div>
+                                <div class="terms-section__content">
+                                    <p>I agree to follow community guidelines, including:</p>
+                                    <ul>
+                                        <li>Respectful communication</li>
+                                        <li>Collaborative problem-solving</li>
+                                        <li>Supporting fellow developers</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="terms-section">
+                                <div class="terms-section__header">
+                                    <div class="custom-checkbox">
+                                        <input type="checkbox" id="term4">
+                                        <label for="term4"></label>
+                                    </div>
+                                    <h4>Project Maintenance</h4>
+                                </div>
+                                <div class="terms-section__content">
+                                    <p>I understand my responsibilities regarding:</p>
+                                    <ul>
+                                        <li>Timely response to feedback</li>
+                                        <li>Bug fixes and maintenance</li>
+                                        <li>Version control best practices</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="terms-section">
+                                <div class="terms-section__header">
+                                    <div class="custom-checkbox">
+                                        <input type="checkbox" id="term5">
+                                        <label for="term5"></label>
+                                    </div>
+                                    <h4>Code Review Process</h4>
+                                </div>
+                                <div class="terms-section__content">
+                                    <p>I agree to participate in the code review process by:</p>
+                                    <ul>
+                                        <li>Accepting constructive feedback</li>
+                                        <li>Making requested changes</li>
+                                        <li>Following review guidelines</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="terms-modal__footer">
+                        <button class="terms-modal__button terms-modal__button--secondary">Decline</button>
+                        <button class="terms-modal__button terms-modal__button--primary" disabled>Accept & Continue</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Trigger animation after a small delay
+            setTimeout(() => modal.classList.add('show'), 50);
+
+            // Handle checkbox changes
+            const checkboxes = modal.querySelectorAll('input[type="checkbox"]');
+            const acceptButton = modal.querySelector('.terms-modal__button--primary');
+            const progressBar = modal.querySelector('.terms-progress__bar');
+            const progressText = modal.querySelector('.terms-progress__text');
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    const checkedCount = [...checkboxes].filter(cb => cb.checked).length;
+                    const progress = (checkedCount / checkboxes.length) * 100;
+
+                    progressBar.style.width = `${progress}%`;
+                    progressText.textContent = `${checkedCount}/${checkboxes.length} Accepted`;
+
+                    acceptButton.disabled = checkedCount !== checkboxes.length;
+
+                    if (checkedCount === checkboxes.length) {
+                        acceptButton.classList.add('ready');
+                    } else {
+                        acceptButton.classList.remove('ready');
+                    }
+                });
+            });
+
+            // Handle section expand/collapse
+            const sections = modal.querySelectorAll('.terms-section');
+            sections.forEach(section => {
+                const header = section.querySelector('.terms-section__header');
+                const content = section.querySelector('.terms-section__content');
+
+                header.addEventListener('click', (e) => {
+                    if (!e.target.matches('input') && !e.target.matches('label')) {
+                        section.classList.toggle('expanded');
+
+                        if (section.classList.contains('expanded')) {
+                            content.style.maxHeight = content.scrollHeight + 'px';
+                        } else {
+                            content.style.maxHeight = '0';
+                        }
+                    }
+                });
+            });
+
+            // Close modal handlers
+            const closeModal = () => {
+                modal.classList.remove('show');
+                setTimeout(() => modal.remove(), 300);
+            };
+
+            modal.querySelector('.terms-modal__close').addEventListener('click', closeModal);
+            modal.querySelector('.terms-modal__button--secondary').addEventListener('click', closeModal);
+            modal.querySelector('.terms-modal__overlay').addEventListener('click', closeModal);
+
+            // Accept button handler
+            modal.querySelector('.terms-modal__button--primary').addEventListener('click', () => {
+                // Handle terms acceptance here
+                closeModal();
+                // Continue with project submission
+                submitProject();
+            });
+        };
+
+        // Event listeners
+        showTermsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showTermsModal();
+        });
+
+        termsCheckbox.addEventListener('change', () => {
+            submitButton.disabled = !termsCheckbox.checked;
+        });
+    };
+
+    // Initialize terms modal
+    function initTermsModal() {
+        const termsContent = `
+            <div class="modal__terms">
+                <div class="modal__terms-content">
+                    <div class="modal__terms-header">
+                        <h3 class="modal__terms-title">Terms and Conditions</h3>
+                        <button class="modal__terms-close">×</button>
+                    </div>
+                    <div class="modal__terms-body">
+                        <div class="terms__section">
+                            <h4>1. Project Guidelines</h4>
+                            <p>By submitting a project, you agree to:</p>
+                            <ul>
+                                <li>Provide accurate and complete project information</li>
+                                <li>Submit original work or properly credit sources</li>
+                                <li>Follow community guidelines and coding standards</li>
+                                <li>Maintain respectful communication</li>
+                            </ul>
+                        </div>
+                        <!-- Add more sections as needed -->
+                    </div>
+                    <div class="modal__terms-footer">
+                        <button class="modal__terms-button modal__terms-button--secondary">Cancel</button>
+                        <button class="modal__terms-button modal__terms-button--primary">Accept & Continue</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Inject modal HTML
+        document.body.insertAdjacentHTML('beforeend', termsContent);
+
+        // Get modal elements
+        const modal = document.querySelector('.modal__terms');
+        const closeBtn = modal.querySelector('.modal__terms-close');
+        const cancelBtn = modal.querySelector('.modal__terms-button--secondary');
+        const acceptBtn = modal.querySelector('.modal__terms-button--primary');
+
+        // Add event listeners
+        [closeBtn, cancelBtn].forEach(btn => {
+            btn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+        });
+
+        acceptBtn.addEventListener('click', () => {
+            // Handle terms acceptance
+            modal.style.display = 'none';
+            // Additional acceptance logic here
+        });
+
+        // Close on outside click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Prevent scroll when modal is open
+        modal.addEventListener('show', () => {
+            document.body.style.overflow = 'hidden';
+        });
+
+        modal.addEventListener('hide', () => {
+            document.body.style.overflow = '';
+        });
+
+        return modal;
+    }
 
     // Add these utility functions for the modal
     function showModal(type, title, message, callback) {
@@ -976,7 +1272,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     processingButtons.delete(updatePointsBtn);
                     updatePointsBtn.disabled = false;
                     updatePointsBtn.style.opacity = '1';
-                    updatePointsBtn.style
+                    updatePointsBtn.style.cursor = 'pointer';
                 }
                 return;
             }

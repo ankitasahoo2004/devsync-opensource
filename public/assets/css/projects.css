@@ -764,6 +764,303 @@
     color: #fff;
 }
 
+/* Terms and Conditions Styling */
+.terms-section {
+    margin-bottom: 2rem;
+}
+
+.terms-checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.terms-checkbox-container input[type="checkbox"] {
+    margin-top: 0.25rem;
+}
+
+.terms-modal .modal__content {
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.terms-content {
+    padding: 2rem;
+}
+
+.terms-content h4 {
+    color: var(--first-color);
+    margin: 1.5rem 0 1rem;
+}
+
+.terms-content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.term-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    cursor: pointer;
+}
+
+.term-item input[type="checkbox"] {
+    margin-top: 0.25rem;
+}
+
+.term-item span {
+    line-height: 1.5;
+}
+
+#showTermsBtn {
+    color: var(--first-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+#showTermsBtn:hover {
+    text-decoration: underline;
+}
+
+/* Enhanced Terms Modal Styles */
+.terms-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.terms-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.terms-modal__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+.terms-modal__content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    background: rgba(30, 32, 35, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.terms-modal.show .terms-modal__content {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.terms-modal__header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    position: relative;
+}
+
+.terms-progress {
+    flex: 1;
+    max-width: 200px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+}
+
+.terms-progress__bar {
+    height: 100%;
+    background: linear-gradient(90deg, #e51837, #FF6B6B);
+    width: 0;
+    transition: width 0.3s ease;
+}
+
+.terms-progress__text {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.terms-modal__close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.terms-modal__close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.terms-modal__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+.terms-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.terms-section__header {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+}
+
+.terms-section__header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: white;
+}
+
+.terms-section__content {
+    padding: 0 1rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.terms-section.expanded .terms-section__content {
+    padding: 0 1rem 1rem;
+}
+
+.custom-checkbox {
+    position: relative;
+    width: 24px;
+    height: 24px;
+}
+
+.custom-checkbox input {
+    display: none;
+}
+
+.custom-checkbox label {
+    position: absolute;
+    inset: 0;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.custom-checkbox input:checked+label {
+    background: #e51837;
+    border-color: #e51837;
+}
+
+.custom-checkbox input:checked+label::after {
+    content: '';
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+}
+
+.terms-modal__footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.terms-modal__button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.terms-modal__button--secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.terms-modal__button--primary {
+    background: #666;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: not-allowed;
+}
+
+.terms-modal__button--primary.ready {
+    background: linear-gradient(135deg, #e51837, #FF6B6B);
+    color: white;
+    cursor: pointer;
+}
+
+.terms-modal__button:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 768px) {
+    .terms-modal__content {
+        width: 95%;
+    }
+
+    .terms-modal__header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .terms-progress {
+        max-width: 100%;
+    }
+
+    .terms-modal__footer {
+        flex-direction: column;
+    }
+
+    .terms-modal__button {
+        width: 100%;
+    }
+}
+
 /* Responsive Adjustments */
 @media screen and (max-width: 1200px) {
     .projects-grid {
@@ -838,6 +1135,7 @@
     .projects-grid {
         grid-template-columns: 1fr;
     }
+
     .action-buttons {
         display: flex;
         flex-direction: column;
@@ -1070,182 +1368,175 @@
     margin-top: 0.5rem;
 }
 
-/* Responsive adjustments */
-@media screen and (min-width: 2000px) {
-    .points-control {
-        padding: 2rem;
-    }
-
-    .points-field {
-        flex-direction: row;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .points-field label {
-        flex: 1;
-        min-width: 200px;
-    }
-
-    .points-input {
-        flex: 0 0 auto;
-    }
+/* Terms Modal Responsive Styles */
+.modal__terms {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
 }
 
-@media screen and (max-width: 480px) {
-    .points-control {
-        padding: 1rem;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 2rem;
-        padding: 2rem;
-    }
-
-    .project-action-buttons {
-        width: 100%;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .action-buttons {
-        gap: 0.4rem;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .repo-link {
-        width: 200px;
-    }
-
-    .points-field {
-        margin-bottom: 1rem;
-    }
-
-    .points-input,
-    .update-points {
-        max-width: 100%;
-    }
+.modal__terms-content {
+    background: rgba(30, 32, 35, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    padding: 2rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
-/* Responsive Design */
+.modal__terms-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal__terms-title {
+    font-size: 1.5rem;
+    color: var(--title-color);
+    font-weight: 600;
+}
+
+.modal__terms-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: var(--text-color);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal__terms-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.modal__terms-body {
+    margin-bottom: 2rem;
+}
+
+.terms__section {
+    margin-bottom: 2rem;
+}
+
+.terms__section h4 {
+    color: var(--first-color);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.terms__section p {
+    color: var(--text-color);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.terms__section ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.terms__section li {
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.modal__terms-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal__terms-button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal__terms-button--secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border: none;
+}
+
+.modal__terms-button--primary {
+    background: var(--first-color);
+    color: white;
+    border: none;
+}
+
+.modal__terms-button:hover {
+    transform: translateY(-2px);
+}
+
 @media screen and (max-width: 768px) {
-    .points-field {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-    }
-
-    .points-input {
-        width: 100%;
-    }
-}
-
-@media screen and (max-width: 480px) {
-    .points-control {
+    .modal__terms {
         padding: 1rem;
     }
 
-    .update-points {
-        padding: 0.75rem;
-    }
-}
-
-/* Enhanced Responsive Design */
-@media screen and (max-width: 1366px) {
-    .section__title {
-        font-size: 2.8rem;
-        padding: 1.5rem;
-        margin-bottom: 3rem;
-    }
-
-    .project-card {
+    .modal__terms-content {
         padding: 1.5rem;
     }
 
-    .project-card h4 {
-        font-size: 1.3rem;
-    }
-
-    .tech-stack {
-        gap: 0.4rem;
-    }
-
-    .tech-tag {
-        font-size: 0.8rem;
-        padding: 0.4rem 0.8rem;
-    }
-
-    .projects-grid {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-    }
-
-    .section-tabs {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.8rem;
-        padding: 0 1rem;
-    }
-
-    .tab-button {
-        padding: 0.8rem 1.5rem;
-        font-size: 0.9rem;
-        min-width: 120px;
-    }
-
-    .search-container {
-        padding: 0 1rem;
-    }
-
-    .points-control {
-        padding: 1.25rem;
-    }
-
-    .points-field label {
-        font-size: 0.85rem;
-    }
-}
-
-@media screen and (max-width: 1024px) {
-    .section__title {
-        font-size: 2.5rem;
-        margin-bottom: 2.5rem;
-    }
-
-    .projects-grid {
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 1.25rem;
-        padding: 0.75rem;
-    }
-
-    .project-form {
-        padding: 2.5rem;
-        margin: 1rem;
-    }
-
-    .form-group {
+    .modal__terms-header {
         margin-bottom: 1.5rem;
     }
 
-    .form-group label {
-        font-size: 0.9rem;
+    .modal__terms-title {
+        font-size: 1.25rem;
     }
 
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
+    .modal__terms-footer {
+        flex-direction: column;
+    }
+
+    .modal__terms-button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .modal__terms {
+        padding: 0.5rem;
+    }
+
+    .modal__terms-content {
         padding: 1rem;
+        max-height: 85vh;
+    }
+
+    .modal__terms-header {
+        margin-bottom: 1rem;
+    }
+
+    .modal__terms-title {
+        font-size: 1.1rem;
+    }
+
+    .terms__section h4 {
         font-size: 1rem;
-    }
-
-    .points-field {
-        margin-bottom: 0.8rem;
-    }
-
-    .update-points {
-        padding: 0.8rem;
     }
 }
