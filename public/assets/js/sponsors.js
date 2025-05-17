@@ -66,6 +66,28 @@ document.addEventListener('DOMContentLoaded', () => {
             twitter: 'https://twitter.com/Azure',
             linkedin: 'https://www.linkedin.com/company/microsoft-azure/',
             github: 'https://github.com/Azure'
+        },
+        {
+            name: '',
+            contribution: 'Upcoming Partner',
+            amount: 'Ξ0.00',
+            link: '#',
+            logo: 'assets/img/sponsors/minecraft_generic.png',
+            description: '',
+            twitter: '#',
+            linkedin: '#',
+            github: '#'
+        },
+        {
+            name: '',
+            contribution: 'Upcoming Partner',
+            amount: 'Ξ0.00',
+            link: '#',
+            logo: 'assets/img/sponsors/minecraft_generic.png',
+            description: '',
+            twitter: '#',
+            linkedin: '#',
+            github: '#'
         }
     ];
 
