@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             contribution: 'Upcoming Partner',
             amount: 'Ξ0.00',
             link: '#',
-            logo: 'assets/img/sponsors/sponsor_generic.png',
+            logo: 'assets/img/sponsors/minecraft_generic.png',
             description: '',
             twitter: '#',
             linkedin: '#',
