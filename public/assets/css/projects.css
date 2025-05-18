@@ -440,9 +440,11 @@
 
 .section-tabs {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     gap: 1rem;
     margin-bottom: 2rem;
+    margin-top: 2rem;
 }
 
 .tab-button {
