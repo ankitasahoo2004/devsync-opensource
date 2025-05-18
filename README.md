@@ -72,7 +72,7 @@ A modern, interactive platform designed to foster open-source collaboration and 
       </td>
       <td align="center">
         <a href="https://github.com/Sayan-dev731">
-          <img src="public/assets/img/team members/Sayan.jpg" width="100px;" style="border-radius: 50%;"><br>
+          <img src="public/assets/img/team members/Sayan1.png" width="100px;" style="border-radius: 50%;"><br>
           <sub><b>Sayan Karmakar</b></sub>
         </a><br>
         <sub>Founder & Backend Dev</sub>
