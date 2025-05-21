@@ -106,6 +106,40 @@
             </div>
         </section>
 
+        <!-- Timeline & Calendar Section -->
+        <section class="timeline-section section">
+            <div class="timeline-container container">
+                <div class="timeline-header">
+                    <div class="calendar-wrapper">
+                        <div class="calendar-nav">
+                            <button id="prevMonth" class="calendar-nav-btn">
+                                <i class='bx bx-chevron-left'></i>
+                            </button>
+                            <h3 id="currentMonth">Month Year</h3>
+                            <button id="nextMonth" class="calendar-nav-btn">
+                                <i class='bx bx-chevron-right'></i>
+                            </button>
+                        </div>
+                        <div class="calendar-grid">
+                            <div class="calendar-days">
+                                <span>Sun</span><span>Mon</span><span>Tue</span>
+                                <span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                            </div>
+                            <div id="calendarDates" class="calendar-dates"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-wrapper">
+                    <div class="timeline-scale">
+                        <div id="timeScale" class="time-markers"></div>
+                    </div>
+                    <div id="eventTimeline" class="timeline-events">
+                        <!-- Events will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="events section">
             <div class="events__container container">
                 <h2 class="section__title">Events</h2>
@@ -130,6 +164,7 @@
     </main>
     <script src="assets/js/events-admin.js"></script>
     <script src="assets/js/events-display.js"></script>
+    <script src="assets/js/timeline.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/swiper-bundle.min.js"></script>
