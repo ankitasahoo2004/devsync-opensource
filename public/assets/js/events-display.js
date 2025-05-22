@@ -1,9 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const eventsContent = document.getElementById('eventsContent');
-    const filterBtns = document.querySelectorAll('.filter-btn');
     let allEvents = [];
-    let searchTimeout;
-    const searchInput = document.getElementById('eventsSearch');
 
     const fetchEvents = async () => {
         try {
@@ -281,122 +277,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    const filterEvents = (events, searchTerm) => {
-        if (!events || !searchTerm) return events;
-
-        searchTerm = searchTerm.toLowerCase();
-        return events.filter(event =>
-            event.name.toLowerCase().includes(searchTerm) ||
-            event.type.toLowerCase().includes(searchTerm) ||
-            (event.venue && event.venue.toLowerCase().includes(searchTerm)) ||
-            event.mode.toLowerCase().includes(searchTerm)
-        );
-    };
-
-    const handleSearchAndFilter = () => {
-        const searchTerm = searchInput.value.trim();
-        if (document.querySelector('.view-btn.active').dataset.view === 'list') {
-            const filteredEvents = filterEvents(allEvents, searchTerm);
-            renderTimelineView(filteredEvents);
-        }
-    };
-
-    // Update search handler
-    if (searchInput) {
-        searchInput.addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(handleSearchAndFilter, 300);
-        });
-    }
-
-    document.querySelectorAll('.filter-menu input').forEach(checkbox => {
-        checkbox.addEventListener('change', handleSearchAndFilter);
-    });
-
-    // Update view switching
-    document.querySelectorAll('.view-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const view = btn.dataset.view;
-            document.querySelector('.calendar-actions').style.display =
-                view === 'list' ? 'flex' : 'none';
-            // ...rest of existing view switching code...
-        });
-    });
-
-    // Hide search/filter initially if not in list view
-    document.querySelector('.calendar-actions').style.display = 'none';
-
-    const displayEvents = async (filter = 'all', searchTerm = '') => {
-        showLoading();
-        try {
-            const events = await fetchEvents();
-            const filteredEvents = filterEvents(events, searchTerm, filter);
-
-            eventsContent.innerHTML = '';
-            if (filteredEvents.length) {
-                const grid = document.createElement('div');
-                grid.className = 'events__grid';
-
-                filteredEvents.forEach((event, index) => {
-                    setTimeout(() => {
-                        grid.appendChild(renderEventCard(event));
-                    }, index * 100);
-                });
-
-                eventsContent.appendChild(grid);
-            } else {
-                eventsContent.innerHTML = `
-                    <div class="events__empty">
-                        <i class='bx bx-calendar-x'></i>
-                        <p>No events found${searchTerm ? ' matching your search' : ''}</p>
-                    </div>
-                `;
-            }
-        } catch (error) {
-            console.error('Error displaying events:', error);
-            eventsContent.innerHTML = `
-                <div class="events__empty">
-                    <i class='bx bx-error-circle'></i>
-                    <p>Failed to load events</p>
-                </div>
-            `;
-        } finally {
-            hideLoading();
-        }
-    };
-
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
-                displayEvents(activeFilter, e.target.value.trim());
-            }, 300);
-        });
-    }
-
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            displayEvents(btn.dataset.filter, searchInput.value.trim());
-        });
-    });
-
-    setInterval(() => {
-        const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
-        displayEvents(activeFilter, searchInput.value.trim());
-    }, 5 * 60 * 1000);
-
-    displayEvents();
-
     const initializeCalendar = () => {
         const calendarDays = document.getElementById('calendarDays');
         const currentDate = document.getElementById('currentDate');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const todayBtn = document.getElementById('todayBtn');
-        const listView = document.getElementById('listView');
         const timelineEvents = document.getElementById('timelineEvents');
 
         let currentMonth = new Date();
@@ -563,7 +449,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCalendar();
     };
 
-    // Initialize view switching with smooth transitions
     const initializeViewSwitching = () => {
         const viewBtns = document.querySelectorAll('.view-btn');
         const calendarView = document.getElementById('calendarView');
