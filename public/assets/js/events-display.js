@@ -281,99 +281,50 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    const filterEvents = (events, searchTerm, filterType) => {
-        if (!events) return [];
+    const filterEvents = (events, searchTerm) => {
+        if (!events || !searchTerm) return events;
 
-        let filtered = events;
-        if (searchTerm) {
-            searchTerm = searchTerm.toLowerCase();
-            filtered = events.filter(event => {
-                const searchableFields = [
-                    event.name,
-                    event.description,
-                    event.type,
-                    event.mode,
-                    new Date(event.date).toLocaleDateString(),
-                    event.time,
-                    event.venue || '',
-                    event.address || ''
-                ];
-                return searchableFields.some(field =>
-                    field.toString().toLowerCase().includes(searchTerm)
-                );
-            });
-        }
+        searchTerm = searchTerm.toLowerCase();
+        return events.filter(event =>
+            event.name.toLowerCase().includes(searchTerm) ||
+            event.type.toLowerCase().includes(searchTerm) ||
+            (event.venue && event.venue.toLowerCase().includes(searchTerm)) ||
+            event.mode.toLowerCase().includes(searchTerm)
+        );
+    };
 
-        const now = new Date();
-        switch (filterType) {
-            case 'upcoming':
-                return filtered.filter(event => new Date(event.date) > now)
-                    .sort((a, b) => new Date(a.date) - new Date(b.date));
-            case 'past':
-                return filtered.filter(event => new Date(event.date) < now)
-                    .sort((a, b) => new Date(b.date) - new Date(a.date));
-            default:
-                return filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+    const handleSearchAndFilter = () => {
+        const searchTerm = searchInput.value.trim();
+        if (document.querySelector('.view-btn.active').dataset.view === 'list') {
+            const filteredEvents = filterEvents(allEvents, searchTerm);
+            renderTimelineView(filteredEvents);
         }
     };
 
-    const renderEventCard = (event) => {
-        const eventDate = new Date(event.date);
-        const isFull = event.mode !== 'online' && event.filledSlots >= event.totalSlots;
-        const isPast = eventDate < new Date();
+    // Update search handler
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(handleSearchAndFilter, 300);
+        });
+    }
 
-        const card = document.createElement('div');
-        card.className = 'event__card';
-        card.innerHTML = `
-            <div class="event__header">
-                <span class="event__tag">${event.type}</span>
-                <h3 class="event__title">${event.name}</h3>
-                <div class="event__date">
-                    <i class='bx bx-calendar'></i>
-                    ${eventDate.toLocaleDateString()} at ${event.time}
-                </div>
-            </div>
-            
-            <p class="event__description">${event.description}</p>
-            
-            <div class="event__details">
-                <span class="event__mode">
-                    <i class='bx bx-${event.mode === 'online' ? 'laptop' : event.mode === 'hybrid' ? 'devices' : 'map'}'></i>
-                    ${event.mode}
-                </span>
-                ${event.mode !== 'online' ? `
-                    <span class="event__slots">
-                        <i class='bx bx-user'></i>
-                        ${event.filledSlots}/${event.totalSlots} slots
-                    </span>
-                ` : ''}
-            </div>
-            
-            ${event.mode !== 'online' ? `
-                <div class="event__location">
-                    <i class='bx bx-map-pin'></i>
-                    <div>
-                        <strong>${event.venue}</strong>
-                        <p>${event.address}</p>
-                    </div>
-                </div>
-            ` : ''}
-            
-            <div class="event__speakers">
-                ${renderSpeakerStack(event.speakers)}
-                <a href="${event.registerLink}" target="_blank" 
-                   class="button event__button ${isPast ? 'disabled' : ''}"
-                   ${isPast || isFull ? 'disabled' : ''}>
-                    ${isPast ? 'Event Ended' : isFull ? 'Fully Booked' : 'Register Now'}
-                    ${!isPast && !isFull ? '<i class="bx bx-right-arrow-alt"></i>' : ''}
-                </a>
-            </div>
-        `;
+    document.querySelectorAll('.filter-menu input').forEach(checkbox => {
+        checkbox.addEventListener('change', handleSearchAndFilter);
+    });
 
-        card.onclick = () => showEventPopup(event);
+    // Update view switching
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const view = btn.dataset.view;
+            document.querySelector('.calendar-actions').style.display =
+                view === 'list' ? 'flex' : 'none';
+            // ...rest of existing view switching code...
+        });
+    });
 
-        return card;
-    };
+    // Hide search/filter initially if not in list view
+    document.querySelector('.calendar-actions').style.display = 'none';
 
     const displayEvents = async (filter = 'all', searchTerm = '') => {
         showLoading();
@@ -438,4 +389,217 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 5 * 60 * 1000);
 
     displayEvents();
+
+    const initializeCalendar = () => {
+        const calendarDays = document.getElementById('calendarDays');
+        const currentDate = document.getElementById('currentDate');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const todayBtn = document.getElementById('todayBtn');
+        const listView = document.getElementById('listView');
+        const timelineEvents = document.getElementById('timelineEvents');
+
+        let currentMonth = new Date();
+
+        const renderCalendar = async () => {
+            showLoading();
+            try {
+                const events = await fetchEvents();
+                const firstDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+                const lastDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+                const startingDay = firstDay.getDay();
+
+                currentDate.textContent = firstDay.toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric'
+                });
+
+                calendarDays.innerHTML = '';
+
+                // Add empty cells for days before the first day of the month
+                for (let i = 0; i < startingDay; i++) {
+                    const emptyDay = document.createElement('div');
+                    emptyDay.className = 'calendar-day empty';
+                    calendarDays.appendChild(emptyDay);
+                }
+
+                // Add days of the month
+                for (let day = 1; day <= lastDay.getDate(); day++) {
+                    const currentDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+                    const dayCell = document.createElement('div');
+                    dayCell.className = 'calendar-day';
+
+                    const isToday = new Date().toDateString() === currentDate.toDateString();
+                    if (isToday) dayCell.classList.add('today');
+
+                    // Get events for this day
+                    const dayEvents = events.filter(event => {
+                        const eventDate = new Date(event.date);
+                        return eventDate.toDateString() === currentDate.toDateString();
+                    });
+
+                    dayCell.innerHTML = `
+                        <div class="day-number">${day}</div>
+                        <div class="day-events">
+                            ${dayEvents.map(event => `
+                                <div class="day-event ${event.type.toLowerCase()}" data-event='${JSON.stringify(event)}'>
+                                    <span class="event-time">${event.time}</span>
+                                    <span class="event-name">${event.name}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+
+                    calendarDays.appendChild(dayCell);
+                }
+
+                // Add event listeners for day events
+                const dayEventElements = calendarDays.querySelectorAll('.day-event');
+                dayEventElements.forEach(eventEl => {
+                    eventEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const eventData = JSON.parse(eventEl.dataset.event);
+                        showEventPopup(eventData);
+                    });
+                });
+
+                renderTimelineView(events);
+            } catch (error) {
+                console.error('Error rendering calendar:', error);
+            } finally {
+                hideLoading();
+            }
+        };
+
+        const renderTimelineView = (events) => {
+            // Group events by date
+            const eventsByDate = events.reduce((acc, event) => {
+                const date = new Date(event.date).toDateString();
+                if (!acc[date]) acc[date] = [];
+                acc[date].push(event);
+                return acc;
+            }, {});
+
+            // Sort events by time for each date
+            Object.values(eventsByDate).forEach(dateEvents => {
+                dateEvents.sort((a, b) => {
+                    const timeA = new Date(`2000/01/01 ${a.time}`);
+                    const timeB = new Date(`2000/01/01 ${b.time}`);
+                    return timeA - timeB;
+                });
+            });
+
+            timelineEvents.innerHTML = Object.entries(eventsByDate)
+                .map(([date, dateEvents]) => `
+                    <div class="timeline-date">
+                        <div class="date-header">
+                            <i class='bx bx-calendar'></i>
+                            ${new Date(date).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric'
+                })}
+                        </div>
+                        <div class="timeline-events-list">
+                            ${dateEvents.map(event => `
+                                <div class="timeline-event ${event.type.toLowerCase()}" data-event='${JSON.stringify(event)}'>
+                                    <div class="event-time">
+                                        <i class='bx bx-time'></i>
+                                        ${event.time}
+                                    </div>
+                                    <div class="event-content">
+                                        <h3 class="event-title">${event.name}</h3>
+                                        <div class="event-details">
+                                            <span class="event-type">
+                                                <i class='bx bx-category'></i>
+                                                ${event.type}
+                                            </span>
+                                            <span class="event-mode">
+                                                <i class='bx bx-${event.mode === 'online' ? 'laptop' :
+                        event.mode === 'hybrid' ? 'devices' : 'map'}'></i>
+                                                ${event.mode}
+                                            </span>
+                                            ${event.mode !== 'online' ? `
+                                                <span class="event-venue">
+                                                    <i class='bx bx-map-pin'></i>
+                                                    ${event.venue}
+                                                </span>
+                                            ` : ''}
+                                        </div>
+                                        ${renderSpeakerStack(event.speakers)}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+
+            // Add event listeners for timeline events
+            const timelineEventElements = timelineEvents.querySelectorAll('.timeline-event');
+            timelineEventElements.forEach(eventEl => {
+                eventEl.addEventListener('click', () => {
+                    const eventData = JSON.parse(eventEl.dataset.event);
+                    showEventPopup(eventData);
+                });
+            });
+        };
+
+        prevBtn.onclick = () => {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            renderCalendar();
+        };
+
+        nextBtn.onclick = () => {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            renderCalendar();
+        };
+
+        todayBtn.onclick = () => {
+            currentMonth = new Date();
+            renderCalendar();
+        };
+
+        // Initial render
+        renderCalendar();
+    };
+
+    // Initialize view switching with smooth transitions
+    const initializeViewSwitching = () => {
+        const viewBtns = document.querySelectorAll('.view-btn');
+        const calendarView = document.getElementById('calendarView');
+        const listView = document.getElementById('listView');
+
+        viewBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const view = btn.dataset.view;
+
+                // Update active button state
+                viewBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Smooth transition between views
+                calendarView.style.opacity = '0';
+                listView.style.opacity = '0';
+
+                setTimeout(() => {
+                    calendarView.style.display = view === 'calendar' ? 'block' : 'none';
+                    listView.style.display = view === 'list' ? 'block' : 'none';
+
+                    requestAnimationFrame(() => {
+                        if (view === 'calendar') {
+                            calendarView.style.opacity = '1';
+                        } else {
+                            listView.style.opacity = '1';
+                        }
+                    });
+                }, 300);
+            });
+        });
+    };
+
+    // Initialize everything when DOM is loaded
+    fetchEvents().then(() => {
+        initializeCalendar();
+        initializeViewSwitching();
+    });
 });

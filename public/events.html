@@ -106,57 +106,61 @@
             </div>
         </section>
 
-        <!-- Timeline & Calendar Section -->
-        <section class="timeline-section section">
-            <div class="timeline-container container">
-                <div class="timeline-header">
-                    <div class="calendar-wrapper">
-                        <div class="calendar-nav">
-                            <button id="prevMonth" class="calendar-nav-btn">
-                                <i class='bx bx-chevron-left'></i>
-                            </button>
-                            <h3 id="currentMonth">Month Year</h3>
-                            <button id="nextMonth" class="calendar-nav-btn">
-                                <i class='bx bx-chevron-right'></i>
-                            </button>
-                        </div>
-                        <div class="calendar-grid">
-                            <div class="calendar-days">
-                                <span>Sun</span><span>Mon</span><span>Tue</span>
-                                <span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
-                            </div>
-                            <div id="calendarDates" class="calendar-dates"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="timeline-wrapper">
-                    <div class="timeline-scale">
-                        <div id="timeScale" class="time-markers"></div>
-                    </div>
-                    <div id="eventTimeline" class="timeline-events">
-                        <!-- Events will be dynamically inserted here -->
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <section class="events section">
             <div class="events__container container">
-                <h2 class="section__title">Events</h2>
-                <div class="events__filters">
-                    <button class="filter-btn active" data-filter="all">All Events</button>
-                    <button class="filter-btn" data-filter="upcoming">Upcoming</button>
-                    <button class="filter-btn" data-filter="past">Past</button>
+                <div class="events__header">
+                    <h2 class="section__title">Calendar</h2>
+                    <div class="view-controls">
+                        <button class="view-btn active" data-view="calendar">
+                            <i class='bx bx-calendar'></i> Calendar
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <i class='bx bx-list-ul'></i> List
+                        </button>
+                    </div>
                 </div>
-                <div class="events__search">
-                    <i class='bx bx-search'></i>
-                    <input type="text" id="eventsSearch"
-                        placeholder="Search events by name, date, type, mode, or description..." autocomplete="off">
+
+                <div class="calendar-toolbar">
+                    <div class="calendar-nav">
+                        <button class="nav-btn" id="prevBtn">
+                            <i class='bx bx-chevron-left'></i>
+                        </button>
+                        <h3 class="current-date" id="currentDate">September 2023</h3>
+                        <button class="nav-btn" id="nextBtn">
+                            <i class='bx bx-chevron-right'></i>
+                        </button>
+                        <button class="today-btn" id="todayBtn">Today</button>
+                    </div>
+                    <div class="calendar-actions">
+                        <div class="search-box">
+                            <i class='bx bx-search'></i>
+                            <input type="text" id="eventsSearch" placeholder="Search events by name, type, or venue...">
+                        </div>
+                    </div>
                 </div>
-                <div class="events__content" id="eventsContent">
-                    <div class="events__loading">
-                        <i class='bx bx-loader-alt bx-spin'></i>
-                        <p>Loading events...</p>
+
+                <div class="calendar-views">
+                    <div class="calendar-view active" id="calendarView">
+                        <div class="calendar-grid">
+                            <div class="calendar-header">
+                                <span>Sun</span>
+                                <span>Mon</span>
+                                <span>Tue</span>
+                                <span>Wed</span>
+                                <span>Thu</span>
+                                <span>Fri</span>
+                                <span>Sat</span>
+                            </div>
+                            <div class="calendar-days" id="calendarDays"></div>
+                        </div>
+                    </div>
+
+                    <div class="list-view" id="listView">
+                        <div class="timeline-header">
+                            <div class="timeline-scale">
+                            </div>
+                        </div>
+                        <div class="timeline-events" id="timelineEvents"></div>
                     </div>
                 </div>
             </div>
@@ -164,7 +168,6 @@
     </main>
     <script src="assets/js/events-admin.js"></script>
     <script src="assets/js/events-display.js"></script>
-    <script src="assets/js/timeline.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/swiper-bundle.min.js"></script>
