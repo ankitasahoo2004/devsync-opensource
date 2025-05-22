@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const renderTimelineView = (events) => {
             // Group events by date
             const eventsByDate = events.reduce((acc, event) => {
-                const date = new Date(event.date).toDateString();
+                const date = new Date(event.date).toLocaleDateString();
                 if (!acc[date]) acc[date] = [];
                 acc[date].push(event);
                 return acc;
@@ -368,51 +368,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Sort events by time for each date
             Object.values(eventsByDate).forEach(dateEvents => {
-                dateEvents.sort((a, b) => {
-                    const timeA = new Date(`2000/01/01 ${a.time}`);
-                    const timeB = new Date(`2000/01/01 ${b.time}`);
-                    return timeA - timeB;
-                });
+                dateEvents.sort((a, b) => a.time.localeCompare(b.time));
             });
 
+            const timelineEvents = document.getElementById('timelineEvents');
             timelineEvents.innerHTML = Object.entries(eventsByDate)
-                .map(([date, dateEvents]) => `
+                .map(([date, events]) => `
                     <div class="timeline-date">
                         <div class="date-header">
                             <i class='bx bx-calendar'></i>
-                            ${new Date(date).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    month: 'long',
-                    day: 'numeric'
-                })}
+                            ${date}
                         </div>
                         <div class="timeline-events-list">
-                            ${dateEvents.map(event => `
-                                <div class="timeline-event ${event.type.toLowerCase()}" data-event='${JSON.stringify(event)}'>
+                            ${events.map(event => `
+                                <div class="timeline-event" data-event='${JSON.stringify(event)}'>
                                     <div class="event-time">
-                                        <i class='bx bx-time'></i>
+                                        <i class='bx bx-time-five'></i>
                                         ${event.time}
                                     </div>
                                     <div class="event-content">
                                         <h3 class="event-title">${event.name}</h3>
                                         <div class="event-details">
-                                            <span class="event-type">
-                                                <i class='bx bx-category'></i>
-                                                ${event.type}
-                                            </span>
-                                            <span class="event-mode">
-                                                <i class='bx bx-${event.mode === 'online' ? 'laptop' :
-                        event.mode === 'hybrid' ? 'devices' : 'map'}'></i>
-                                                ${event.mode}
-                                            </span>
-                                            ${event.mode !== 'online' ? `
-                                                <span class="event-venue">
-                                                    <i class='bx bx-map-pin'></i>
-                                                    ${event.venue}
-                                                </span>
-                                            ` : ''}
+                                            <span>${event.type}</span>
+                                            <span>${event.mode}</span>
                                         </div>
-                                        ${renderSpeakerStack(event.speakers)}
                                     </div>
                                 </div>
                             `).join('')}
@@ -420,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 `).join('');
 
-            // Add event listeners for timeline events
+            // Add event listeners to timeline events
             const timelineEventElements = timelineEvents.querySelectorAll('.timeline-event');
             timelineEventElements.forEach(eventEl => {
                 eventEl.addEventListener('click', () => {
@@ -481,6 +460,36 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     };
+
+    // Add search functionality
+    const eventsSearch = document.getElementById('eventsSearch');
+    if (eventsSearch) {
+        eventsSearch.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const timelineEvents = document.getElementById('timelineEvents');
+            const allTimelineEvents = timelineEvents.querySelectorAll('.timeline-event');
+
+            allTimelineEvents.forEach(eventEl => {
+                const eventData = JSON.parse(eventEl.dataset.event);
+                const matchesSearch =
+                    eventData.name.toLowerCase().includes(searchTerm) ||
+                    eventData.type.toLowerCase().includes(searchTerm) ||
+                    eventData.mode.toLowerCase().includes(searchTerm) ||
+                    (eventData.venue && eventData.venue.toLowerCase().includes(searchTerm)) ||
+                    (eventData.description && eventData.description.toLowerCase().includes(searchTerm));
+
+                const timelineDate = eventEl.closest('.timeline-date');
+                eventEl.style.display = matchesSearch ? 'flex' : 'none';
+
+                // Hide date header if no events are visible
+                if (timelineDate) {
+                    const hasVisibleEvents = Array.from(timelineDate.querySelectorAll('.timeline-event'))
+                        .some(event => event.style.display !== 'none');
+                    timelineDate.style.display = hasVisibleEvents ? 'block' : 'none';
+                }
+            });
+        });
+    }
 
     // Initialize everything when DOM is loaded
     fetchEvents().then(() => {
