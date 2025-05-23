@@ -312,7 +312,7 @@ GitHub Animation .github-animation {
 }
 
 .footer__links a {
-    color: var(--first-color);
+    color: #e51837 ;
     text-decoration: none;
     transition: color 0.3s ease;
 }
