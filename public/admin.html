@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - DevSync</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/admin.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body>
+    <!-- Auth Check Overlay -->
+    <div id="authCheckOverlay" class="auth-check-overlay">
+        <div class="loader">
+            <i class='bx bx-loader-alt bx-spin'></i>
+            <p>Verifying admin access...</p>
+        </div>
+    </div>
+
+    <!-- Unauthorized Message -->
+    <div id="unauthorizedMessage" class="unauthorized-screen" style="display: none;">
+        <div class="unauthorized-content">
+            <i class='bx bx-shield-x'></i>
+            <h2>Access Denied</h2>
+            <p>You don't have permission to access this area.</p>
+            <a href="index.html" class="back-button">
+                <i class='bx bx-arrow-back'></i>
+                Return to Homepage
+            </a>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="admin-dashboard" style="display: none;">
+        <nav class="admin-nav">
+            <div class="nav-content">
+                <div class="nav-left">
+                    <a href="index.html" class="nav-logo">
+                        <img src="assets/img/logo.png" alt="DevSync Logo">
+                        <span>DevSync Admin</span>
+                    </a>
+                </div>
+                <div class="nav-right">
+                    <div class="admin-profile">
+                        <img id="adminAvatar" src="" alt="Admin">
+                        <span id="adminName"></span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="admin-content">
+            <div class="sidebar">
+                <div class="menu-section">
+                    <h3>Dashboard</h3>
+                    <button class="menu-item active" data-section="pending">
+                        <i class='bx bx-time-five'></i>
+                        Pending Reviews
+                        <span class="badge" id="pendingCount">0</span>
+                    </button>
+                    <button class="menu-item" data-section="approved">
+                        <i class='bx bx-check-circle'></i>
+                        Approved PRs
+                    </button>
+                    <button class="menu-item" data-section="rejected">
+                        <i class='bx bx-x-circle'></i>
+                        Rejected PRs
+                    </button>
+                </div>
+
+                <div class="menu-section">
+                    <h3>Management</h3>
+                    <button class="menu-item" data-section="users">
+                        <i class='bx bx-user'></i>
+                        User Management
+                    </button>
+                    <button class="menu-item" data-section="repos">
+                        <i class='bx bx-git-repo-forked'></i>
+                        Repository Settings
+                    </button>
+                    <button class="menu-item" data-section="automation">
+                        <i class='bx bx-cog'></i>
+                        Automation Settings
+                    </button>
+                </div>
+            </div>
+
+            <main class="main-content">
+                <div id="pendingSection" class="content-section active">
+                    <div class="section-header">
+                        <h2>Pending PR Reviews</h2>
+                        <div class="actions">
+                            <button class="refresh-btn">
+                                <i class='bx bx-refresh'></i>
+                                Refresh PRs
+                            </button>
+                            <div class="filter-dropdown">
+                                <button class="filter-btn">
+                                    <i class='bx bx-filter'></i>
+                                    Filter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="pendingPRsGrid" class="pr-grid">
+                        <!-- PR cards will be dynamically added here -->
+                    </div>
+                </div>
+
+                <!-- Other sections will be toggled via JavaScript -->
+            </main>
+        </div>
+    </div>
+
+    <!-- PR Review Modal Template -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Review Pull Request</h3>
+                <button class="close-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/admin.js"></script>
+</body>
+
+</html>
