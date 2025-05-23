@@ -32,7 +32,7 @@
     display: inline-block;
     padding: 0.25rem 0.75rem;
     background: rgba(16, 185, 129, 0.1);
-    color: var(--first-color);
+    color: #e51837;
     border-radius: 1rem;
     font-size: 0.875rem;
     margin-bottom: 0.5rem;
@@ -753,7 +753,7 @@
     left: 0;
     width: 50%;
     height: 1px;
-    background: linear-gradient(90deg, var(--first-color), transparent);
+    background: linear-gradient(90deg, #e51837, transparent);
 }
 
 .popup-close {
@@ -767,7 +767,7 @@
 }
 
 .popup-close:hover {
-    color: var(--first-color);
+    color: #e51837;
     transform: rotate(90deg);
 }
 
@@ -798,7 +798,7 @@
     left: 0;
     width: 4px;
     height: 100%;
-    background: var(--first-color);
+    background: #e51837;
     opacity: 0.5;
 }
 
@@ -811,7 +811,7 @@
 
 .meeting-link-header i {
     font-size: 1.5rem;
-    color: var(--first-color);
+    color: #e51837;
 }
 
 .countdown-timer {
@@ -824,8 +824,8 @@
 }
 
 .countdown-timer.active {
-    background: rgba(var(--first-color-rgb), 0.2);
-    color: var(--first-color);
+    background: rgba(#e51837, 0.2);
+    color: #e51837;
 }
 
 .meeting-link {
@@ -843,7 +843,7 @@
 
 .meeting-link.visible {
     background: rgba(var(--first-color-rgb), 0.1);
-    color: var(--first-color);
+    color: #e51837;
 }
 
 .meeting-link:not(.visible) {
@@ -1148,12 +1148,12 @@
     gap: 0.5rem;
     padding: 0.5rem 1rem;
     border-radius: 0.25rem;
-    color: var(--text-color);
+    color: #000000;
     transition: all 0.3s ease;
 }
 
 .view-btn.active {
-    background: var(--first-color);
+    background: #e51837;
     color: var(--white-color);
 }
 
@@ -1195,7 +1195,7 @@
 .today-btn {
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
-    background: var(--first-color);
+    background: #e51837;
     color: var(--white-color);
 }
 
@@ -1223,7 +1223,7 @@
 
 .search-box input:focus {
     background: rgba(255, 255, 255, 0.08);
-    border-color: var(--first-color);
+    border-color: #e51837;
     outline: none;
 }
 
@@ -1256,7 +1256,7 @@
 .nav-btn {
     padding: 0.5rem;
     border-radius: 0.5rem;
-    color: var(--text-color);
+    color: #000000;
     transition: all 0.3s ease;
 }
 
@@ -1274,7 +1274,7 @@
 .today-btn {
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
-    background: var(--first-color);
+    background: #e51837;
     color: var(--white-color);
 }
 
@@ -1358,7 +1358,7 @@
 }
 
 .calendar-day.today .day-number {
-    color: var(--first-color);
+    color: #e51837;
     font-weight: 600;
     background: rgba(var(--first-color-rgb), 0.1);
     width: 24px;
@@ -1382,8 +1382,8 @@
 .day-event {
     padding: 0.25rem 0.35rem;
     font-size: 0.7rem;
-    background: rgba(var(--first-color-rgb), 0.1);
-    border-left: 3px solid var(--first-color);
+    background: rgba(#e51837, 0.1);
+    border-left: 3px solid #e51837;
     border-radius: 3px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1441,7 +1441,7 @@
     padding: 1rem;
     background: rgba(255, 255, 255, 0.05);
     font-weight: 600;
-    color: var(--first-color);
+    color: #e51837;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -1473,7 +1473,7 @@
 
 .event-time {
     min-width: 100px;
-    color: var(--first-color);
+    color: #e51837;
     font-weight: 500;
     display: flex;
     align-items: center;
