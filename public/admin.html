@@ -84,33 +84,62 @@
                         <i class='bx bx-cog'></i>
                         Automation Settings
                     </button>
+                    <button class="menu-item" onclick="triggerPRScan()">
+                        <i class='bx bx-refresh'></i>
+                        Trigger PR Scan
+                    </button>
                 </div>
             </div>
 
             <main class="main-content">
                 <div id="pendingSection" class="content-section active">
                     <div class="section-header">
-                        <h2>Pending PR Reviews</h2>
+                        <h2><i class='bx bx-time-five'></i> Pending PR Reviews</h2>
                         <div class="actions">
-                            <button class="refresh-btn">
+                            <button class="refresh-btn" onclick="loadPendingPRs()">
                                 <i class='bx bx-refresh'></i>
-                                Refresh PRs
+                                Refresh
                             </button>
-                            <div class="filter-dropdown">
-                                <button class="filter-btn">
-                                    <i class='bx bx-filter'></i>
-                                    Filter
-                                </button>
-                            </div>
+                            <button class="filter-btn">
+                                <i class='bx bx-filter'></i>
+                                Filter
+                            </button>
                         </div>
                     </div>
-
                     <div id="pendingPRsGrid" class="pr-grid">
                         <!-- PR cards will be dynamically added here -->
                     </div>
                 </div>
 
-                <!-- Other sections will be toggled via JavaScript -->
+                <div id="approvedSection" class="content-section">
+                    <div class="section-header">
+                        <h2><i class='bx bx-check-circle'></i> Approved PRs</h2>
+                        <div class="actions">
+                            <button class="refresh-btn" onclick="loadApprovedPRs()">
+                                <i class='bx bx-refresh'></i>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div id="approvedPRsGrid" class="pr-grid">
+                        <!-- Approved PR cards will be dynamically added here -->
+                    </div>
+                </div>
+
+                <div id="rejectedSection" class="content-section">
+                    <div class="section-header">
+                        <h2><i class='bx bx-x-circle'></i> Rejected PRs</h2>
+                        <div class="actions">
+                            <button class="refresh-btn" onclick="loadRejectedPRs()">
+                                <i class='bx bx-refresh'></i>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div id="rejectedPRsGrid" class="pr-grid">
+                        <!-- Rejected PR cards will be dynamically added here -->
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -124,6 +153,57 @@
             </div>
             <div class="modal-body">
                 <!-- Dynamic content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Points Adjustment Modal -->
+    <div id="pointsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Adjust Points</h3>
+                <button class="close-modal" onclick="closePointsModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="points-adjustment-form">
+                    <label for="adjustedPoints">Award Points:</label>
+                    <input type="number" id="adjustedPoints" min="1" max="200" value="50">
+                    <div class="modal-actions">
+                        <button class="approve-btn" onclick="approveWithAdjustedPoints()">
+                            <i class='bx bx-check'></i>
+                            Approve with Points
+                        </button>
+                        <button class="cancel-btn" onclick="closePointsModal()">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rejection Modal -->
+    <div id="rejectionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Reject Pull Request</h3>
+                <button class="close-modal" onclick="closeRejectionModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="rejection-form">
+                    <label for="rejectionReason">Reason for rejection:</label>
+                    <textarea id="rejectionReason" rows="4"
+                        placeholder="Please provide a reason for rejecting this PR..."></textarea>
+                    <div class="modal-actions">
+                        <button class="reject-btn" onclick="confirmRejectPR()">
+                            <i class='bx bx-x'></i>
+                            Reject PR
+                        </button>
+                        <button class="cancel-btn" onclick="closeRejectionModal()">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
