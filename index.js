@@ -7,11 +7,9 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
 const { Octokit } = require('@octokit/rest');
-const cron = require('node-cron');
 const User = require('./models/User');
 const Repo = require('./models/Repo');
 const Event = require('./models/Event');
-const PendingPR = require('./models/PendingPR');
 const MongoStore = require('connect-mongo');
 const emailService = require('./services/emailService');
 const PORT = process.env.PORT || 5500;
@@ -824,6 +822,7 @@ app.get('/api/github/prs/update', async (req, res) => {
             const batchResults = await Promise.all(userBatch.map(async (user) => {
                 try {
                     const prData = await fetchPRDetails(user.username);
+                    const mergedPRs = [];
 
                     for (const pr of prData.items) {
                         try {
@@ -844,28 +843,12 @@ app.get('/api/github/prs/update', async (req, res) => {
                                 });
 
                                 if (prDetails.merged) {
-                                    // Create unique PR ID
-                                    const prId = `${owner}/${repo}/${pr.number}`;
-
-                                    // Check if this PR is already processed
-                                    const existingPR = await PendingPR.findOne({ prId });
-
-                                    if (!existingPR) {
-                                        // Store as pending PR for admin review
-                                        await PendingPR.create({
-                                            prId,
-                                            username: user.username,
-                                            githubId: user.githubId,
-                                            title: pr.title,
-                                            repository: `${owner}/${repo}`,
-                                            repoUrl,
-                                            prNumber: pr.number,
-                                            mergedAt: prDetails.merged_at,
-                                            suggestedPoints: registeredRepo.successPoints || 50,
-                                            userAvatarUrl: user.avatarUrl,
-                                            prUrl: pr.html_url
-                                        });
-                                    }
+                                    mergedPRs.push({
+                                        repoId: repoUrl,
+                                        prNumber: pr.number,
+                                        title: pr.title,
+                                        mergedAt: prDetails.merged_at
+                                    });
                                 }
                             }
                         } catch (prError) {
@@ -874,9 +857,17 @@ app.get('/api/github/prs/update', async (req, res) => {
                         }
                     }
 
+                    // Update user's data
+                    user.mergedPRs = mergedPRs;
+                    user.points = await calculatePoints(mergedPRs, user.githubId);
+                    user.badges = await checkBadges(mergedPRs, user.points);
+                    await user.save();
+
                     return {
                         username: user.username,
-                        status: 'success'
+                        status: 'success',
+                        mergedCount: mergedPRs.length,
+                        points: user.points
                     };
                 } catch (userError) {
                     console.error(`Error processing user ${user.username}:`, userError);
@@ -910,117 +901,227 @@ app.get('/api/github/prs/update', async (req, res) => {
     }
 });
 
-// Admin endpoints for PR management
-app.get('/api/admin/pending-prs', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
-    if (!adminIds.includes(req.user.username)) {
-        return res.status(403).json({ error: 'Not authorized' });
-    }
-
+// Modify the automatic update interval to be less frequent
+const updateInterval = 60 * 60 * 1000; // Every 6 hours instead of 1 hour
+setInterval(async () => {
     try {
-        const pendingPRs = await PendingPR.find({ status: 'pending' })
-            .sort({ submittedAt: -1 });
-        res.json(pendingPRs);
-    } catch (error) {
-        console.error('Error fetching pending PRs:', error);
-        res.status(500).json({ error: 'Failed to fetch pending PRs' });
-    }
-});
+        console.log("Starting scheduled PR status update...");
+        const response = await fetch(`${serverUrl}/api/github/prs/update`);
 
-app.get('/api/admin/approved-prs', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
-    if (!adminIds.includes(req.user.username)) {
-        return res.status(403).json({ error: 'Not authorized' });
-    }
-
-    try {
-        const approvedPRs = await PendingPR.find({ status: 'approved' })
-            .sort({ reviewedAt: -1 });
-        res.json(approvedPRs);
-    } catch (error) {
-        console.error('Error fetching approved PRs:', error);
-        res.status(500).json({ error: 'Failed to fetch approved PRs' });
-    }
-});
-
-app.get('/api/admin/rejected-prs', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
-    if (!adminIds.includes(req.user.username)) {
-        return res.status(403).json({ error: 'Not authorized' });
-    }
-
-    try {
-        const rejectedPRs = await PendingPR.find({ status: 'rejected' })
-            .sort({ reviewedAt: -1 });
-        res.json(rejectedPRs);
-    } catch (error) {
-        console.error('Error fetching rejected PRs:', error);
-        res.status(500).json({ error: 'Failed to fetch rejected PRs' });
-    }
-});
-
-app.post('/api/admin/pr/:prId/approve', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
-    if (!adminIds.includes(req.user.username)) {
-        return res.status(403).json({ error: 'Not authorized' });
-    }
-
-    try {
-        const { adjustedPoints } = req.body;
-        const pendingPR = await PendingPR.findById(req.params.prId);
-
-        if (!pendingPR) {
-            return res.status(404).json({ error: 'PR not found' });
+        if (!response.ok) {
+            throw new Error(`Update failed with status: ${response.status}`);
         }
 
-        // Update pending PR status
-        pendingPR.status = 'approved';
-        pendingPR.reviewedBy = req.user.username;
-        pendingPR.reviewedAt = new Date();
-        if (adjustedPoints) {
-            pendingPR.suggestedPoints = adjustedPoints;
-        }
-        await pendingPR.save();
+        const result = await response.json();
+        console.log('Scheduled update completed:', result.message);
+    } catch (error) {
+        console.error('Scheduled update failed:', error);
+    }
+}, updateInterval);
 
-        // Add to user's merged PRs and update stats
-        const user = await User.findOne({ githubId: pendingPR.githubId });
-        if (user) {
-            user.mergedPRs.push({
-                repoId: pendingPR.repoUrl,
-                prNumber: pendingPR.prNumber,
-                title: pendingPR.title,
-                mergedAt: pendingPR.mergedAt
+// Enhanced GitHub API routes with Octokit
+app.get('/api/github/user/:username', async (req, res) => {
+    try {
+        // Get basic user data
+        const { data: userData } = await octokit.users.getByUsername({
+            username: req.params.username
+        });
+
+        // Get contribution data using GraphQL
+        const { data: { user } } = await octokit.graphql(`
+            query($username: String!) {
+                user(login: $username) {
+                    contributionsCollection {
+                        totalCommitContributions
+                        contributionCalendar {
+                            totalContributions
+                            weeks {
+                                contributionDays {
+                                    contributionCount
+                                    date
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        `, {
+            username: req.params.username
+        });
+
+        res.json({
+            ...userData,
+            contributions: user.contributionsCollection
+        });
+    } catch (error) {
+        console.error('Error fetching GitHub user data:', error);
+        res.status(500).json({ error: 'Failed to fetch GitHub data' });
+    }
+});
+
+app.get('/api/github/events/:username/pushes', async (req, res) => {
+    try {
+        const { data } = await octokit.activity.listPublicEventsForUser({
+            username: req.params.username,
+            per_page: 10
+        });
+
+        const pushEvents = data.filter(event => event.type === 'PushEvent');
+        res.json(pushEvents);
+    } catch (error) {
+        console.error('Error fetching push events:', error);
+        res.status(500).json({ error: 'Failed to fetch push events' });
+    }
+});
+
+app.get('/api/github/events/:username/prs', async (req, res) => {
+    try {
+        const { data } = await octokit.search.issuesAndPullRequests({
+            q: `type:pr+author:${req.params.username}`,
+            per_page: 10,
+            sort: 'updated',
+            order: 'desc'
+        });
+        res.json(data.items);
+    } catch (error) {
+        console.error('Error fetching PRs:', error);
+        res.status(500).json({ error: 'Failed to fetch pull requests' });
+    }
+});
+
+app.get('/api/github/events/:username/merges', async (req, res) => {
+    try {
+        const { data } = await octokit.search.issuesAndPullRequests({
+            q: `type:pr+author:${req.params.username}+is:merged`,
+            per_page: 10,
+            sort: 'updated',
+            order: 'desc'
+        });
+        res.json(data.items);
+    } catch (error) {
+        console.error('Error fetching merges:', error);
+        res.status(500).json({ error: 'Failed to fetch merged PRs' });
+    }
+});
+
+// Add new comprehensive user profile endpoint
+app.get('/api/user/profile/:username', async (req, res) => {
+    try {
+        // Get GitHub user data and DevSync data
+        const [userData, acceptedRepos, user] = await Promise.all([
+            octokit.users.getByUsername({ username: req.params.username }),
+            Repo.find({ reviewStatus: 'accepted' }, 'repoLink'),
+            User.findOne({ username: req.params.username }, 'mergedPRs')
+        ]);
+
+        const { data } = await octokit.search.issuesAndPullRequests({
+            q: `type:pr+author:${req.params.username}+created:>=${PROGRAM_START_DATE}`,
+            per_page: 10,
+            sort: 'updated',
+            order: 'desc'
+        });
+
+        const pullRequests = await Promise.all(data.items.map(async (pr) => {
+            const repoUrl = `https://github.com/${pr.repository_url.split('/repos/')[1]}`;
+            const isDevSyncRepo = acceptedRepos.some(repo => repo.repoLink === repoUrl);
+
+            // Get additional PR details
+            const [owner, repo] = pr.repository_url.split('/repos/')[1].split('/');
+            const { data: prDetails } = await octokit.pulls.get({
+                owner,
+                repo,
+                pull_number: pr.number
             });
 
-            user.points = await calculatePoints(user.mergedPRs, user.githubId);
-            user.badges = await checkBadges(user.mergedPRs, user.points);
-            await user.save();
-        }
+            // Check if PR is detected by DevSync
+            const isDevSyncDetected = user?.mergedPRs.some(
+                mergedPr => mergedPr.repoId === repoUrl && mergedPr.prNumber === pr.number
+            );
 
-        res.json({ message: 'PR approved successfully', pr: pendingPR });
+            return {
+                id: pr.id,
+                title: pr.title,
+                number: pr.number,
+                state: pr.state,
+                createdAt: pr.created_at,
+                url: pr.html_url,
+                repository: pr.repository_url.split('/repos/')[1],
+                isDevSyncRepo,
+                merged: prDetails.merged,
+                closed: pr.state === 'closed' && !prDetails.merged,
+                isDevSyncDetected: isDevSyncRepo ? isDevSyncDetected : false
+            };
+        }));
+
+        const profileData = {
+            ...userData.data,
+            pullRequests,
+            programStartDate: PROGRAM_START_DATE // Add start date to response
+        };
+
+        res.json(profileData);
     } catch (error) {
-        console.error('Error approving PR:', error);
-        res.status(500).json({ error: 'Failed to approve PR' });
+        console.error('Error fetching profile data:', error);
+        res.status(500).json({ error: 'Failed to fetch profile data' });
     }
 });
 
-app.post('/api/admin/pr/:prId/reject', async (req, res) => {
+// Get all registered users endpoint
+app.get('/api/users', async (req, res) => {
+    try {
+        const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+        const users = await User.find({}, 'username displayName avatarUrl email')
+            .sort({ username: 1 });
+
+        const enrichedUsers = users.map(user => ({
+            ...user.toObject(),
+            isAdmin: adminIds.includes(user.username)
+        }));
+
+        res.json(enrichedUsers);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({ error: 'Failed to fetch users' });
+    }
+});
+
+// Create event
+app.post('/api/events', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    // Verify admin status
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const eventData = {
+            ...req.body,
+            createdBy: req.user.username
+        };
+        const event = await Event.create(eventData);
+        res.status(201).json(event);
+    } catch (error) {
+        console.error('Error creating event:', error);
+        res.status(500).json({ error: 'Failed to create event' });
+    }
+});
+
+// Get all events
+app.get('/api/events', async (req, res) => {
+    try {
+        const events = await Event.find({}).sort({ date: 1 });
+        res.json(events);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch events' });
+    }
+});
+
+// Update event slots
+app.patch('/api/events/:eventId/slots', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -1031,28 +1132,28 @@ app.post('/api/admin/pr/:prId/reject', async (req, res) => {
     }
 
     try {
-        const { rejectionReason } = req.body;
-        const pendingPR = await PendingPR.findById(req.params.prId);
+        const { filledSlots } = req.body;
+        const event = await Event.findById(req.params.eventId);
 
-        if (!pendingPR) {
-            return res.status(404).json({ error: 'PR not found' });
+        if (!event) {
+            return res.status(404).json({ error: 'Event not found' });
         }
 
-        // Update pending PR status
-        pendingPR.status = 'rejected';
-        pendingPR.reviewedBy = req.user.username;
-        pendingPR.reviewedAt = new Date();
-        pendingPR.rejectionReason = rejectionReason;
-        await pendingPR.save();
+        if (filledSlots > event.totalSlots) {
+            return res.status(400).json({ error: 'Filled slots cannot exceed total slots' });
+        }
 
-        res.json({ message: 'PR rejected successfully', pr: pendingPR });
+        event.filledSlots = filledSlots;
+        await event.save();
+        res.json(event);
     } catch (error) {
-        console.error('Error rejecting PR:', error);
-        res.status(500).json({ error: 'Failed to reject PR' });
+        console.error('Error updating event slots:', error);
+        res.status(500).json({ error: 'Failed to update slots' });
     }
 });
 
-app.delete('/api/admin/pr/:prId', async (req, res) => {
+// Delete event
+app.delete('/api/events/:eventId', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -1063,17 +1164,43 @@ app.delete('/api/admin/pr/:prId', async (req, res) => {
     }
 
     try {
-        const pendingPR = await PendingPR.findById(req.params.prId);
+        const event = await Event.findByIdAndDelete(req.params.eventId);
+        if (!event) {
+            return res.status(404).json({ error: 'Event not found' });
+        }
+        res.json({ message: 'Event deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting event:', error);
+        res.status(500).json({ error: 'Failed to delete event' });
+    }
+});
 
-        if (!pendingPR) {
-            return res.status(404).json({ error: 'PR not found' });
+// Add sponsorship inquiry endpoint
+app.post('/api/sponsorship/inquiry', async (req, res) => {
+    try {
+        if (!req.body.email || !req.body.organization || !req.body.sponsorshipType) {
+            return res.status(400).json({
+                error: 'Missing required fields',
+                details: 'Email, organization name, and sponsorship type are required'
+            });
         }
 
-        await PendingPR.findByIdAndDelete(req.params.prId);
-        res.json({ message: 'PR deleted successfully' });
+        const success = await emailService.sendSponsorshipInquiryEmail(req.body);
+
+        if (success) {
+            res.status(200).json({
+                message: 'Sponsorship inquiry sent successfully',
+                status: 'success'
+            });
+        } else {
+            throw new Error('Failed to send sponsorship inquiry');
+        }
     } catch (error) {
-        console.error('Error deleting PR:', error);
-        res.status(500).json({ error: 'Failed to delete PR' });
+        console.error('Error processing sponsorship inquiry:', error);
+        res.status(500).json({
+            error: 'Failed to process sponsorship inquiry',
+            details: error.message
+        });
     }
 });
 
@@ -1094,181 +1221,31 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
 }));
 
-// Add automatic PR scanning function
-async function automaticPRScan() {
-    console.log('🔄 Starting automatic PR scan...', new Date().toISOString());
-
-    try {
-        const users = await User.find({});
-        const acceptedRepos = await Repo.find({
-            reviewStatus: 'accepted'
-        }, 'repoLink successPoints userId');
-
-        let totalProcessed = 0;
-        let newPRsFound = 0;
-        let errors = 0;
-
-        // Process users in smaller batches for automatic scanning
-        const BATCH_SIZE = 3;
-        const BATCH_DELAY = 10000; // 10 seconds between batches for rate limiting
-
-        for (let i = 0; i < users.length; i += BATCH_SIZE) {
-            const userBatch = users.slice(i, i + BATCH_SIZE);
-            console.log(`📊 Processing batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(users.length / BATCH_SIZE)}`);
-
-            const batchResults = await Promise.all(userBatch.map(async (user) => {
-                try {
-                    totalProcessed++;
-                    const prData = await fetchPRDetails(user.username);
-
-                    for (const pr of prData.items) {
-                        try {
-                            const [owner, repo] = pr.repository_url.split('/repos/')[1].split('/');
-                            const repoUrl = `https://github.com/${owner}/${repo}`;
-
-                            const registeredRepo = acceptedRepos.find(repo => repo.repoLink === repoUrl);
-
-                            if (registeredRepo) {
-                                const prDetails = await retryWithBackoff(async () => {
-                                    const response = await octokit.pulls.get({
-                                        owner,
-                                        repo,
-                                        pull_number: pr.number
-                                    });
-                                    return response.data;
-                                });
-
-                                if (prDetails.merged) {
-                                    const prId = `${owner}/${repo}/${pr.number}`;
-                                    const existingPR = await PendingPR.findOne({ prId });
-
-                                    if (!existingPR) {
-                                        await PendingPR.create({
-                                            prId,
-                                            username: user.username,
-                                            githubId: user.githubId,
-                                            title: pr.title,
-                                            repository: `${owner}/${repo}`,
-                                            repoUrl,
-                                            prNumber: pr.number,
-                                            mergedAt: prDetails.merged_at,
-                                            suggestedPoints: registeredRepo.successPoints || 50,
-                                            userAvatarUrl: user.avatarUrl,
-                                            prUrl: pr.html_url
-                                        });
-                                        newPRsFound++;
-                                        console.log(`✅ New PR found: ${user.username} - ${pr.title}`);
-                                    }
-                                }
-                            }
-                        } catch (prError) {
-                            console.error(`❌ Error processing PR ${pr.number} for ${user.username}:`, prError.message);
-                            errors++;
-                        }
-                    }
-
-                    return { username: user.username, status: 'success' };
-                } catch (userError) {
-                    console.error(`❌ Error processing user ${user.username}:`, userError.message);
-                    errors++;
-                    return { username: user.username, status: 'error', error: userError.message };
-                }
-            }));
-
-            // Add delay between batches
-            if (i + BATCH_SIZE < users.length) {
-                console.log(`⏳ Waiting ${BATCH_DELAY / 1000}s before next batch...`);
-                await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
-            }
-        }
-
-        console.log(`✅ Automatic PR scan completed:`, {
-            totalUsers: users.length,
-            processed: totalProcessed,
-            newPRsFound,
-            errors,
-            timestamp: new Date().toISOString()
-        });
-
-        // Send notification email to admins if new PRs are found
-        if (newPRsFound > 0) {
-            const adminIds = process.env.ADMIN_GITHUB_IDS?.split(',') || [];
-            console.log(`📧 ${newPRsFound} new PRs found, notifying admins...`);
-        }
-
-    } catch (error) {
-        console.error('❌ Automatic PR scan failed:', error);
-    }
-}
-
 // Initialize and start server
 async function startServer() {
     try {
         const PORT = process.env.PORT || 3000;
 
-        // Start automatic PR scanning
-        console.log('🚀 Setting up automatic PR scanning...');
-
-        // Run initial scan after 5 minutes of server start
-        setTimeout(() => {
-            console.log('🔄 Running initial PR scan...');
-            automaticPRScan();
-        }, 5 * 60 * 1000); // 5 minutes delay
-
-        // Schedule automatic PR scanning every hour
-        const scanInterval = process.env.PR_SCAN_INTERVAL || '0 * * * *'; // Every hour at minute 0
-        cron.schedule(scanInterval, () => {
-            automaticPRScan();
-        }, {
-            scheduled: true,
-            timezone: "UTC"
-        });
-
-        console.log(`⏰ Automatic PR scanning scheduled: ${scanInterval} (UTC)`);
-
-        // Manual trigger endpoint for testing (admin only)
-        app.post('/api/admin/trigger-pr-scan', async (req, res) => {
-            if (!req.isAuthenticated()) {
-                return res.status(401).json({ error: 'Unauthorized' });
-            }
-
-            const adminIds = process.env.ADMIN_GITHUB_IDS?.split(',') || [];
-            if (!adminIds.includes(req.user.username)) {
-                return res.status(403).json({ error: 'Not authorized' });
-            }
-
-            try {
-                // Run scan in background
-                automaticPRScan();
-                res.json({
-                    message: 'PR scan triggered successfully',
-                    timestamp: new Date().toISOString()
-                });
-            } catch (error) {
-                console.error('Manual PR scan trigger failed:', error);
-                res.status(500).json({ error: 'Failed to trigger PR scan' });
-            }
-        });
-
         // Ensure all routes are registered before the catch-all
+
+        // Catch-all route for SPA - must be after API routes
         app.get('*', (req, res) => {
             res.sendFile(path.join(__dirname, 'public', 'index.html'));
         });
 
         app.listen(PORT, () => {
-            console.log(`🌟 Server running on http://localhost:${PORT}`);
-            console.log('📁 Serving frontend from', path.join(__dirname, 'public'));
-            console.log('🔄 PR scanning will run every hour');
+            console.log(`Server running on http://localhost:${PORT}`);
+            console.log('Serving frontend from', path.join(__dirname, 'public'));
         }).on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
-                console.error(`❌ Port ${PORT} is already in use`);
+                console.error(`Port ${PORT} is already in use`);
                 process.exit(1);
             } else {
                 throw err;
             }
         });
     } catch (error) {
-        console.error('❌ Failed to start server:', error);
+        console.error('Failed to start server:', error);
         process.exit(1);
     }
 }
