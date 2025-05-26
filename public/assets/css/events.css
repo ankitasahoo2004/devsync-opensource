@@ -866,7 +866,6 @@
 }
 
 .copy-button:hover {
-    background: #e51837;
     color: var(--white-color);
 }
 
