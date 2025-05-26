@@ -2784,7 +2784,7 @@ body.login-body {
   height: 20px;
   border-radius: 50%;
   background: #e51837;
-  box-shadow: 0 0 10px rgba(#e51837), 0.5);
+  box-shadow: 0 0 10px rgba(#e51837), 0.5;
 }
 
 .pr-card:nth-child(odd)::before {
@@ -3233,7 +3233,7 @@ body.login-body {
 
 .redirect-now:hover {
   transform: translateY(-2px);
-  background: v#e51837);
+  background: #e51837;
 }
 
 @keyframes popIn {
