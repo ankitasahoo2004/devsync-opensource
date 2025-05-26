@@ -529,18 +529,44 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkRepoAccessibility = async (repoLink) => {
         try {
             const [owner, repo] = repoLink.split('/').slice(-2);
-            const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
-            const data = await response.json();
 
-            if (!response.ok) {
-                throw new Error('Repository not found or inaccessible');
+            // First try to use GitHub API to verify
+            try {
+                const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
+
+                // Handle rate limit errors
+                if (response.status === 403 && response.headers.get('x-ratelimit-remaining') === '0') {
+                    console.warn('GitHub API rate limit reached, falling back to direct URL check');
+                    // Fall back to a direct URL check if rate limited
+                    const htmlResponse = await fetch(repoLink);
+                    if (!htmlResponse.ok) {
+                        throw new Error('Repository not found or inaccessible');
+                    }
+                    return true;
+                }
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error('Repository not found or inaccessible');
+                }
+
+                if (data.private) {
+                    throw new Error('Repository must be public');
+                }
+
+                return true;
+            } catch (apiError) {
+                // If it's a rate limit error, try direct URL access as fallback
+                if (apiError.message.includes('rate limit')) {
+                    const htmlResponse = await fetch(repoLink);
+                    if (!htmlResponse.ok) {
+                        throw new Error('Repository not found or inaccessible');
+                    }
+                    return true;
+                }
+                throw apiError;
             }
-
-            if (data.private) {
-                throw new Error('Repository must be public');
-            }
-
-            return true;
         } catch (error) {
             throw new Error(error.message || 'Failed to verify repository accessibility');
         }

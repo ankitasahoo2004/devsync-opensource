@@ -736,22 +736,72 @@ async function isRegisteredRepo(repoFullName) {
     return repo ? repo : null;
 }
 
-// Helper function to fetch PR details using Octokit
+// Add new helper functions for caching and rate limiting
+const prCache = new Map();
+const PR_CACHE_TTL = 1000 * 60 * 60; // 1 hour cache TTL
+
+// Helper function to implement exponential backoff for rate limits
+async function retryWithBackoff(fn, maxRetries = 3, initialDelay = 1000) {
+    let retries = 0;
+    while (true) {
+        try {
+            return await fn();
+        } catch (error) {
+            if (error.status === 403 && error.response?.data?.message?.includes('API rate limit exceeded')) {
+                const resetTime = error.response?.headers?.['x-ratelimit-reset'];
+                if (resetTime) {
+                    const waitTime = (parseInt(resetTime) * 1000) - Date.now();
+                    if (waitTime > 0 && waitTime < 15 * 60 * 1000) { // Wait up to 15 minutes
+                        console.log(`Rate limit hit. Waiting for ${Math.ceil(waitTime / 1000)} seconds until reset...`);
+                        await new Promise(resolve => setTimeout(resolve, waitTime + 1000)); // Add 1 second buffer
+                        continue;
+                    }
+                }
+
+                retries++;
+                if (retries >= maxRetries) throw error;
+
+                const delay = initialDelay * Math.pow(2, retries);
+                console.log(`Rate limit hit. Retrying in ${delay}ms (attempt ${retries} of ${maxRetries})...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                continue;
+            }
+            throw error;
+        }
+    }
+}
+
+// Helper function to fetch PRs with caching and rate limit handling
 async function fetchPRDetails(username) {
     try {
-        const { data } = await octokit.search.issuesAndPullRequests({
-            q: `type:pr+author:${username}+is:merged+created:>=${PROGRAM_START_DATE}`,
-            per_page: 100
+        // Check cache first
+        const cacheKey = `prs:${username}`;
+        const cachedData = prCache.get(cacheKey);
+        if (cachedData && (Date.now() - cachedData.timestamp) < PR_CACHE_TTL) {
+            console.log(`Using cached PR data for ${username}`);
+            return cachedData.data;
+        }
+
+        // Fetch with retry logic for rate limits
+        const data = await retryWithBackoff(async () => {
+            const response = await octokit.search.issuesAndPullRequests({
+                q: `type:pr+author:${username}+is:merged+created:>=${PROGRAM_START_DATE}`,
+                per_page: 100
+            });
+            return response.data;
         });
 
+        // Cache the result
+        prCache.set(cacheKey, { data, timestamp: Date.now() });
         return data;
     } catch (error) {
         console.error(`Error fetching PRs for ${username}:`, error);
+        // Return empty results on error after retries
         return { items: [] };
     }
 }
 
-// Update PR status check endpoint
+// Replace the existing PR status update endpoint with this improved version
 app.get('/api/github/prs/update', async (req, res) => {
     try {
         const users = await User.find({});
@@ -761,62 +811,79 @@ app.get('/api/github/prs/update', async (req, res) => {
             reviewStatus: 'accepted'
         }, 'repoLink successPoints userId');
 
-        for (const user of users) {
-            try {
-                const prData = await fetchPRDetails(user.username);
-                const mergedPRs = [];
+        // Process users in batches to avoid hitting rate limits
+        const BATCH_SIZE = 5;
+        const BATCH_DELAY = 5000; // 5 seconds between batches
 
-                for (const pr of prData.items) {
-                    try {
-                        const [owner, repo] = pr.repository_url.split('/repos/')[1].split('/');
-                        const repoUrl = `https://github.com/${owner}/${repo}`;
+        for (let i = 0; i < users.length; i += BATCH_SIZE) {
+            const userBatch = users.slice(i, i + BATCH_SIZE);
 
-                        const registeredRepo = acceptedRepos.find(repo => repo.repoLink === repoUrl);
+            // Process each batch concurrently but with rate limiting
+            const batchResults = await Promise.all(userBatch.map(async (user) => {
+                try {
+                    const prData = await fetchPRDetails(user.username);
+                    const mergedPRs = [];
 
-                        if (registeredRepo) {
-                            // Get detailed PR info using Octokit
-                            const { data: prDetails } = await octokit.pulls.get({
-                                owner,
-                                repo,
-                                pull_number: pr.number
-                            });
+                    for (const pr of prData.items) {
+                        try {
+                            const [owner, repo] = pr.repository_url.split('/repos/')[1].split('/');
+                            const repoUrl = `https://github.com/${owner}/${repo}`;
 
-                            if (prDetails.merged) {
-                                mergedPRs.push({
-                                    repoId: repoUrl,
-                                    prNumber: pr.number,
-                                    title: pr.title,
-                                    mergedAt: prDetails.merged_at
+                            const registeredRepo = acceptedRepos.find(repo => repo.repoLink === repoUrl);
+
+                            if (registeredRepo) {
+                                // Get detailed PR info using Octokit with rate limit handling
+                                const prDetails = await retryWithBackoff(async () => {
+                                    const response = await octokit.pulls.get({
+                                        owner,
+                                        repo,
+                                        pull_number: pr.number
+                                    });
+                                    return response.data;
                                 });
+
+                                if (prDetails.merged) {
+                                    mergedPRs.push({
+                                        repoId: repoUrl,
+                                        prNumber: pr.number,
+                                        title: pr.title,
+                                        mergedAt: prDetails.merged_at
+                                    });
+                                }
                             }
+                        } catch (prError) {
+                            console.error(`Error processing PR ${pr.number}:`, prError);
+                            continue;
                         }
-                    } catch (prError) {
-                        console.error(`Error processing PR ${pr.number}:`, prError);
-                        continue;
                     }
+
+                    // Update user's data
+                    user.mergedPRs = mergedPRs;
+                    user.points = await calculatePoints(mergedPRs, user.githubId);
+                    user.badges = await checkBadges(mergedPRs, user.points);
+                    await user.save();
+
+                    return {
+                        username: user.username,
+                        status: 'success',
+                        mergedCount: mergedPRs.length,
+                        points: user.points
+                    };
+                } catch (userError) {
+                    console.error(`Error processing user ${user.username}:`, userError);
+                    return {
+                        username: user.username,
+                        status: 'error',
+                        error: userError.message
+                    };
                 }
+            }));
 
-                // Update user's data
-                user.mergedPRs = mergedPRs;
-                user.points = await calculatePoints(mergedPRs, user.githubId);
-                user.badges = await checkBadges(mergedPRs, user.points);
-                await user.save();
+            results.push(...batchResults);
 
-                results.push({
-                    username: user.username,
-                    status: 'success',
-                    mergedCount: mergedPRs.length,
-                    points: user.points
-                });
-
-            } catch (userError) {
-                console.error(`Error processing user ${user.username}:`, userError);
-                results.push({
-                    username: user.username,
-                    status: 'error',
-                    error: userError.message
-                });
-                continue;
+            // Add delay between batches to avoid rate limits
+            if (i + BATCH_SIZE < users.length) {
+                await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
             }
         }
 
@@ -834,9 +901,11 @@ app.get('/api/github/prs/update', async (req, res) => {
     }
 });
 
-// Add automatic PR status and leaderboard update
+// Modify the automatic update interval to be less frequent
+const updateInterval = 60 * 60 * 1000; // Every 6 hours instead of 1 hour
 setInterval(async () => {
     try {
+        console.log("Starting scheduled PR status update...");
         const response = await fetch(`${serverUrl}/api/github/prs/update`);
 
         if (!response.ok) {
@@ -844,11 +913,11 @@ setInterval(async () => {
         }
 
         const result = await response.json();
-        console.log('Scheduled update completed:', result);
+        console.log('Scheduled update completed:', result.message);
     } catch (error) {
         console.error('Scheduled update failed:', error);
     }
-}, 60 * 60 * 1000); // Every 60 minutes
+}, updateInterval);
 
 // Enhanced GitHub API routes with Octokit
 app.get('/api/github/user/:username', async (req, res) => {
