@@ -866,7 +866,6 @@
 }
 
 .copy-button:hover {
-    background: var(--first-color);
     color: var(--white-color);
 }
 
@@ -1301,7 +1300,7 @@
 
 .search-box input:focus {
     background: rgba(255, 255, 255, 0.08);
-    border-color: var(--first-color);
+    border-color: #e51837;
     outline: none;
 }
 
