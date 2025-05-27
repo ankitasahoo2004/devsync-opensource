@@ -149,9 +149,83 @@ const sr = ScrollReveal({
 });
 
 sr.reveal(`.home-swiper, .new-swiper, .newsletter__container`);
-sr.reveal(`.category__data, .trick__content, .footer__content`, { interval: 100 });
-sr.reveal(`.about__data, .discount__img`, { origin: 'left' });
-sr.reveal(`.about__img, .discount__data`, { origin: 'right' });
+
+/*=============== GLOBAL SEARCH HINT ===============*/
+// Show search hint to users
+document.addEventListener('DOMContentLoaded', () => {
+    // Show search hint after 3 seconds on first visit
+    if (!localStorage.getItem('searchHintShown')) {
+        setTimeout(() => {
+            showSearchHint();
+            localStorage.setItem('searchHintShown', 'true');
+        }, 3000);
+    }
+});
+
+function showSearchHint() {
+    const hint = document.createElement('div');
+    hint.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        z-index: 9998;
+        animation: fadeInSlide 0.5s ease-out;
+        cursor: pointer;
+    `;
+    hint.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="bx bx-search"></i>
+            <span>Press <kbd style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; font-family: monospace;">Alt+F</kbd> to search</span>
+            <i class="bx bx-x" style="margin-left: 8px; opacity: 0.7;"></i>
+        </div>
+    `;
+
+    document.body.appendChild(hint);
+
+    hint.addEventListener('click', () => {
+        hint.remove();
+    });
+
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (document.body.contains(hint)) {
+            hint.style.animation = 'fadeOut 0.5s ease-out forwards';
+            setTimeout(() => hint.remove(), 500);
+        }
+    }, 5000);
+}
+
+// Add CSS for hint animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInSlide {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+    }
+`;
+document.head.appendChild(style);
 
 /*=============== UPDATE NAV BASED ON LOGIN ===============*/
 function updateNavigation() {

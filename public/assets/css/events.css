@@ -703,7 +703,7 @@
     width: 50px;
     height: 50px;
     border: 3px solid rgba(255, 255, 255, 0.1);
-    border-top-color: var(--first-color);
+    border-top-color: #e51837;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -829,7 +829,6 @@
 }
 
 .meeting-link {
-    display: flex;
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem 1rem;
@@ -867,7 +866,6 @@
 }
 
 .copy-button:hover {
-    background: var(--first-color);
     color: var(--white-color);
 }
 
@@ -1302,7 +1300,7 @@
 
 .search-box input:focus {
     background: rgba(255, 255, 255, 0.08);
-    border-color: var(--first-color);
+    border-color: #e51837;
     outline: none;
 }
 
