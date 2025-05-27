@@ -153,7 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div>
                             <h4>Meeting Link</h4>
                             ${isLinkVisible ?
-                    `<div class="countdown-timer active">Link Available Now</div>` :
+
+                    `<div class="countdown-timer active" style="color: white; font-weight: bold; font-size: 1rem; text-decoration: none;" >Link Available Now</div>` :
                     `<div class="countdown-timer">
                                     Available in: <span class="countdown-text"></span>
                                 </div>`
@@ -162,7 +163,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="meeting-link ${isLinkVisible ? 'visible' : ''}">
                         ${isLinkVisible ?
-                    `<span class="link-text">${event.meetingLink}</span>
+                    `<span class="link-text">
+            <a href="${event.meetingLink}" 
+               target="_blank" 
+               style="color: #e51837; font-weight: bold; text-decoration: none;">
+               ${event.meetingLink}
+            </a>
+                    </span>
                              <button class="copy-button" onclick="copyMeetingLink(event)">
                                 <i class='bx bx-copy'></i> Copy
                              </button>` :
