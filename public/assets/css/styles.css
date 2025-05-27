@@ -2755,7 +2755,7 @@ body.login-body {
   opacity: 0;
   transform-style: preserve-3d;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  filter: blur(10px);
+  /* filter: blur(10px); */
 }
 
 .pr-card.visible {

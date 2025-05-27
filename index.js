@@ -10,6 +10,7 @@ const { Octokit } = require('@octokit/rest');
 const User = require('./models/User');
 const Repo = require('./models/Repo');
 const Event = require('./models/Event');
+const PendingPR = require('./models/PendingPR');
 const MongoStore = require('connect-mongo');
 const emailService = require('./services/emailService');
 const PORT = process.env.PORT || 5500;
@@ -801,7 +802,289 @@ async function fetchPRDetails(username) {
     }
 }
 
-// Replace the existing PR status update endpoint with this improved version
+// Modified function to submit PRs for admin approval instead of auto-approving
+async function submitPRForApproval(userId, username, repoUrl, prData) {
+    try {
+        // Check if this PR already exists in pending submissions
+        const existingPR = await PendingPR.findOne({
+            userId: userId,
+            repoUrl: repoUrl,
+            prNumber: prData.number
+        });
+
+        if (existingPR) {
+            console.log(`PR already submitted: ${repoUrl}#${prData.number}`);
+            return existingPR;
+        }
+
+        // Get repo details for suggested points
+        const repo = await Repo.findOne({ repoLink: repoUrl });
+        const suggestedPoints = repo ? repo.successPoints || 50 : 50;
+
+        const pendingPR = await PendingPR.create({
+            userId: userId,
+            username: username,
+            repoId: repoUrl,
+            repoUrl: repoUrl,
+            prNumber: prData.number,
+            title: prData.title,
+            mergedAt: prData.merged_at,
+            suggestedPoints: suggestedPoints
+        });
+
+        console.log(`PR submitted for approval: ${username} - ${repoUrl}#${prData.number}`);
+        return pendingPR;
+    } catch (error) {
+        console.error('Error submitting PR for approval:', error);
+        return null;
+    }
+}
+
+// Admin endpoint to get pending PRs
+app.get('/api/admin/pending-prs', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const pendingPRs = await PendingPR.find({ status: 'pending' })
+            .sort({ submittedAt: -1 });
+
+        // Enrich with user data
+        const enrichedPRs = await Promise.all(pendingPRs.map(async (pr) => {
+            const user = await User.findOne({ githubId: pr.userId });
+            return {
+                ...pr.toObject(),
+                user: {
+                    avatar_url: user ? user.avatarUrl : `https://github.com/${pr.username}.png`,
+                    login: pr.username
+                },
+                repository: pr.repoUrl.replace('https://github.com/', '')
+            };
+        }));
+
+        res.json(enrichedPRs);
+    } catch (error) {
+        console.error('Error fetching pending PRs:', error);
+        res.status(500).json({ error: 'Failed to fetch pending PRs' });
+    }
+});
+
+// Admin endpoint to approve PR
+app.post('/api/admin/pr/:prId/approve', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const pendingPR = await PendingPR.findById(req.params.prId);
+        if (!pendingPR) {
+            return res.status(404).json({ error: 'PR not found' });
+        }
+
+        // Update PR status to approved
+        pendingPR.status = 'approved';
+        pendingPR.reviewedBy = req.user.username;
+        pendingPR.reviewedAt = new Date();
+        await pendingPR.save();
+
+        // Update user's points and badges based on approved PRs
+        const user = await User.findOne({ githubId: pendingPR.userId });
+        if (user) {
+            const approvedMergedPRs = await getApprovedMergedPRs(pendingPR.userId);
+            user.mergedPRs = approvedMergedPRs;
+            user.points = await calculatePointsFromApprovedPRs(pendingPR.userId);
+            user.badges = await checkBadges(approvedMergedPRs, user.points);
+            await user.save();
+        }
+
+        res.json({ message: 'PR approved successfully', pr: pendingPR });
+    } catch (error) {
+        console.error('Error approving PR:', error);
+        res.status(500).json({ error: 'Failed to approve PR' });
+    }
+});
+
+// Admin endpoint to reject PR
+app.post('/api/admin/pr/:prId/reject', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { rejectionReason } = req.body;
+        const pendingPR = await PendingPR.findById(req.params.prId);
+
+        if (!pendingPR) {
+            return res.status(404).json({ error: 'PR not found' });
+        }
+
+        // Update PR status to rejected
+        pendingPR.status = 'rejected';
+        pendingPR.reviewedBy = req.user.username;
+        pendingPR.reviewedAt = new Date();
+        pendingPR.rejectionReason = rejectionReason || 'No reason provided';
+        await pendingPR.save();
+
+        res.json({ message: 'PR rejected successfully', pr: pendingPR });
+    } catch (error) {
+        console.error('Error rejecting PR:', error);
+        res.status(500).json({ error: 'Failed to reject PR' });
+    }
+});
+
+// Admin endpoint to adjust PR points
+app.patch('/api/admin/pr/:prId/points', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { points } = req.body;
+        const pendingPR = await PendingPR.findById(req.params.prId);
+
+        if (!pendingPR) {
+            return res.status(404).json({ error: 'PR not found' });
+        }
+
+        pendingPR.suggestedPoints = points;
+        await pendingPR.save();
+
+        // If PR is already approved, update user points
+        if (pendingPR.status === 'approved') {
+            const user = await User.findOne({ githubId: pendingPR.userId });
+            if (user) {
+                user.points = await calculatePointsFromApprovedPRs(pendingPR.userId);
+                await user.save();
+            }
+        }
+
+        res.json({ message: 'Points updated successfully', pr: pendingPR });
+    } catch (error) {
+        console.error('Error updating points:', error);
+        res.status(500).json({ error: 'Failed to update points' });
+    }
+});
+
+// Admin endpoint to get rejected PRs
+app.get('/api/admin/rejected-prs', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const rejectedPRs = await PendingPR.find({ status: 'rejected' })
+            .sort({ reviewedAt: -1 });
+
+        const enrichedPRs = await Promise.all(rejectedPRs.map(async (pr) => {
+            const user = await User.findOne({ githubId: pr.userId });
+            return {
+                ...pr.toObject(),
+                user: {
+                    avatar_url: user ? user.avatarUrl : `https://github.com/${pr.username}.png`,
+                    login: pr.username
+                },
+                repository: pr.repoUrl.replace('https://github.com/', '')
+            };
+        }));
+
+        res.json(enrichedPRs);
+    } catch (error) {
+        console.error('Error fetching rejected PRs:', error);
+        res.status(500).json({ error: 'Failed to fetch rejected PRs' });
+    }
+});
+
+// Admin endpoint to delete rejected PR
+app.delete('/api/admin/pr/:prId', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const pendingPR = await PendingPR.findById(req.params.prId);
+
+        if (!pendingPR) {
+            return res.status(404).json({ error: 'PR not found' });
+        }
+
+        if (pendingPR.status !== 'rejected') {
+            return res.status(400).json({ error: 'Can only delete rejected PRs' });
+        }
+
+        await PendingPR.findByIdAndDelete(req.params.prId);
+        res.json({ message: 'Rejected PR deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting rejected PR:', error);
+        res.status(500).json({ error: 'Failed to delete rejected PR' });
+    }
+});
+
+// Admin endpoint to get all PRs (approved, pending, rejected)
+app.get('/api/admin/all-prs', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const allPRs = await PendingPR.find({})
+            .sort({ submittedAt: -1 });
+
+        const enrichedPRs = await Promise.all(allPRs.map(async (pr) => {
+            const user = await User.findOne({ githubId: pr.userId });
+            return {
+                ...pr.toObject(),
+                user: {
+                    avatar_url: user ? user.avatarUrl : `https://github.com/${pr.username}.png`,
+                    login: pr.username
+                },
+                repository: pr.repoUrl.replace('https://github.com/', '')
+            };
+        }));
+
+        res.json(enrichedPRs);
+    } catch (error) {
+        console.error('Error fetching all PRs:', error);
+        res.status(500).json({ error: 'Failed to fetch all PRs' });
+    }
+});
+
+// Modified PR status update endpoint to use new approval system
 app.get('/api/github/prs/update', async (req, res) => {
     try {
         const users = await User.find({});
@@ -818,11 +1101,10 @@ app.get('/api/github/prs/update', async (req, res) => {
         for (let i = 0; i < users.length; i += BATCH_SIZE) {
             const userBatch = users.slice(i, i + BATCH_SIZE);
 
-            // Process each batch concurrently but with rate limiting
             const batchResults = await Promise.all(userBatch.map(async (user) => {
                 try {
                     const prData = await fetchPRDetails(user.username);
-                    const mergedPRs = [];
+                    const newSubmissions = [];
 
                     for (const pr of prData.items) {
                         try {
@@ -832,7 +1114,6 @@ app.get('/api/github/prs/update', async (req, res) => {
                             const registeredRepo = acceptedRepos.find(repo => repo.repoLink === repoUrl);
 
                             if (registeredRepo) {
-                                // Get detailed PR info using Octokit with rate limit handling
                                 const prDetails = await retryWithBackoff(async () => {
                                     const response = await octokit.pulls.get({
                                         owner,
@@ -843,12 +1124,17 @@ app.get('/api/github/prs/update', async (req, res) => {
                                 });
 
                                 if (prDetails.merged) {
-                                    mergedPRs.push({
-                                        repoId: repoUrl,
-                                        prNumber: pr.number,
-                                        title: pr.title,
-                                        mergedAt: prDetails.merged_at
-                                    });
+                                    // Submit PR for admin approval instead of auto-approving
+                                    const submission = await submitPRForApproval(
+                                        user.githubId,
+                                        user.username,
+                                        repoUrl,
+                                        prDetails
+                                    );
+
+                                    if (submission) {
+                                        newSubmissions.push(submission);
+                                    }
                                 }
                             }
                         } catch (prError) {
@@ -857,16 +1143,18 @@ app.get('/api/github/prs/update', async (req, res) => {
                         }
                     }
 
-                    // Update user's data
-                    user.mergedPRs = mergedPRs;
-                    user.points = await calculatePoints(mergedPRs, user.githubId);
-                    user.badges = await checkBadges(mergedPRs, user.points);
+                    // Update user's data based on approved PRs only
+                    const approvedMergedPRs = await getApprovedMergedPRs(user.githubId);
+                    user.mergedPRs = approvedMergedPRs;
+                    user.points = await calculatePointsFromApprovedPRs(user.githubId);
+                    user.badges = await checkBadges(approvedMergedPRs, user.points);
                     await user.save();
 
                     return {
                         username: user.username,
                         status: 'success',
-                        mergedCount: mergedPRs.length,
+                        newSubmissions: newSubmissions.length,
+                        approvedCount: approvedMergedPRs.length,
                         points: user.points
                     };
                 } catch (userError) {
@@ -881,14 +1169,13 @@ app.get('/api/github/prs/update', async (req, res) => {
 
             results.push(...batchResults);
 
-            // Add delay between batches to avoid rate limits
             if (i + BATCH_SIZE < users.length) {
                 await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
             }
         }
 
         res.json({
-            message: 'PR status update completed',
+            message: 'PR status update completed with admin approval system',
             results
         });
 
@@ -900,24 +1187,6 @@ app.get('/api/github/prs/update', async (req, res) => {
         });
     }
 });
-
-// Modify the automatic update interval to be less frequent
-const updateInterval = 60 * 60 * 1000; // Every 6 hours instead of 1 hour
-setInterval(async () => {
-    try {
-        console.log("Starting scheduled PR status update...");
-        const response = await fetch(`${serverUrl}/api/github/prs/update`);
-
-        if (!response.ok) {
-            throw new Error(`Update failed with status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        console.log('Scheduled update completed:', result.message);
-    } catch (error) {
-        console.error('Scheduled update failed:', error);
-    }
-}, updateInterval);
 
 // Enhanced GitHub API routes with Octokit
 app.get('/api/github/user/:username', async (req, res) => {
