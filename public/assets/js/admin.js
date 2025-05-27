@@ -106,13 +106,13 @@ async function loadSection(section, forceRefresh = false) {
 }
 
 async function loadPendingPRs() {
-    const grid = document.getElementById('pendingPRsGrid');
+    const grid = document.getElementById('userPRGrid');
     if (!grid) {
-        console.error('pendingPRsGrid element not found');
+        console.error('userPRGrid element not found');
         return;
     }
 
-    grid.innerHTML = '<div class="loading">Loading PRs...</div>';
+    grid.innerHTML = '<div class="loading"><i class="bx bx-loader-alt bx-spin"></i><p>Loading user PRs...</p></div>';
 
     try {
         const response = await fetch(`${serverUrl}/api/admin/pending-prs`, {
@@ -120,7 +120,19 @@ async function loadPendingPRs() {
         });
         const prs = await response.json();
 
-        grid.innerHTML = prs.map(pr => createPRCard(pr)).join('');
+        // Group PRs by user
+        const userGroups = groupPRsByUser(prs);
+
+        if (Object.keys(userGroups).length === 0) {
+            grid.innerHTML = '<div class="no-data">No pending PRs found</div>';
+        } else {
+            grid.innerHTML = Object.entries(userGroups)
+                .map(([username, userData]) => createUserPRCard(username, userData))
+                .join('');
+
+            // Add click handlers after rendering
+            addUserCardClickHandlers();
+        }
 
         // Update pending count
         const pendingCount = document.getElementById('pendingCount');
@@ -128,112 +140,17 @@ async function loadPendingPRs() {
             pendingCount.textContent = prs.length;
         }
 
-        // Add event listeners to PR cards
-        attachPRCardHandlers();
     } catch (error) {
         console.error('Failed to load PRs:', error);
         grid.innerHTML = '<div class="error">Failed to load PRs. Please try again.</div>';
     }
 }
 
-function attachPRCardHandlers() {
-    // Add event listeners for view repo buttons and other interactions
-    const prCards = document.querySelectorAll('.pr-card');
-    prCards.forEach(card => {
-        // Add click handler for card expansion or details
-        const prId = card.dataset.prId;
-
-        // Handle any additional card interactions here
-        card.addEventListener('click', (e) => {
-            // Prevent event bubbling for button clicks
-            if (!e.target.closest('button')) {
-                // Handle card click if needed
-            }
-        });
-    });
-}
-
-function createPRCard(pr) {
-    const statusClass = pr.status || 'pending';
-    const isRejected = pr.status === 'rejected';
-    const isPending = pr.status === 'pending';
-
-    return `
-        <div class="pr-card ${statusClass}" data-pr-id="${pr._id}">
-            <div class="pr-header">
-                <img src="${pr.user.avatar_url}" alt="${pr.user.login}" class="user-avatar">
-                <div class="pr-info">
-                    <h3 class="pr-title">${pr.title}</h3>
-                    <span class="pr-repo">${pr.repository}</span>
-                    <div class="pr-status-badge ${statusClass}">
-                        ${pr.status?.toUpperCase() || 'PENDING'}
-                    </div>
-                </div>
-            </div>
-            <div class="pr-body">
-                <div class="pr-stats">
-                    <div class="stat">
-                        <i class='bx bx-user'></i>
-                        <span>${pr.username}</span>
-                    </div>
-                    <div class="stat">
-                        <i class='bx bx-git-merge'></i>
-                        <span>${new Date(pr.mergedAt).toLocaleDateString()}</span>
-                    </div>
-                    <div class="stat">
-                        <i class='bx bx-trophy'></i>
-                        <span>${pr.suggestedPoints} points</span>
-                    </div>
-                </div>
-                
-                ${pr.rejectionReason ? `
-                    <div class="rejection-reason">
-                        <strong>Rejection Reason:</strong> ${pr.rejectionReason}
-                    </div>
-                ` : ''}
-                
-                ${pr.reviewedBy ? `
-                    <div class="review-info">
-                        <small>Reviewed by ${pr.reviewedBy} on ${new Date(pr.reviewedAt).toLocaleDateString()}</small>
-                    </div>
-                ` : ''}
-                
-                <div class="pr-actions">
-                    ${isPending ? `
-                        <button class="approve-btn" onclick="approvePR('${pr._id}')">
-                            <i class='bx bx-check'></i>
-                            Approve
-                        </button>
-                        <button class="adjust-btn" onclick="adjustPoints('${pr._id}', ${pr.suggestedPoints})">
-                            <i class='bx bx-edit'></i>
-                            Adjust Points
-                        </button>
-                        <button class="reject-btn" onclick="rejectPR('${pr._id}')">
-                            <i class='bx bx-x'></i>
-                            Reject
-                        </button>
-                    ` : isRejected ? `
-                        <button class="delete-btn" onclick="deleteRejectedPR('${pr._id}')">
-                            <i class='bx bx-trash'></i>
-                            Delete
-                        </button>
-                    ` : `
-                        <button class="adjust-btn" onclick="adjustPoints('${pr._id}', ${pr.suggestedPoints})">
-                            <i class='bx bx-edit'></i>
-                            Adjust Points
-                        </button>
-                    `}
-                </div>
-            </div>
-        </div>
-    `;
-}
-
 async function loadApprovedPRs() {
-    const grid = document.getElementById('pendingPRsGrid');
+    const grid = document.getElementById('userPRGrid');
     if (!grid) return;
 
-    grid.innerHTML = '<div class="loading">Loading approved PRs...</div>';
+    grid.innerHTML = '<div class="loading"><i class="bx bx-loader-alt bx-spin"></i><p>Loading approved PRs...</p></div>';
 
     try {
         const response = await fetch(`${serverUrl}/api/admin/all-prs`, {
@@ -242,13 +159,19 @@ async function loadApprovedPRs() {
         const allPrs = await response.json();
         const approvedPrs = allPrs.filter(pr => pr.status === 'approved');
 
-        if (approvedPrs.length === 0) {
+        const userGroups = groupPRsByUser(approvedPrs);
+
+        if (Object.keys(userGroups).length === 0) {
             grid.innerHTML = '<div class="no-data">No approved PRs found</div>';
         } else {
-            grid.innerHTML = approvedPrs.map(pr => createPRCard(pr)).join('');
+            grid.innerHTML = Object.entries(userGroups)
+                .map(([username, userData]) => createUserPRCard(username, userData))
+                .join('');
+
+            // Add click handlers after rendering
+            addUserCardClickHandlers();
         }
 
-        attachPRCardHandlers();
     } catch (error) {
         console.error('Failed to load approved PRs:', error);
         grid.innerHTML = '<div class="error">Failed to load approved PRs. Please try again.</div>';
@@ -256,13 +179,10 @@ async function loadApprovedPRs() {
 }
 
 async function loadRejectedPRs() {
-    const grid = document.getElementById('pendingPRsGrid');
-    if (!grid) {
-        console.error('pendingPRsGrid element not found');
-        return;
-    }
+    const grid = document.getElementById('userPRGrid');
+    if (!grid) return;
 
-    grid.innerHTML = '<div class="loading">Loading rejected PRs...</div>';
+    grid.innerHTML = '<div class="loading"><i class="bx bx-loader-alt bx-spin"></i><p>Loading rejected PRs...</p></div>';
 
     try {
         const response = await fetch(`${serverUrl}/api/admin/rejected-prs`, {
@@ -270,53 +190,193 @@ async function loadRejectedPRs() {
         });
         const prs = await response.json();
 
-        if (prs.length === 0) {
+        const userGroups = groupPRsByUser(prs);
+
+        if (Object.keys(userGroups).length === 0) {
             grid.innerHTML = '<div class="no-data">No rejected PRs found</div>';
         } else {
-            grid.innerHTML = prs.map(pr => createPRCard(pr)).join('');
+            grid.innerHTML = Object.entries(userGroups)
+                .map(([username, userData]) => createUserPRCard(username, userData))
+                .join('');
+
+            // Add click handlers after rendering
+            addUserCardClickHandlers();
         }
 
-        // Update rejected count if element exists
-        const rejectedCount = document.getElementById('rejectedCount');
-        if (rejectedCount) {
-            rejectedCount.textContent = prs.length;
-        }
-
-        attachPRCardHandlers();
     } catch (error) {
         console.error('Failed to load rejected PRs:', error);
         grid.innerHTML = '<div class="error">Failed to load rejected PRs. Please try again.</div>';
     }
 }
 
-async function loadAllPRs() {
-    const grid = document.getElementById('allPRsGrid');
-    grid.innerHTML = '<div class="loading">Loading all PRs...</div>';
+function groupPRsByUser(prs) {
+    const groups = {};
 
-    try {
-        const response = await fetch(`${serverUrl}/api/admin/all-prs`, {
-            credentials: 'include'
-        });
-        const prs = await response.json();
-
-        if (prs.length === 0) {
-            grid.innerHTML = '<div class="no-data">No PR submissions found</div>';
-        } else {
-            grid.innerHTML = prs.map(pr => createPRCard(pr)).join('');
+    prs.forEach(pr => {
+        if (!groups[pr.username]) {
+            groups[pr.username] = {
+                user: pr.user,
+                prs: [],
+                stats: {
+                    pending: 0,
+                    approved: 0,
+                    rejected: 0,
+                    total: 0
+                }
+            };
         }
 
-        // Update stats
-        const approved = prs.filter(pr => pr.status === 'approved').length;
-        const pending = prs.filter(pr => pr.status === 'pending').length;
-        const rejected = prs.filter(pr => pr.status === 'rejected').length;
+        groups[pr.username].prs.push(pr);
+        groups[pr.username].stats[pr.status || 'pending']++;
+        groups[pr.username].stats.total++;
+    });
 
-        document.getElementById('approvedCountAll').textContent = approved;
-        document.getElementById('pendingCountAll').textContent = pending;
-        document.getElementById('rejectedCountAll').textContent = rejected;
-    } catch (error) {
-        console.error('Failed to load all PRs:', error);
-        grid.innerHTML = '<div class="error">Failed to load all PRs. Please try again.</div>';
-    }
+    return groups;
+}
+
+function createUserPRCard(username, userData) {
+    const { user, prs, stats } = userData;
+    const latestPR = prs[0]; // Assuming PRs are sorted by date
+
+    // Store userData in a data attribute instead of inline JSON
+    return `
+        <div class="user-pr-card" data-username="${username}" data-user-data='${JSON.stringify(userData)}'>
+            <div class="user-card-header">
+                <img src="${user.avatar_url}" alt="${username}" class="user-card-avatar">
+                <div class="user-card-info">
+                    <h3>${username}</h3>
+                    <span class="username">@${username}</span>
+                </div>
+            </div>
+            
+            <div class="pr-stats-summary">
+                <div class="stat-item pending">
+                    <span class="stat-number">${stats.pending}</span>
+                    <span class="stat-label">Pending</span>
+                </div>
+                <div class="stat-item approved">
+                    <span class="stat-number">${stats.approved}</span>
+                    <span class="stat-label">Approved</span>
+                </div>
+                <div class="stat-item rejected">
+                    <span class="stat-number">${stats.rejected}</span>
+                    <span class="stat-label">Rejected</span>
+                </div>
+            </div>
+            
+            <div class="pr-preview">
+                <span class="preview-text">
+                    ${stats.total} PR${stats.total !== 1 ? 's' : ''} • Latest: ${latestPR.title.substring(0, 30)}${latestPR.title.length > 30 ? '...' : ''}
+                </span>
+                <span class="view-details-btn">
+                    View Details <i class='bx bx-chevron-right'></i>
+                </span>
+            </div>
+        </div>
+    `;
+}
+
+function openUserPRModal(username, userData) {
+    // userData is now already an object, no need to parse
+    const modal = document.getElementById('userPRModal');
+
+    // Populate modal header
+    document.getElementById('modalUserAvatar').src = userData.user.avatar_url;
+    document.getElementById('modalUsername').textContent = username;
+    document.getElementById('modalUserStats').textContent =
+        `${userData.stats.total} PRs • ${userData.stats.pending} Pending • ${userData.stats.approved} Approved • ${userData.stats.rejected} Rejected`;
+
+    // Populate PR list
+    const prList = document.getElementById('modalPRList');
+    prList.innerHTML = userData.prs.map(pr => createModalPRItem(pr)).join('');
+
+    // Show modal
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeUserPRModal() {
+    const modal = document.getElementById('userPRModal');
+    modal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+}
+
+function createModalPRItem(pr) {
+    const statusClass = pr.status || 'pending';
+    const isPending = pr.status === 'pending';
+    const isRejected = pr.status === 'rejected';
+
+    return `
+        <div class="modal-pr-item">
+            <div class="pr-item-header">
+                <div class="pr-title-section">
+                    <h4>${pr.title}</h4>
+                    <div class="pr-meta">
+                        <span><i class='bx bx-git-repo-forked'></i> ${pr.repository}</span>
+                        <span><i class='bx bx-calendar'></i> ${new Date(pr.mergedAt).toLocaleDateString()}</span>
+                        <span><i class='bx bx-hash'></i> PR #${pr.prNumber}</span>
+                    </div>
+                </div>
+                <div class="pr-status-badge ${statusClass}">
+                    ${(pr.status || 'pending').toUpperCase()}
+                </div>
+            </div>
+            
+            <div class="pr-details">
+                <div class="pr-info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Points</span>
+                        <span class="info-value">${pr.suggestedPoints}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Submitted</span>
+                        <span class="info-value">${new Date(pr.submittedAt).toLocaleDateString()}</span>
+                    </div>
+                    ${pr.reviewedBy ? `
+                        <div class="info-item">
+                            <span class="info-label">Reviewed By</span>
+                            <span class="info-value">${pr.reviewedBy}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Review Date</span>
+                            <span class="info-value">${new Date(pr.reviewedAt).toLocaleDateString()}</span>
+                        </div>
+                    ` : ''}
+                </div>
+                
+                <div class="pr-actions">
+                    ${isPending ? `
+                        <button class="action-btn approve-btn" onclick="approvePR('${pr._id}')">
+                            <i class='bx bx-check'></i> Approve
+                        </button>
+                        <button class="action-btn adjust-btn" onclick="adjustPoints('${pr._id}', ${pr.suggestedPoints})">
+                            <i class='bx bx-edit'></i> Adjust Points
+                        </button>
+                        <button class="action-btn reject-btn" onclick="rejectPR('${pr._id}')">
+                            <i class='bx bx-x'></i> Reject
+                        </button>
+                    ` : isRejected ? `
+                        <button class="action-btn reject-btn" onclick="deleteRejectedPR('${pr._id}')">
+                            <i class='bx bx-trash'></i> Delete
+                        </button>
+                    ` : `
+                        <button class="action-btn adjust-btn" onclick="adjustPoints('${pr._id}', ${pr.suggestedPoints})">
+                            <i class='bx bx-edit'></i> Adjust Points
+                        </button>
+                    `}
+                    <button class="action-btn view-btn" onclick="window.open('${pr.repoUrl}/pull/${pr.prNumber}', '_blank')">
+                        <i class='bx bx-link-external'></i> View PR
+                    </button>
+                </div>
+            </div>
+            
+            ${pr.rejectionReason ? `
+                <div class="rejection-reason">
+                    <strong>Rejection Reason:</strong> ${pr.rejectionReason}
+                </div>
+            ` : ''}
+        </div>
+    `;
 }
 
 async function approvePR(prId) {
@@ -328,7 +388,10 @@ async function approvePR(prId) {
 
         if (response.ok) {
             showToast('success', 'PR approved successfully!');
-            loadPendingPRs(); // Refresh the list
+            closeUserPRModal();
+            // Reload current section
+            const activeSection = document.querySelector('.menu-item.active').dataset.section;
+            loadSection(activeSection);
         } else {
             throw new Error('Failed to approve PR');
         }
@@ -352,7 +415,9 @@ async function rejectPR(prId) {
 
         if (response.ok) {
             showToast('success', 'PR rejected successfully!');
-            loadPendingPRs();
+            closeUserPRModal();
+            const activeSection = document.querySelector('.menu-item.active').dataset.section;
+            loadSection(activeSection);
         } else {
             throw new Error('Failed to reject PR');
         }
@@ -384,7 +449,7 @@ async function adjustPoints(prId, currentPoints) {
 
         if (response.ok) {
             showToast('success', 'Points updated successfully!');
-            // Reload current section
+            closeUserPRModal();
             const activeSection = document.querySelector('.menu-item.active').dataset.section;
             loadSection(activeSection);
         } else {
@@ -408,7 +473,9 @@ async function deleteRejectedPR(prId) {
 
         if (response.ok) {
             showToast('success', 'Rejected PR deleted successfully!');
-            loadRejectedPRs();
+            closeUserPRModal();
+            const activeSection = document.querySelector('.menu-item.active').dataset.section;
+            loadSection(activeSection);
         } else {
             throw new Error('Failed to delete rejected PR');
         }
@@ -551,6 +618,33 @@ function showToast(type, message) {
         toast.classList.remove('show');
         setTimeout(() => toast.remove(), 300);
     }, 3000);
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal-overlay')) {
+        closeUserPRModal();
+    }
+});
+
+// Close modal with escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeUserPRModal();
+    }
+});
+
+// Add function to handle click events properly
+function addUserCardClickHandlers() {
+    const userCards = document.querySelectorAll('.user-pr-card');
+    userCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            e.preventDefault();
+            const username = card.dataset.username;
+            const userData = JSON.parse(card.dataset.userData);
+            openUserPRModal(username, userData);
+        });
+    });
 }
 
 // ... Additional functions for other admin operations ...
