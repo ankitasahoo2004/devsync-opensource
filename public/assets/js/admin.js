@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize UI handlers after auth check
     initializeUI();
+
+    // Initialize admin search
+    initializeAdminSearch();
 });
 
 async function checkAdminAuth() {
@@ -75,6 +78,22 @@ function initializeUI() {
         const activeSection = document.querySelector('.menu-item.active').dataset.section;
         loadSection(activeSection, true);
     });
+}
+
+function initializeAdminSearch() {
+    // Add search hint toast after successful auth
+    setTimeout(() => {
+        if (document.querySelector('.admin-dashboard').style.display !== 'none') {
+            showSearchHintToast();
+        }
+    }, 2000);
+}
+
+function showSearchHintToast() {
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const shortcut = isMac ? 'Cmd+F' : 'Alt+F';
+
+    showToast('info', `💡 Pro tip: Press ${shortcut} to search anything in the admin panel!`);
 }
 
 async function loadSection(section, forceRefresh = false) {
