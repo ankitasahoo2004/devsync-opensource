@@ -598,6 +598,10 @@
     padding-left: 2.5rem;
   }
 
+  .search-icon {
+  top: 25%;
+}
+
   .leaderboard-item .badges-container {
     justify-content: center;
     margin-top: 0.75rem;
