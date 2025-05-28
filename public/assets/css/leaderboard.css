@@ -343,7 +343,7 @@
 .search-icon {
   position: absolute;
   left: 1.2rem;
-  top: 50%;
+  top: 34%;
   transform: translateY(-50%);
   color: var(--text-secondary);
   font-size: 1.2rem;
@@ -597,6 +597,10 @@
     padding: 0.8rem 1.2rem;
     padding-left: 2.5rem;
   }
+
+  .search-icon {
+  top: 25%;
+}
 
   .leaderboard-item .badges-container {
     justify-content: center;
