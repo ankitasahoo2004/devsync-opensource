@@ -387,7 +387,7 @@
 }
 
 .tech-tag:hover {
-    background: var(--first-color);
+    background: #e51837;
     color: #fff;
     transform: translateY(-2px);
 }
