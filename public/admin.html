@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/admin.css">
     <link rel="stylesheet" href="assets/css/admin-search.css">
+    <link rel="stylesheet" href="assets/css/admin-pr-scan.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 
@@ -111,6 +112,11 @@
                                 <i class='bx bx-refresh'></i>
                                 Refresh PRs
                             </button>
+                            <button class="scanner-quick-btn" onclick="openAdvancedPRScan()"
+                                title="Open Advanced PR Scanner">
+                                <i class='bx bx-search-alt'></i>
+                                Quick Scan
+                            </button>
                             <div class="filter-dropdown">
                                 <button class="filter-btn">
                                     <i class='bx bx-filter'></i>
@@ -173,7 +179,20 @@
         </div>
     </div>
 
+    <script>
+        // Initialize PR Scanner when page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize the PR scanner
+            if (typeof PRScanManager !== 'undefined') {
+                window.prScanManager = new PRScanManager();
+                console.log('PR Scanner initialized successfully');
+            } else {
+                console.error('PRScanManager not found - check if admin-pr-scan.js is loaded');
+            }
+        });
+    </script>
     <script src="assets/js/admin-search.js"></script>
+    <script src="assets/js/admin-pr-scan.js"></script>
     <script src="assets/js/admin.js"></script>
 </body>
 

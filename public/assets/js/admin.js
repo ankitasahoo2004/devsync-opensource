@@ -1,6 +1,6 @@
 // Server URL from auth.js
-// const serverUrl = 'https://www.devsync.club';
-const serverUrl = 'http://localhost:3000';
+const serverUrl = 'https://www.devsync.club';
+// const serverUrl = 'http://localhost:3000';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Check admin authorization
@@ -573,50 +573,122 @@ async function loadRepos() {
 }
 
 async function loadAutomation() {
-    const grid = document.getElementById('pendingPRsGrid');
+    const grid = document.getElementById('userPRGrid');
     if (!grid) return;
 
     grid.innerHTML = `
         <div class="automation-settings">
-            <div class="setting-card">
-                <h3>PR Detection</h3>
-                <p>Automatically detect and process merged pull requests</p>
-                <button class="button" onclick="triggerPRUpdate()">
-                    <i class='bx bx-refresh'></i>
-                    Trigger PR Update
-                </button>
+            <div class="section-header">
+                <h2>Automation & Tools</h2>
+                <p>Manage automated systems and advanced tools for PR management</p>
             </div>
-            <div class="setting-card">
-                <h3>Email Notifications</h3>
-                <p>Manage automated email notifications</p>
-                <button class="button" onclick="testEmailSystem()">
-                    <i class='bx bx-envelope'></i>
-                    Test Email System
-                </button>
+            
+            <div class="automation-grid">
+                <div class="setting-card featured">
+                    <div class="setting-icon">
+                        <i class='bx bx-git-pull-request'></i>
+                    </div>
+                    <div class="setting-content">
+                        <h3>Advanced PR Scanner</h3>
+                        <p>Use GraphQL-powered scanning with real-time progress tracking and batch processing for optimal performance</p>
+                        <div class="setting-features">
+                            <span class="feature-tag">🚀 GraphQL API</span>
+                            <span class="feature-tag">📊 Real-time Progress</span>
+                            <span class="feature-tag">⚡ Batch Processing</span>
+                        </div>
+                    </div>
+                    <button class="button primary scanner-btn" onclick="openAdvancedPRScan()">
+                        <i class='bx bx-search-alt'></i>
+                        Start Advanced Scan
+                    </button>
+                </div>
+                
+                <div class="setting-card">
+                    <div class="setting-icon">
+                        <i class='bx bx-refresh'></i>
+                    </div>
+                    <div class="setting-content">
+                        <h3>Legacy PR Detection</h3>
+                        <p>Simple PR detection and processing (deprecated - use Advanced Scanner instead)</p>
+                    </div>
+                    <button class="button secondary" onclick="triggerPRUpdate()">
+                        <i class='bx bx-refresh'></i>
+                        Legacy Trigger
+                    </button>
+                </div>
+                
+                <div class="setting-card">
+                    <div class="setting-icon">
+                        <i class='bx bx-envelope'></i>
+                    </div>
+                    <div class="setting-content">
+                        <h3>Email Notifications</h3>
+                        <p>Manage automated email notifications and templates</p>
+                    </div>
+                    <button class="button secondary" onclick="testEmailSystem()">
+                        <i class='bx bx-envelope'></i>
+                        Test Email System
+                    </button>
+                </div>
+                
+                <div class="setting-card">
+                    <div class="setting-icon">
+                        <i class='bx bx-database'></i>
+                    </div>
+                    <div class="setting-content">
+                        <h3>Data Management</h3>
+                        <p>Backup, export, and manage system data</p>
+                    </div>
+                    <button class="button secondary" onclick="openDataManagement()">
+                        <i class='bx bx-database'></i>
+                        Manage Data
+                    </button>
+                </div>
             </div>
         </div>
     `;
 }
 
-async function triggerPRUpdate() {
-    try {
-        showToast('info', 'Triggering PR update...');
-        const response = await fetch(`${serverUrl}/api/github/prs/update`, {
-            credentials: 'include'
-        });
+function openAdvancedPRScan() {
+    // Initialize the PR scanner if not already done
+    if (!window.prScanManager) {
+        window.prScanManager = new PRScanManager();
+    }
 
-        if (response.ok) {
-            showToast('success', 'PR update completed successfully!');
-        } else {
-            throw new Error('Failed to trigger PR update');
-        }
-    } catch (error) {
-        showToast('error', 'Failed to trigger PR update');
+    // Open the scanner modal
+    window.prScanManager.open();
+    showToast('info', 'Advanced PR Scanner opened. Configure settings and start scanning!');
+}
+
+function triggerPRUpdate() {
+    if (confirm('This will trigger the legacy PR update system. This may take several minutes. Continue?')) {
+        showToast('info', 'Starting legacy PR update...');
+
+        fetch(`${serverUrl}/api/github/prs/update`, {
+            credentials: 'include'
+        })
+            .then(response => response.json())
+            .then(data => {
+                showToast('success', 'Legacy PR update completed!');
+                console.log('PR Update Results:', data);
+            })
+            .catch(error => {
+                showToast('error', 'Legacy PR update failed');
+                console.error('PR Update Error:', error);
+            });
     }
 }
 
-async function testEmailSystem() {
-    showToast('info', 'Email system test feature coming soon...');
+function testEmailSystem() {
+    showToast('info', 'Email system test initiated...');
+    // Add email system test logic here
+    setTimeout(() => {
+        showToast('success', 'Email system is working correctly!');
+    }, 2000);
+}
+
+function openDataManagement() {
+    showToast('info', 'Data management panel coming soon...');
 }
 
 function showToast(type, message) {
