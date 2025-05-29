@@ -918,6 +918,10 @@
     color: var(--first-color);
 }
 
+.events.section {
+    position: relative;
+}
+
 @keyframes fadeUp {
     to {
         opacity: 1;

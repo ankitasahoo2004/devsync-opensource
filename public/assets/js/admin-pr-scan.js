@@ -17,7 +17,17 @@ class PRScanManager {
             includePrivateRepos: false
         };
 
+        // Ensure modal utilities are available
+        this.ensureModalUtilities();
+
         this.init();
+    }
+
+    ensureModalUtilities() {
+        // Ensure showModal is available
+        if (!window.showModal && window.showAdminModal) {
+            window.showModal = window.showAdminModal;
+        }
     }
 
     init() {

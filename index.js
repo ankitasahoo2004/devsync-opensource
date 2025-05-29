@@ -13,6 +13,7 @@ const Event = require('./models/Event');
 const PendingPR = require('./models/PendingPR');
 const MongoStore = require('connect-mongo');
 const emailService = require('./services/emailService');
+const dbSync = require('./utils/dbSync');
 const PORT = process.env.PORT || 5500;
 const serverUrl = process.env.SERVER_URL;
 
@@ -1820,6 +1821,56 @@ app.post('/api/admin/submit-pr', async (req, res) => {
         res.status(500).json({
             error: 'Failed to submit PR',
             details: error.message
+        });
+    }
+});
+
+// Add new endpoint for PendingPR to User table synchronization
+app.post('/api/admin/sync-pending-prs', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        console.log(`Admin ${req.user.username} initiated PendingPR to User sync`);
+
+        // Optional: Create backup before sync
+        if (req.body.createBackup) {
+            await dbSync.backupUserTable();
+        }
+
+        // Perform the synchronization
+        const syncResults = await dbSync.syncPendingPRsToUserTable();
+
+        // Validate integrity after sync
+        const validation = await dbSync.validateSyncIntegrity();
+
+        const duration = syncResults.endTime - syncResults.startTime;
+
+        res.json({
+            success: true,
+            message: 'PendingPR to User table synchronization completed',
+            results: {
+                ...syncResults,
+                duration: `${Math.round(duration / 1000)}s`,
+                validation
+            },
+            timestamp: new Date().toISOString(),
+            performedBy: req.user.username
+        });
+
+    } catch (error) {
+        console.error('PendingPR sync failed:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to sync PendingPR data to User table',
+            details: error.message,
+            timestamp: new Date().toISOString()
         });
     }
 });
