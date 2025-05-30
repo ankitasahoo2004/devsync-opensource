@@ -1502,7 +1502,7 @@ app.get('/api/user/profile/:username', async (req, res) => {
         const [userData, acceptedRepos, user] = await Promise.all([
             octokit.users.getByUsername({ username: req.params.username }),
             Repo.find({ reviewStatus: 'accepted' }, 'repoLink'),
-            User.findOne({ username: req.params.username }, 'mergedPRs')
+            User.findOne({ username: req.params.username }, 'mergedPRs cancelledPRs')
         ]);
 
         const { data } = await octokit.search.issuesAndPullRequests({
@@ -1524,9 +1524,14 @@ app.get('/api/user/profile/:username', async (req, res) => {
                 pull_number: pr.number
             });
 
-            // Check if PR is detected by DevSync
+            // Check if PR is detected by DevSync (approved)
             const isDevSyncDetected = user?.mergedPRs.some(
                 mergedPr => mergedPr.repoId === repoUrl && mergedPr.prNumber === pr.number
+            );
+
+            // Check if PR is in cancelled/rejected list
+            const isRejected = user?.cancelledPRs.some(
+                cancelledPr => cancelledPr.repoId === repoUrl && cancelledPr.prNumber === pr.number
             );
 
             return {
@@ -1540,7 +1545,8 @@ app.get('/api/user/profile/:username', async (req, res) => {
                 isDevSyncRepo,
                 merged: prDetails.merged,
                 closed: pr.state === 'closed' && !prDetails.merged,
-                isDevSyncDetected: isDevSyncRepo ? isDevSyncDetected : false
+                isDevSyncDetected: isDevSyncRepo ? isDevSyncDetected : false,
+                isRejected: isDevSyncRepo ? isRejected : false
             };
         }));
 

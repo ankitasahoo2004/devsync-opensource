@@ -2828,6 +2828,11 @@ body.login-body {
   color: #55efc4;
 }
 
+.pr-status.rejected {
+  background: rgba(255, 71, 87, 0.15);
+  color: #ff4757;
+}
+
 .pr-status.failed {
   background: rgba(255, 71, 87, 0.15);
   color: #ff4757;
