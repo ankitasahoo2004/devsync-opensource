@@ -5,13 +5,16 @@ const Repo = require('../models/Repo');
 /**
  * Synchronize approved PendingPR data to User table
  * This function migrates approved PRs from PendingPR collection to User.mergedPRs
+ * and rejected PRs to User.cancelledPRs
  */
 async function syncPendingPRsToUserTable() {
     const syncResults = {
         totalUsers: 0,
         updatedUsers: 0,
         totalApprovedPRs: 0,
+        totalRejectedPRs: 0,
         syncedPRs: 0,
+        syncedCancelledPRs: 0,
         errors: [],
         startTime: Date.now(),
         endTime: null
@@ -20,24 +23,42 @@ async function syncPendingPRsToUserTable() {
     try {
         console.log('Starting PendingPR to User table synchronization...');
 
-        // Get all approved PendingPRs
-        const approvedPRs = await PendingPR.find({ status: 'approved' }).lean();
-        syncResults.totalApprovedPRs = approvedPRs.length;
+        // Get all approved and rejected PendingPRs
+        const [approvedPRs, rejectedPRs] = await Promise.all([
+            PendingPR.find({ status: 'approved' }).lean(),
+            PendingPR.find({ status: 'rejected' }).lean()
+        ]);
 
-        if (approvedPRs.length === 0) {
-            console.log('No approved PRs found to sync');
+        syncResults.totalApprovedPRs = approvedPRs.length;
+        syncResults.totalRejectedPRs = rejectedPRs.length;
+
+        if (approvedPRs.length === 0 && rejectedPRs.length === 0) {
+            console.log('No approved or rejected PRs found to sync');
             syncResults.endTime = Date.now();
             return syncResults;
         }
 
         // Group PRs by userId
-        const prsByUser = groupPRsByUserId(approvedPRs);
-        syncResults.totalUsers = Object.keys(prsByUser).length;
+        const approvedPrsByUser = groupPRsByUserId(approvedPRs);
+        const rejectedPrsByUser = groupPRsByUserId(rejectedPRs);
+
+        // Get all unique user IDs
+        const allUserIds = new Set([
+            ...Object.keys(approvedPrsByUser),
+            ...Object.keys(rejectedPrsByUser)
+        ]);
+
+        syncResults.totalUsers = allUserIds.size;
 
         // Process each user
-        for (const [userId, userPRs] of Object.entries(prsByUser)) {
+        for (const userId of allUserIds) {
             try {
-                await syncUserPRs(userId, userPRs, syncResults);
+                await syncUserPRs(
+                    userId,
+                    approvedPrsByUser[userId] || [],
+                    rejectedPrsByUser[userId] || [],
+                    syncResults
+                );
             } catch (userError) {
                 console.error(`Error syncing user ${userId}:`, userError);
                 syncResults.errors.push({
@@ -81,9 +102,9 @@ function groupPRsByUserId(prs) {
 }
 
 /**
- * Sync PRs for a specific user
+ * Sync PRs for a specific user (both approved and rejected)
  */
-async function syncUserPRs(userId, userPRs, syncResults) {
+async function syncUserPRs(userId, approvedPRs, rejectedPRs, syncResults) {
     // Find the user - handle both githubId and MongoDB ObjectId cases
     let user;
 
@@ -96,8 +117,8 @@ async function syncUserPRs(userId, userPRs, syncResults) {
     }
 
     // If still not found, try finding by username from the PR data
-    if (!user && userPRs.length > 0) {
-        const username = userPRs[0].username;
+    if (!user && (approvedPRs.length > 0 || rejectedPRs.length > 0)) {
+        const username = (approvedPRs[0] || rejectedPRs[0]).username;
         user = await User.findOne({ username: username });
 
         if (user) {
@@ -106,21 +127,22 @@ async function syncUserPRs(userId, userPRs, syncResults) {
     }
 
     if (!user) {
-        console.warn(`User not found for userId: ${userId}, username: ${userPRs[0]?.username}`);
+        const username = (approvedPRs[0] || rejectedPRs[0])?.username;
+        console.warn(`User not found for userId: ${userId}, username: ${username}`);
         syncResults.errors.push({
             userId,
-            username: userPRs[0]?.username,
+            username: username,
             error: 'User not found - tried githubId, ObjectId, and username lookup',
             timestamp: new Date()
         });
         return;
     }
 
-    // Convert PendingPRs to User.mergedPRs format
+    // Convert approved PendingPRs to User.mergedPRs format
     const newMergedPRs = [];
     let syncedCount = 0;
 
-    for (const pendingPR of userPRs) {
+    for (const pendingPR of approvedPRs) {
         try {
             // Check if this PR is already in user's mergedPRs
             const existingPR = user.mergedPRs.find(pr =>
@@ -140,7 +162,7 @@ async function syncUserPRs(userId, userPRs, syncResults) {
                 console.log(`PR already exists in user data: ${user.username} - ${pendingPR.repoUrl}#${pendingPR.prNumber}`);
             }
         } catch (prError) {
-            console.error(`Error processing PR ${pendingPR._id}:`, prError);
+            console.error(`Error processing approved PR ${pendingPR._id}:`, prError);
             syncResults.errors.push({
                 userId,
                 prId: pendingPR._id,
@@ -150,36 +172,90 @@ async function syncUserPRs(userId, userPRs, syncResults) {
         }
     }
 
-    // Update user if there are new PRs
+    // Convert rejected PendingPRs to User.cancelledPRs format
+    const newCancelledPRs = [];
+    let syncedCancelledCount = 0;
+
+    for (const pendingPR of rejectedPRs) {
+        try {
+            // Check if this PR is already in user's cancelledPRs
+            const existingCancelledPR = user.cancelledPRs.find(pr =>
+                pr.repoId === pendingPR.repoUrl && pr.prNumber === pendingPR.prNumber
+            );
+
+            if (!existingCancelledPR) {
+                newCancelledPRs.push({
+                    repoId: pendingPR.repoUrl,
+                    prNumber: pendingPR.prNumber,
+                    title: pendingPR.title,
+                    cancelledAt: pendingPR.reviewedAt || pendingPR.submittedAt,
+                    rejectionReason: pendingPR.rejectionReason || 'No reason provided'
+                });
+
+                syncedCancelledCount++;
+            } else {
+                console.log(`Cancelled PR already exists in user data: ${user.username} - ${pendingPR.repoUrl}#${pendingPR.prNumber}`);
+            }
+        } catch (prError) {
+            console.error(`Error processing rejected PR ${pendingPR._id}:`, prError);
+            syncResults.errors.push({
+                userId,
+                prId: pendingPR._id,
+                error: prError.message,
+                timestamp: new Date()
+            });
+        }
+    }
+
+    // Always recalculate points from ALL approved PRs for this user (including updated suggestedPoints)
+    const userQueryId = user.githubId;
+    const allApprovedPRs = await PendingPR.find({
+        $or: [
+            { userId: userQueryId },
+            { userId: user._id.toString() },
+            { username: user.username }
+        ],
+        status: 'approved'
+    }).lean();
+
+    // Calculate total points with current suggestedPoints values
+    const totalPoints = allApprovedPRs.reduce((sum, pr) => sum + (pr.suggestedPoints || 50), 0);
+    const previousPoints = user.points;
+
+    // Update user data
     if (newMergedPRs.length > 0) {
         // Add new PRs to existing ones
         user.mergedPRs.push(...newMergedPRs);
+    }
 
-        // Recalculate total points from all approved PRs for this user
-        // Use the correct user identifier for the query
-        const userQueryId = user.githubId;
-        const allApprovedPRs = await PendingPR.find({
-            $or: [
-                { userId: userQueryId },
-                { userId: user._id.toString() },
-                { username: user.username }
-            ],
-            status: 'approved'
-        }).lean();
+    if (newCancelledPRs.length > 0) {
+        // Add new cancelled PRs to existing ones
+        user.cancelledPRs.push(...newCancelledPRs);
+    }
 
-        const totalPoints = allApprovedPRs.reduce((sum, pr) => sum + (pr.suggestedPoints || 50), 0);
-        user.points = totalPoints;
+    // Always update points (to catch suggestedPoints changes) and badges
+    user.points = totalPoints;
+    user.badges = await calculateBadges(user.mergedPRs, user.points);
 
-        // Update badges based on new PR count and points
-        user.badges = await calculateBadges(user.mergedPRs, user.points);
+    await user.save();
 
-        await user.save();
+    // Update sync results
+    if (newMergedPRs.length > 0 || newCancelledPRs.length > 0 || previousPoints !== totalPoints) {
         syncResults.updatedUsers++;
         syncResults.syncedPRs += syncedCount;
+        syncResults.syncedCancelledPRs += syncedCancelledCount;
 
-        console.log(`✅ Synced ${newMergedPRs.length} new PRs for user ${user.username} (${user.githubId}). Total points: ${totalPoints}`);
+        const pointsMessage = previousPoints !== totalPoints
+            ? ` (points: ${previousPoints} → ${totalPoints})`
+            : '';
+
+        const cancelledMessage = newCancelledPRs.length > 0
+            ? `, ${newCancelledPRs.length} cancelled PRs`
+            : '';
+
+        console.log(`✅ Synced user ${user.username} (${user.githubId}): ${newMergedPRs.length} new PRs${cancelledMessage}${pointsMessage}. Total: ${user.mergedPRs.length} PRs, ${user.cancelledPRs.length} cancelled PRs, ${totalPoints} points`);
     } else {
-        console.log(`No new PRs to sync for user ${user.username} (${user.githubId})`);
+        console.log(`No changes for user ${user.username} (${user.githubId})`);
     }
 }
 
@@ -249,22 +325,30 @@ async function validateSyncIntegrity() {
     try {
         console.log('Validating sync integrity...');
 
-        const [approvedPRCount, userPRCount, users, pendingPRs] = await Promise.all([
+        const [approvedPRCount, rejectedPRCount, userPRCount, userCancelledPRCount, users, pendingPRs] = await Promise.all([
             PendingPR.countDocuments({ status: 'approved' }),
+            PendingPR.countDocuments({ status: 'rejected' }),
             User.aggregate([
                 { $unwind: '$mergedPRs' },
                 { $count: 'totalMergedPRs' }
             ]),
-            User.find({}, 'username githubId mergedPRs points').lean(),
-            PendingPR.find({ status: 'approved' }, 'userId username').lean()
+            User.aggregate([
+                { $unwind: '$cancelledPRs' },
+                { $count: 'totalCancelledPRs' }
+            ]),
+            User.find({}, 'username githubId mergedPRs cancelledPRs points').lean(),
+            PendingPR.find({ $or: [{ status: 'approved' }, { status: 'rejected' }] }, 'userId username status').lean()
         ]);
 
         const totalUserPRs = userPRCount[0]?.totalMergedPRs || 0;
+        const totalUserCancelledPRs = userCancelledPRCount[0]?.totalCancelledPRs || 0;
 
         // Additional debugging info
         console.log(`Users in database: ${users.length}`);
         console.log(`Approved PRs: ${approvedPRCount}`);
+        console.log(`Rejected PRs: ${rejectedPRCount}`);
         console.log(`User merged PRs: ${totalUserPRs}`);
+        console.log(`User cancelled PRs: ${totalUserCancelledPRs}`);
 
         // Check for common sync issues
         const userIdTypes = {};
@@ -277,12 +361,15 @@ async function validateSyncIntegrity() {
 
         return {
             approvedPRCount,
+            rejectedPRCount,
             userPRCount: totalUserPRs,
+            userCancelledPRCount: totalUserCancelledPRs,
             totalUsers: users.length,
             userIdTypes,
             isValid: true,
             debugInfo: {
                 usersWithPRs: users.filter(u => u.mergedPRs.length > 0).length,
+                usersWithCancelledPRs: users.filter(u => u.cancelledPRs.length > 0).length,
                 usersWithPoints: users.filter(u => u.points > 0).length
             }
         };

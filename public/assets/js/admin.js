@@ -837,12 +837,14 @@ function addUserCardClickHandlers() {
 async function syncPendingPRsToUsers() {
     const confirmed = await showConfirmModal(
         'Database Synchronization',
-        `This will sync all approved PendingPR data to the User table. This will:
+        `This will sync all approved and rejected PendingPR data to the User table. This will:
 
-• Update user points based on approved PRs
+• Update user points based on current suggestedPoints values
+• Migrate approved PRs to user.mergedPRs
+• Migrate rejected PRs to user.cancelledPRs with rejection reasons
 • Recalculate user badges  
-• Migrate PR data to user profiles
 • Update leaderboard rankings
+• Apply any point adjustments made to existing PRs
 
 This operation is safe but may take a few minutes. Continue?`
     );
@@ -856,7 +858,7 @@ This operation is safe but may take a few minutes. Continue?`
     syncBtn.innerHTML = '<div class="loading-spinner"></div> Syncing Data...';
 
     try {
-        showToast('info', 'Starting database synchronization...');
+        showToast('info', 'Starting database synchronization with approved and rejected PRs...');
 
         const response = await fetch(`${serverUrl}/api/admin/sync-pending-prs`, {
             method: 'POST',
@@ -873,7 +875,13 @@ This operation is safe but may take a few minutes. Continue?`
 
         if (result.success) {
             showSyncResults(result.results);
-            showToast('success', `Database sync completed! Updated ${result.results.updatedUsers} users with ${result.results.syncedPRs} PRs`);
+            const pointsRecalculatedMessage = result.results.updatedUsers > 0
+                ? ` Points recalculated for ${result.results.updatedUsers} users.`
+                : '';
+            const cancelledMessage = result.results.syncedCancelledPRs > 0
+                ? ` ${result.results.syncedCancelledPRs} rejected PRs synced to cancelledPRs.`
+                : '';
+            showToast('success', `Database sync completed! Updated ${result.results.updatedUsers} users with ${result.results.syncedPRs} new PRs.${cancelledMessage}${pointsRecalculatedMessage}`);
         } else {
             throw new Error(result.details || 'Sync failed');
         }
@@ -910,7 +918,17 @@ function showSyncResults(results) {
                     <div class="stat-item success">
                         <i class='bx bx-git-pull-request'></i>
                         <span class="stat-number">${results.syncedPRs}</span>
-                        <span class="stat-label">PRs Synced</span>
+                        <span class="stat-label">New PRs Synced</span>
+                    </div>
+                    <div class="stat-item warning">
+                        <i class='bx bx-x-circle'></i>
+                        <span class="stat-number">${results.syncedCancelledPRs || 0}</span>
+                        <span class="stat-label">Cancelled PRs Synced</span>
+                    </div>
+                    <div class="stat-item info">
+                        <i class='bx bx-calculator'></i>
+                        <span class="stat-number">${results.totalApprovedPRs}</span>
+                        <span class="stat-label">Points Recalculated</span>
                     </div>
                     <div class="stat-item info">
                         <i class='bx bx-time'></i>
@@ -929,17 +947,24 @@ function showSyncResults(results) {
                     <ul>
                         <li>Total Users Processed: ${results.totalUsers}</li>
                         <li>Total Approved PRs: ${results.totalApprovedPRs}</li>
-                        <li>Successfully Synced: ${results.syncedPRs} PRs</li>
+                        <li>Total Rejected PRs: ${results.totalRejectedPRs || 0}</li>
+                        <li>New PRs Synced: ${results.syncedPRs} PRs</li>
+                        <li>Cancelled PRs Synced: ${results.syncedCancelledPRs || 0} PRs</li>
                         <li>Users Updated: ${results.updatedUsers}</li>
+                        <li><strong>All user points recalculated from current suggestedPoints values</strong></li>
+                        <li><strong>Rejected PRs synced to user.cancelledPRs with rejection reasons</strong></li>
                     </ul>
                     
                     ${results.validation ? `
                         <h3>Validation & Debug Info</h3>
                         <ul>
                             <li>Approved PRs in Database: ${results.validation.approvedPRCount}</li>
+                            <li>Rejected PRs in Database: ${results.validation.rejectedPRCount || 0}</li>
                             <li>User Merged PRs: ${results.validation.userPRCount}</li>
+                            <li>User Cancelled PRs: ${results.validation.userCancelledPRCount || 0}</li>
                             <li>Total Users in DB: ${results.validation.totalUsers}</li>
                             <li>Users with PRs: ${results.validation.debugInfo?.usersWithPRs || 'N/A'}</li>
+                            <li>Users with Cancelled PRs: ${results.validation.debugInfo?.usersWithCancelledPRs || 'N/A'}</li>
                             <li>Users with Points: ${results.validation.debugInfo?.usersWithPoints || 'N/A'}</li>
                             <li>Integrity Check: ${results.validation.isValid ? '✅ Passed' : '❌ Failed'}</li>
                         </ul>
