@@ -681,13 +681,26 @@ async function loadAutomation() {
 function openAdvancedPRScan() {
     // Initialize the PR scanner if not already done
     if (!window.prScanManager) {
-        window.prScanManager = new PRScanManager();
+        // Import the class and create instance
+        if (typeof PRScanManager !== 'undefined') {
+            window.prScanManager = new PRScanManager();
+        } else {
+            showToast('error', 'PR Scanner not loaded. Please refresh the page.');
+            return;
+        }
     }
 
     // Open the scanner modal
     window.prScanManager.open();
     showToast('info', 'Advanced PR Scanner opened. Configure settings and start scanning!');
 }
+
+// Add global fallback function for modal close (in case inline onclick is still used)
+window.closePRScanModal = function () {
+    if (window.prScanManager) {
+        window.prScanManager.close();
+    }
+};
 
 function triggerPRUpdate() {
     if (confirm('This will trigger the legacy PR update system. This may take several minutes. Continue?')) {
