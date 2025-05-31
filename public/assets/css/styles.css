@@ -20,8 +20,8 @@ body {
 
   /*========== Colors ==========*/
   --hue: 14;
-  --first-color: hsl(var(--hue), 91%, 54%);
-  --first-color-alt: hsl(var(--hue), 91%, 50%);
+  --first-color: #e51837;
+  --first-color-alt: #e51837;
   --title-color: hsl(var(--hue), 4%, 100%);
   --text-color: hsl(var(--hue), 4%, 85%);
   --text-color-light: hsl(var(--hue), 4%, 55%);
@@ -2826,6 +2826,11 @@ body.login-body {
 .pr-status.merged {
   background: rgba(85, 239, 196, 0.15);
   color: #55efc4;
+}
+
+.pr-status.rejected {
+  background: rgba(255, 71, 87, 0.15);
+  color: #ff4757;
 }
 
 .pr-status.failed {

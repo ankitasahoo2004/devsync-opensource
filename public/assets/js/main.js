@@ -201,8 +201,8 @@ function showSearchHint() {
 }
 
 // Add CSS for hint animations
-const style = document.createElement('style');
-style.textContent = `
+const hintStyle = document.createElement('style');
+hintStyle.textContent = `
     @keyframes fadeInSlide {
         from {
             opacity: 0;
@@ -225,7 +225,7 @@ style.textContent = `
         }
     }
 `;
-document.head.appendChild(style);
+document.head.appendChild(hintStyle);
 
 /*=============== UPDATE NAV BASED ON LOGIN ===============*/
 function updateNavigation() {

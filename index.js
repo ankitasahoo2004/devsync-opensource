@@ -13,6 +13,7 @@ const Event = require('./models/Event');
 const PendingPR = require('./models/PendingPR');
 const MongoStore = require('connect-mongo');
 const emailService = require('./services/emailService');
+const dbSync = require('./utils/dbSync');
 const PORT = process.env.PORT || 5500;
 const serverUrl = process.env.SERVER_URL;
 
@@ -802,45 +803,120 @@ async function fetchPRDetails(username) {
     }
 }
 
-// Modified function to submit PRs for admin approval instead of auto-approving
+// Helper function to get approved merged PRs for a user
+async function getApprovedMergedPRs(userId) {
+    try {
+        const approvedPRs = await PendingPR.find({
+            userId: userId,
+            status: 'approved'
+        });
+
+        return approvedPRs.map(pr => ({
+            repoId: pr.repoUrl,
+            prNumber: pr.prNumber,
+            title: pr.title,
+            mergedAt: pr.mergedAt,
+            points: pr.suggestedPoints
+        }));
+    } catch (error) {
+        console.error('Error getting approved merged PRs:', error);
+        return [];
+    }
+}
+
+// Helper function to calculate points from approved PRs
+async function calculatePointsFromApprovedPRs(userId) {
+    try {
+        const approvedPRs = await PendingPR.find({
+            userId: userId,
+            status: 'approved'
+        });
+
+        return approvedPRs.reduce((total, pr) => total + (pr.suggestedPoints || 50), 0);
+    } catch (error) {
+        console.error('Error calculating points from approved PRs:', error);
+        return 0;
+    }
+}
+
+// Modified function to submit PRs for admin approval with better duplicate checking
 async function submitPRForApproval(userId, username, repoUrl, prData) {
     try {
-        // Check if this PR already exists in pending submissions
+        // Enhanced duplicate check - check all possible combinations
         const existingPR = await PendingPR.findOne({
-            userId: userId,
-            repoUrl: repoUrl,
-            prNumber: prData.number
+            $or: [
+                {
+                    userId: userId,
+                    repoUrl: repoUrl,
+                    prNumber: prData.number
+                },
+                {
+                    userId: userId,
+                    repoId: repoUrl,
+                    prNumber: prData.number
+                },
+                {
+                    username: username,
+                    repoUrl: repoUrl,
+                    prNumber: prData.number
+                }
+            ]
         });
 
         if (existingPR) {
-            console.log(`PR already submitted: ${repoUrl}#${prData.number}`);
+            console.log(`PR already exists in database: ${username} - ${repoUrl}#${prData.number} (Status: ${existingPR.status})`);
             return existingPR;
         }
 
         // Get repo details for suggested points
         const repo = await Repo.findOne({ repoLink: repoUrl });
-        const suggestedPoints = repo ? repo.successPoints || 50 : 50;
+        const suggestedPoints = repo ? (repo.successPoints || 50) : 50;
 
-        const pendingPR = await PendingPR.create({
+        // Create new pending PR with all required fields
+        const pendingPRData = {
             userId: userId,
             username: username,
-            repoId: repoUrl,
-            repoUrl: repoUrl,
+            repoId: repoUrl,  // Keep for backward compatibility
+            repoUrl: repoUrl, // Primary field
             prNumber: prData.number,
             title: prData.title,
-            mergedAt: prData.merged_at,
-            suggestedPoints: suggestedPoints
-        });
+            mergedAt: new Date(prData.merged_at),
+            suggestedPoints: suggestedPoints,
+            status: 'pending',
+            submittedAt: new Date()
+        };
 
-        console.log(`PR submitted for approval: ${username} - ${repoUrl}#${prData.number}`);
+        const pendingPR = await PendingPR.create(pendingPRData);
+
+        console.log(`New PR submitted for approval: ${username} - ${repoUrl}#${prData.number}`);
         return pendingPR;
     } catch (error) {
+        // Handle duplicate key errors gracefully
+        if (error.code === 11000) {
+            console.log(`Duplicate key error - PR already exists: ${username} - ${repoUrl}#${prData.number}`);
+
+            // Try to find and return the existing PR
+            const existingPR = await PendingPR.findOne({
+                userId: userId,
+                repoUrl: repoUrl,
+                prNumber: prData.number
+            });
+
+            return existingPR;
+        }
+
         console.error('Error submitting PR for approval:', error);
         return null;
     }
 }
 
-// Admin endpoint to get pending PRs
+// Middleware to log request details (for debugging)
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url} - ${new Date().toISOString()}`);
+    next();
+});
+
+// Admin endpoint to get pending PRs with enhanced formatting
 app.get('/api/admin/pending-prs', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -853,22 +929,68 @@ app.get('/api/admin/pending-prs', async (req, res) => {
 
     try {
         const pendingPRs = await PendingPR.find({ status: 'pending' })
-            .sort({ submittedAt: -1 });
+            .sort({ submittedAt: -1 })
+            .lean(); // Use lean() for better performance
 
-        // Enrich with user data
+        // Enrich with user data and ensure proper JSON formatting
         const enrichedPRs = await Promise.all(pendingPRs.map(async (pr) => {
-            const user = await User.findOne({ githubId: pr.userId });
-            return {
-                ...pr.toObject(),
-                user: {
-                    avatar_url: user ? user.avatarUrl : `https://github.com/${pr.username}.png`,
-                    login: pr.username
-                },
-                repository: pr.repoUrl.replace('https://github.com/', '')
-            };
+            try {
+                const user = await User.findOne({ githubId: pr.userId }).lean();
+
+                // Ensure all fields are properly formatted for JSON
+                const enrichedPR = {
+                    _id: pr._id.toString(),
+                    userId: pr.userId,
+                    username: pr.username,
+                    repoId: pr.repoId || pr.repoUrl,
+                    repoUrl: pr.repoUrl,
+                    prNumber: pr.prNumber,
+                    title: pr.title,
+                    mergedAt: pr.mergedAt.toISOString(),
+                    suggestedPoints: pr.suggestedPoints || 50,
+                    status: pr.status,
+                    submittedAt: pr.submittedAt.toISOString(),
+                    reviewedBy: pr.reviewedBy || null,
+                    reviewedAt: pr.reviewedAt ? pr.reviewedAt.toISOString() : null,
+                    rejectionReason: pr.rejectionReason || null,
+                    user: {
+                        avatar_url: user ? user.avatarUrl : `https://github.com/${pr.username}.png`,
+                        login: pr.username,
+                        displayName: user ? user.displayName : pr.username
+                    },
+                    repository: pr.repoUrl.replace('https://github.com/', '')
+                };
+
+                return enrichedPR;
+            } catch (userError) {
+                console.error(`Error enriching PR data for ${pr.username}:`, userError);
+
+                // Return minimal data structure on error
+                return {
+                    _id: pr._id.toString(),
+                    userId: pr.userId,
+                    username: pr.username,
+                    repoUrl: pr.repoUrl,
+                    prNumber: pr.prNumber,
+                    title: pr.title,
+                    mergedAt: pr.mergedAt.toISOString(),
+                    suggestedPoints: pr.suggestedPoints || 50,
+                    status: pr.status,
+                    submittedAt: pr.submittedAt.toISOString(),
+                    user: {
+                        avatar_url: `https://github.com/${pr.username}.png`,
+                        login: pr.username,
+                        displayName: pr.username
+                    },
+                    repository: pr.repoUrl.replace('https://github.com/', '')
+                };
+            }
         }));
 
-        res.json(enrichedPRs);
+        // Filter out any null results and ensure clean JSON
+        const validPRs = enrichedPRs.filter(pr => pr !== null);
+
+        res.json(validPRs);
     } catch (error) {
         console.error('Error fetching pending PRs:', error);
         res.status(500).json({ error: 'Failed to fetch pending PRs' });
@@ -1063,48 +1185,90 @@ app.get('/api/admin/all-prs', async (req, res) => {
 
     try {
         const allPRs = await PendingPR.find({})
-            .sort({ submittedAt: -1 });
+            .sort({ submittedAt: -1 })
+            .lean();
 
         const enrichedPRs = await Promise.all(allPRs.map(async (pr) => {
-            const user = await User.findOne({ githubId: pr.userId });
-            return {
-                ...pr.toObject(),
-                user: {
-                    avatar_url: user ? user.avatarUrl : `https://github.com/${pr.username}.png`,
-                    login: pr.username
-                },
-                repository: pr.repoUrl.replace('https://github.com/', '')
-            };
+            try {
+                const user = await User.findOne({ githubId: pr.userId }).lean();
+
+                return {
+                    _id: pr._id.toString(),
+                    userId: pr.userId,
+                    username: pr.username,
+                    repoId: pr.repoId || pr.repoUrl,
+                    repoUrl: pr.repoUrl,
+                    prNumber: pr.prNumber,
+                    title: pr.title,
+                    mergedAt: pr.mergedAt.toISOString(),
+                    suggestedPoints: pr.suggestedPoints || 50,
+                    status: pr.status,
+                    submittedAt: pr.submittedAt.toISOString(),
+                    reviewedBy: pr.reviewedBy || null,
+                    reviewedAt: pr.reviewedAt ? pr.reviewedAt.toISOString() : null,
+                    rejectionReason: pr.rejectionReason || null,
+                    user: {
+                        avatar_url: user ? user.avatarUrl : `https://github.com/${pr.username}.png`,
+                        login: pr.username,
+                        displayName: user ? user.displayName : pr.username
+                    },
+                    repository: pr.repoUrl.replace('https://github.com/', '')
+                };
+            } catch (userError) {
+                console.error(`Error enriching PR data for ${pr.username}:`, userError);
+                return {
+                    _id: pr._id.toString(),
+                    userId: pr.userId,
+                    username: pr.username,
+                    repoUrl: pr.repoUrl,
+                    prNumber: pr.prNumber,
+                    title: pr.title,
+                    mergedAt: pr.mergedAt.toISOString(),
+                    suggestedPoints: pr.suggestedPoints || 50,
+                    status: pr.status,
+                    submittedAt: pr.submittedAt.toISOString(),
+                    user: {
+                        avatar_url: `https://github.com/${pr.username}.png`,
+                        login: pr.username,
+                        displayName: pr.username
+                    },
+                    repository: pr.repoUrl.replace('https://github.com/', '')
+                };
+            }
         }));
 
-        res.json(enrichedPRs);
+        const validPRs = enrichedPRs.filter(pr => pr !== null);
+        res.json(validPRs);
     } catch (error) {
         console.error('Error fetching all PRs:', error);
         res.status(500).json({ error: 'Failed to fetch all PRs' });
     }
 });
 
-// Modified PR status update endpoint to use new approval system
+// Modified PR status update endpoint with better error handling
 app.get('/api/github/prs/update', async (req, res) => {
     try {
-        const users = await User.find({});
+        const users = await User.find({}).lean();
         const results = [];
 
         const acceptedRepos = await Repo.find({
             reviewStatus: 'accepted'
-        }, 'repoLink successPoints userId');
+        }, 'repoLink successPoints userId').lean();
 
         // Process users in batches to avoid hitting rate limits
-        const BATCH_SIZE = 5;
-        const BATCH_DELAY = 5000; // 5 seconds between batches
+        const BATCH_SIZE = 3; // Reduced batch size for better error handling
+        const BATCH_DELAY = 6000; // Increased delay between batches
 
         for (let i = 0; i < users.length; i += BATCH_SIZE) {
             const userBatch = users.slice(i, i + BATCH_SIZE);
 
-            const batchResults = await Promise.all(userBatch.map(async (user) => {
+            const batchResults = await Promise.allSettled(userBatch.map(async (user) => {
                 try {
+                    console.log(`Processing user: ${user.username}`);
+
                     const prData = await fetchPRDetails(user.username);
                     const newSubmissions = [];
+                    const skippedDuplicates = [];
 
                     for (const pr of prData.items) {
                         try {
@@ -1114,6 +1278,23 @@ app.get('/api/github/prs/update', async (req, res) => {
                             const registeredRepo = acceptedRepos.find(repo => repo.repoLink === repoUrl);
 
                             if (registeredRepo) {
+                                // Check if PR already exists before making API call
+                                const existingPR = await PendingPR.findOne({
+                                    $or: [
+                                        { userId: user.githubId, repoUrl: repoUrl, prNumber: pr.number },
+                                        { username: user.username, repoUrl: repoUrl, prNumber: pr.number }
+                                    ]
+                                });
+
+                                if (existingPR) {
+                                    skippedDuplicates.push({
+                                        prNumber: pr.number,
+                                        repoUrl: repoUrl,
+                                        status: existingPR.status
+                                    });
+                                    continue;
+                                }
+
                                 const prDetails = await retryWithBackoff(async () => {
                                     const response = await octokit.pulls.get({
                                         owner,
@@ -1124,7 +1305,6 @@ app.get('/api/github/prs/update', async (req, res) => {
                                 });
 
                                 if (prDetails.merged) {
-                                    // Submit PR for admin approval instead of auto-approving
                                     const submission = await submitPRForApproval(
                                         user.githubId,
                                         user.username,
@@ -1132,33 +1312,49 @@ app.get('/api/github/prs/update', async (req, res) => {
                                         prDetails
                                     );
 
-                                    if (submission) {
-                                        newSubmissions.push(submission);
+                                    if (submission && submission._id) {
+                                        newSubmissions.push({
+                                            prNumber: submission.prNumber,
+                                            repoUrl: submission.repoUrl,
+                                            title: submission.title
+                                        });
                                     }
                                 }
                             }
                         } catch (prError) {
-                            console.error(`Error processing PR ${pr.number}:`, prError);
+                            console.error(`Error processing PR ${pr.number} for ${user.username}:`, prError.message);
                             continue;
                         }
                     }
 
                     // Update user's data based on approved PRs only
                     const approvedMergedPRs = await getApprovedMergedPRs(user.githubId);
-                    user.mergedPRs = approvedMergedPRs;
-                    user.points = await calculatePointsFromApprovedPRs(user.githubId);
-                    user.badges = await checkBadges(approvedMergedPRs, user.points);
-                    await user.save();
+                    const updatedPoints = await calculatePointsFromApprovedPRs(user.githubId);
+                    const updatedBadges = await checkBadges(approvedMergedPRs, updatedPoints);
+
+                    await User.findOneAndUpdate(
+                        { githubId: user.githubId },
+                        {
+                            mergedPRs: approvedMergedPRs,
+                            points: updatedPoints,
+                            badges: updatedBadges
+                        }
+                    );
 
                     return {
                         username: user.username,
                         status: 'success',
                         newSubmissions: newSubmissions.length,
+                        skippedDuplicates: skippedDuplicates.length,
                         approvedCount: approvedMergedPRs.length,
-                        points: user.points
+                        points: updatedPoints,
+                        details: {
+                            newSubmissions,
+                            skippedDuplicates: skippedDuplicates.slice(0, 5) // Limit for response size
+                        }
                     };
                 } catch (userError) {
-                    console.error(`Error processing user ${user.username}:`, userError);
+                    console.error(`Error processing user ${user.username}:`, userError.message);
                     return {
                         username: user.username,
                         status: 'error',
@@ -1167,23 +1363,49 @@ app.get('/api/github/prs/update', async (req, res) => {
                 }
             }));
 
-            results.push(...batchResults);
+            // Handle both fulfilled and rejected promises
+            batchResults.forEach((result, index) => {
+                if (result.status === 'fulfilled') {
+                    results.push(result.value);
+                } else {
+                    const user = userBatch[index];
+                    results.push({
+                        username: user.username,
+                        status: 'error',
+                        error: result.reason?.message || 'Unknown error'
+                    });
+                }
+            });
 
+            // Delay between batches
             if (i + BATCH_SIZE < users.length) {
+                console.log(`Processed batch ${Math.floor(i / BATCH_SIZE) + 1}. Waiting before next batch...`);
                 await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
             }
         }
 
+        // Generate summary statistics
+        const summary = {
+            totalUsers: users.length,
+            successfulUsers: results.filter(r => r.status === 'success').length,
+            errorUsers: results.filter(r => r.status === 'error').length,
+            totalNewSubmissions: results.reduce((sum, r) => sum + (r.newSubmissions || 0), 0),
+            totalSkippedDuplicates: results.reduce((sum, r) => sum + (r.skippedDuplicates || 0), 0)
+        };
+
         res.json({
-            message: 'PR status update completed with admin approval system',
-            results
+            message: 'PR status update completed with improved duplicate handling',
+            summary,
+            results: results.slice(0, 50), // Limit response size
+            timestamp: new Date().toISOString()
         });
 
     } catch (error) {
         console.error('Error in PR status update:', error);
         res.status(500).json({
             error: 'Failed to update PR status',
-            details: error.message
+            details: error.message,
+            timestamp: new Date().toISOString()
         });
     }
 });
@@ -1280,7 +1502,7 @@ app.get('/api/user/profile/:username', async (req, res) => {
         const [userData, acceptedRepos, user] = await Promise.all([
             octokit.users.getByUsername({ username: req.params.username }),
             Repo.find({ reviewStatus: 'accepted' }, 'repoLink'),
-            User.findOne({ username: req.params.username }, 'mergedPRs')
+            User.findOne({ username: req.params.username }, 'mergedPRs cancelledPRs')
         ]);
 
         const { data } = await octokit.search.issuesAndPullRequests({
@@ -1302,9 +1524,14 @@ app.get('/api/user/profile/:username', async (req, res) => {
                 pull_number: pr.number
             });
 
-            // Check if PR is detected by DevSync
+            // Check if PR is detected by DevSync (approved)
             const isDevSyncDetected = user?.mergedPRs.some(
                 mergedPr => mergedPr.repoId === repoUrl && mergedPr.prNumber === pr.number
+            );
+
+            // Check if PR is in cancelled/rejected list
+            const isRejected = user?.cancelledPRs.some(
+                cancelledPr => cancelledPr.repoId === repoUrl && cancelledPr.prNumber === pr.number
             );
 
             return {
@@ -1318,7 +1545,8 @@ app.get('/api/user/profile/:username', async (req, res) => {
                 isDevSyncRepo,
                 merged: prDetails.merged,
                 closed: pr.state === 'closed' && !prDetails.merged,
-                isDevSyncDetected: isDevSyncRepo ? isDevSyncDetected : false
+                isDevSyncDetected: isDevSyncRepo ? isDevSyncDetected : false,
+                isRejected: isDevSyncRepo ? isRejected : false
             };
         }));
 
@@ -1555,3 +1783,134 @@ app.get('/api/admin/all-prs', async (req, res) => {
 
 // Start the server
 startServer();
+
+// Add GraphQL proxy endpoint for admin PR scanning
+app.post('/api/github/graphql', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { query, variables } = req.body;
+
+        const response = await octokit.graphql(query, variables);
+        res.json({ data: response });
+    } catch (error) {
+        console.error('GraphQL query error:', error);
+        res.status(500).json({
+            error: 'GraphQL query failed',
+            details: error.message
+        });
+    }
+});
+
+// Add PR submission endpoint for advanced scanner
+app.post('/api/admin/submit-pr', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { userId, username, repoUrl, prNumber, title, mergedAt } = req.body;
+
+        // Check if this PR already exists
+        const existingPR = await PendingPR.findOne({
+            userId: userId,
+            repoUrl: repoUrl,
+            prNumber: prNumber
+        });
+
+        if (existingPR) {
+            return res.status(409).json({
+                error: 'PR already exists',
+                pr: existingPR
+            });
+        }
+
+        // Get repo details for suggested points
+        const repo = await Repo.findOne({ repoLink: repoUrl });
+        const suggestedPoints = repo ? repo.successPoints || 50 : 50;
+
+        const pendingPR = await PendingPR.create({
+            userId: userId,
+            username: username,
+            repoId: repoUrl,
+            repoUrl: repoUrl,
+            prNumber: prNumber,
+            title: title,
+            mergedAt: new Date(mergedAt),
+            suggestedPoints: suggestedPoints
+        });
+
+        res.status(201).json({
+            message: 'PR submitted for approval',
+            pr: pendingPR
+        });
+    } catch (error) {
+        console.error('Error submitting PR:', error);
+        res.status(500).json({
+            error: 'Failed to submit PR',
+            details: error.message
+        });
+    }
+});
+
+// Add new endpoint for PendingPR to User table synchronization
+app.post('/api/admin/sync-pending-prs', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        console.log(`Admin ${req.user.username} initiated PendingPR to User sync`);
+
+        // Optional: Create backup before sync
+        if (req.body.createBackup) {
+            await dbSync.backupUserTable();
+        }
+
+        // Perform the synchronization
+        const syncResults = await dbSync.syncPendingPRsToUserTable();
+
+        // Validate integrity after sync
+        const validation = await dbSync.validateSyncIntegrity();
+
+        const duration = syncResults.endTime - syncResults.startTime;
+
+        res.json({
+            success: true,
+            message: 'PendingPR to User table synchronization completed',
+            results: {
+                ...syncResults,
+                duration: `${Math.round(duration / 1000)}s`,
+                validation
+            },
+            timestamp: new Date().toISOString(),
+            performedBy: req.user.username
+        });
+
+    } catch (error) {
+        console.error('PendingPR sync failed:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to sync PendingPR data to User table',
+            details: error.message,
+            timestamp: new Date().toISOString()
+        });
+    }
+});
