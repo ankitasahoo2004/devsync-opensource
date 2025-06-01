@@ -2072,3 +2072,65 @@ app.post('/api/admin/sync-pending-prs', async (req, res) => {
         });
     }
 });
+
+// Add admin email sending endpoint
+app.post('/api/admin/send-email', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { to, subject, message, recipientName, templateData } = req.body;
+
+        // Validate required fields
+        if (!to || !subject || !message) {
+            return res.status(400).json({
+                error: 'Missing required fields',
+                details: 'Recipient email, subject, and message are required'
+            });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(to)) {
+            return res.status(400).json({
+                error: 'Invalid email format'
+            });
+        }
+
+        // Send the email using the EmailService
+        const emailService = require('./services/emailService');
+        const result = await emailService.sendMessageEmail(
+            to,
+            recipientName || 'DevSync User',
+            subject,
+            message,
+            templateData
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Email sent successfully',
+            result: {
+                messageId: result.messageId,
+                recipient: result.recipient,
+                subject: result.subject,
+                sentAt: new Date().toISOString(),
+                sentBy: req.user.username
+            }
+        });
+
+    } catch (error) {
+        console.error('Error in admin email sending:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to send email',
+            details: error.message
+        });
+    }
+});

@@ -771,6 +771,10 @@
     border-radius: 3px;
 }
 
+.user-details-modal .modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
 .user-details-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1091,6 +1095,739 @@
     }
 
     .loading i {
+        animation: none;
+    }
+}
+
+/* User PRs Section Styling */
+.user-prs-section {
+    margin-top: 24px;
+}
+
+.pr-category {
+    margin-bottom: 24px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.pr-category h4 {
+    margin: 0;
+    padding: 16px 20px;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.pr-category.approved {
+    border-color: rgba(16, 185, 129, 0.2);
+    background: rgba(16, 185, 129, 0.03);
+}
+
+.pr-category.approved h4 {
+    color: var(--success-color);
+    background: rgba(16, 185, 129, 0.08);
+}
+
+.pr-category.pending {
+    border-color: rgba(245, 158, 11, 0.2);
+    background: rgba(245, 158, 11, 0.03);
+}
+
+.pr-category.pending h4 {
+    color: var(--warning-color);
+    background: rgba(245, 158, 11, 0.08);
+}
+
+.pr-category.rejected {
+    border-color: rgba(239, 68, 68, 0.2);
+    background: rgba(239, 68, 68, 0.03);
+}
+
+.pr-category.rejected h4 {
+    color: var(--error-color);
+    background: rgba(239, 68, 68, 0.08);
+}
+
+.pr-category .pr-list {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pr-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.pr-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--text-muted);
+    transition: all 0.3s ease;
+}
+
+.pr-item.approved::before {
+    background: linear-gradient(180deg, var(--success-color), #34D399);
+}
+
+.pr-item.pending::before {
+    background: linear-gradient(180deg, var(--warning-color), #FBBF24);
+}
+
+.pr-item.rejected::before {
+    background: linear-gradient(135deg, var(--error-color), #F87171);
+}
+
+.pr-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.pr-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.pr-header i {
+    font-size: 18px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.pr-item.approved .pr-header i {
+    color: var(--success-color);
+    background: rgba(16, 185, 129, 0.15);
+}
+
+.pr-item.pending .pr-header i {
+    color: var(--warning-color);
+    background: rgba(245, 158, 11, 0.15);
+}
+
+.pr-item.rejected .pr-header i {
+    color: var(--error-color);
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.pr-title {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+    cursor: help;
+}
+
+.pr-number {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+.pr-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 12px;
+}
+
+.pr-meta>span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.2s ease;
+}
+
+.pr-meta>span:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.pr-meta i {
+    font-size: 14px;
+    color: var(--accent-primary);
+}
+
+.pr-repo {
+    max-width: 200px;
+    overflow: overlay;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pr-points {
+    color: var(--warning-color) !important;
+    font-weight: 600;
+}
+
+.pr-points i {
+    color: var(--warning-color) !important;
+}
+
+.pr-date {
+    font-family: 'Courier New', monospace;
+}
+
+.pr-rejection-reason {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--error-color);
+    line-height: 1.4;
+}
+
+.pr-rejection-reason i {
+    color: var(--error-color);
+    font-size: 16px;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.pr-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.pr-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 197, 253, 0.1));
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 8px;
+    color: #3B82F6;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.pr-link:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(147, 197, 253, 0.15));
+    border-color: rgba(59, 130, 246, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.pr-actions .mini {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.approve-btn.mini {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.1));
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: var(--success-color);
+}
+
+.approve-btn.mini:hover {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(52, 211, 153, 0.15));
+    border-color: rgba(16, 185, 129, 0.4);
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.reject-btn.mini {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(248, 113, 113, 0.1));
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: var(--error-color);
+}
+
+.reject-btn.mini:hover {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(248, 113, 113, 0.15));
+    border-color: rgba(239, 68, 68, 0.4);
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.no-prs {
+    text-align: center;
+    padding: 32px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    margin: 16px 0;
+}
+
+/* Email Modal Styling */
+.email-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px;
+}
+
+.email-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.email-modal .modal-container {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow:
+        0 32px 64px -12px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+    transform: scale(0.9) translateY(20px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: unset;
+}
+
+.email-modal.show .modal-container {
+    transform: scale(1) translateY(0);
+}
+
+.email-modal .modal-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+}
+
+.email-modal .modal-header {
+    background: linear-gradient(135deg, rgba(15, 15, 15, 0.95), rgba(30, 30, 30, 0.9));
+    border-bottom: 1px solid var(--glass-border);
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(20px);
+}
+
+.email-modal .modal-header h2 {
+    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(135deg, #ffffff 0%, #e5e5e5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.email-modal .modal-header h2::before {
+    content: '';
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'boxicons';
+    font-size: 14px;
+    color: white;
+}
+
+.email-modal .modal-body {
+    padding: 32px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.email-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.email-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.email-form .form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.email-form .form-group label::before {
+    content: '';
+    width: 4px;
+    height: 16px;
+    background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: 2px;
+}
+
+.email-form input[type="email"],
+.email-form input[type="text"],
+.email-form textarea {
+    width: 100%;
+    padding: 16px 20px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    resize: none;
+    box-sizing: border-box;
+}
+
+.email-form input[type="email"]:focus,
+.email-form input[type="text"]:focus,
+.email-form textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    background: rgba(28, 28, 30, 0.98);
+    box-shadow:
+        0 0 0 3px rgba(229, 24, 55, 0.15),
+        0 8px 32px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.email-form input[type="email"]::placeholder,
+.email-form input[type="text"]::placeholder,
+.email-form textarea::placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.email-form input[type="email"][readonly] {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.email-form textarea {
+    min-height: 120px;
+    max-height: 200px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.email-form textarea::-webkit-scrollbar {
+    width: 6px;
+}
+
+.email-form textarea::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.email-form textarea::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.email-form textarea::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.email-modal .modal-footer {
+    padding: 10px 32px;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    backdrop-filter: blur(10px);
+}
+
+.email-modal .cancel-btn,
+.email-modal .send-btn {
+    padding: 14px 24px;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+    justify-content: center;
+    text-transform: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.email-modal .cancel-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-secondary);
+    backdrop-filter: blur(10px);
+}
+
+.email-modal .cancel-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.email-modal .cancel-btn:hover::before {
+    left: 100%;
+}
+
+.email-modal .cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.email-modal .send-btn {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    box-shadow: 0 4px 16px rgba(229, 24, 55, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.email-modal .send-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.email-modal .send-btn:hover::before {
+    left: 100%;
+}
+
+.email-modal .send-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(229, 24, 55, 0.4);
+}
+
+.email-modal .send-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: 0 4px 16px rgba(229, 24, 55, 0.15) !important;
+}
+
+.email-modal .send-btn:disabled::before {
+    display: none;
+}
+
+.email-modal .send-btn i,
+.email-modal .cancel-btn i {
+    font-size: 16px;
+    transition: transform 0.2s ease;
+}
+
+.email-modal .send-btn:hover i {
+    transform: translateX(2px);
+}
+
+.email-modal .cancel-btn:hover i {
+    transform: rotate(-90deg);
+}
+
+/* Loading state for send button */
+.email-modal .send-btn .bx-loader-alt {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Email Modal Responsive Design */
+@media (max-width: 768px) {
+    .email-modal {
+        padding: 10px;
+    }
+
+    .email-modal .modal-container {
+        max-width: calc(100vw - 20px);
+        max-height: 90vh;
+    }
+
+    .email-modal .modal-header {
+        padding: 20px 24px;
+    }
+
+    .email-modal .modal-header h2 {
+        font-size: 18px;
+    }
+
+    .email-modal .modal-body {
+        padding: 24px;
+    }
+
+    .email-modal .modal-footer {
+        padding: 20px 24px;
+        flex-direction: column-reverse;
+        gap: 12px;
+    }
+
+    .email-modal .cancel-btn,
+    .email-modal .send-btn {
+        width: 100%;
+        padding: 16px 24px;
+    }
+
+    .email-form {
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .email-modal .modal-header {
+        padding: 16px 20px;
+    }
+
+    .email-modal .modal-header h2 {
+        font-size: 16px;
+    }
+
+    .email-modal .modal-body {
+        padding: 20px;
+    }
+
+    .email-modal .modal-footer {
+        padding: 16px 20px;
+    }
+
+    .email-form input[type="email"],
+    .email-form input[type="text"],
+    .email-form textarea {
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+
+    .email-form .form-group label {
+        font-size: 13px;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+
+    .email-modal .modal-container,
+    .email-form input,
+    .email-form textarea,
+    .email-modal .cancel-btn,
+    .email-modal .send-btn {
+        border-width: 2px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+
+    .email-modal,
+    .email-modal .modal-container,
+    .email-form input,
+    .email-form textarea,
+    .email-modal .cancel-btn,
+    .email-modal .send-btn {
+        transition: none;
+    }
+
+    .email-modal .cancel-btn:hover,
+    .email-modal .send-btn:hover {
+        transform: none;
+    }
+
+    .email-modal .send-btn .bx-loader-alt {
         animation: none;
     }
 }

@@ -39,6 +39,10 @@ class UserManagement {
             this.users = data.users;
             this.summary = data.summary;
             this.filteredUsers = [...this.users];
+
+            // Also fetch recent PRs for all users
+            await this.loadRecentPRsForUsers(this.users);
+
             this.renderUserManagement();
 
         } catch (error) {
@@ -69,6 +73,62 @@ class UserManagement {
                 grid.innerHTML = '<div class="error">Failed to load users. Please check your permissions and try again.</div>';
             }
         }
+    }
+
+    // Add new method to fetch recent PRs for users
+    async loadRecentPRsForUsers(users) {
+        try {
+            // Fetch all pending PRs for analysis
+            const prResponse = await fetch(`${this.serverUrl}/api/admin/all-prs`, {
+                credentials: 'include'
+            });
+
+            if (prResponse.ok) {
+                const allPRs = await prResponse.json();
+
+                // Group PRs by user for easy lookup
+                this.userPRsMap = new Map();
+
+                allPRs.forEach(pr => {
+                    const userId = pr.userId || pr.username;
+                    if (!this.userPRsMap.has(userId)) {
+                        this.userPRsMap.set(userId, {
+                            approved: [],
+                            pending: [],
+                            rejected: []
+                        });
+                    }
+
+                    const userPRs = this.userPRsMap.get(userId);
+                    userPRs[pr.status].push(pr);
+                });
+
+                // Sort PRs by date for each user
+                this.userPRsMap.forEach((prs, userId) => {
+                    Object.keys(prs).forEach(status => {
+                        prs[status].sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+                    });
+                });
+            }
+        } catch (error) {
+            console.error('Error loading recent PRs:', error);
+            this.userPRsMap = new Map();
+        }
+    }
+
+    // Add method to get user's recent PRs
+    getUserRecentPRs(userId, username) {
+        const userPRs = this.userPRsMap.get(userId) || this.userPRsMap.get(username);
+        if (!userPRs) {
+            return { approved: [], pending: [], rejected: [] };
+        }
+
+        // Return most recent 5 PRs from each category
+        return {
+            approved: userPRs.approved.slice(0, 5),
+            pending: userPRs.pending.slice(0, 5),
+            rejected: userPRs.rejected.slice(0, 5)
+        };
     }
 
     renderUserManagement() {
@@ -447,13 +507,169 @@ class UserManagement {
 
     // Add new method for sending emails
     sendEmail(email, username) {
-        if (window.showToast) {
-            window.showToast('info', `Email functionality for ${username} coming soon!`);
+        this.openEmailModal(email, username);
+    }
+
+    openEmailModal(email, username) {
+        const modal = document.createElement('div');
+        modal.className = 'email-modal modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2>Send Email to ${username}</h2>
+                    <button class="close-modal" onclick="this.closest('.modal-overlay').remove()">
+                        <i class='bx bx-x'></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="email-form">
+                        <div class="form-group">
+                            <label for="emailTo">To:</label>
+                            <input type="email" id="emailTo" value="${email}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="emailSubject">Subject:</label>
+                            <input type="text" id="emailSubject" placeholder="Enter email subject..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="emailMessage">Message:</label>
+                            <textarea id="emailMessage" rows="8" placeholder="Enter your message here..." required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="cancel-btn" onclick="this.closest('.modal-overlay').remove()">
+                        <i class='bx bx-x'></i>
+                        Cancel
+                    </button>
+                    <button class="send-btn" onclick="userManagement.sendEmailMessage('${email}', '${username}', this)">
+                        <i class='bx bx-send'></i>
+                        Send Email
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        modal.classList.add('show');
+
+        // Focus on subject field
+        setTimeout(() => {
+            modal.querySelector('#emailSubject').focus();
+        }, 100);
+    }
+
+    sendEmailMessage(email, username, button) {
+        const modal = button.closest('.modal-overlay');
+        const subject = modal.querySelector('#emailSubject').value.trim();
+        const message = modal.querySelector('#emailMessage').value.trim();
+
+        // Validation
+        if (!subject) {
+            if (window.showToast) {
+                window.showToast('error', 'Please enter a subject');
+            }
+            modal.querySelector('#emailSubject').focus();
+            return;
         }
-        // TODO: Implement email sending functionality
+
+        if (!message) {
+            if (window.showToast) {
+                window.showToast('error', 'Please enter a message');
+            }
+            modal.querySelector('#emailMessage').focus();
+            return;
+        }
+
+        // Show loading state
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Sending...';
+
+        // Implement actual email sending with template
+        this.sendEmailToServer(email, subject, message, username)
+            .then(() => {
+                // Reset button
+                button.disabled = false;
+                button.innerHTML = originalText;
+
+                // Close modal
+                modal.remove();
+
+                // Show success message
+                if (window.showToast) {
+                    window.showToast('success', `Email sent successfully to ${username}!`);
+                }
+            })
+            .catch((error) => {
+                console.error('Email sending failed:', error);
+
+                // Reset button
+                button.disabled = false;
+                button.innerHTML = originalText;
+
+                // Show error message
+                if (window.showToast) {
+                    window.showToast('error', `Failed to send email: ${error.message}`);
+                }
+            });
+    }
+
+    // Method for actual email sending with template
+    async sendEmailToServer(email, subject, message, username) {
+        try {
+            const response = await fetch(`${this.serverUrl}/api/admin/send-email`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    to: email,
+                    subject: subject,
+                    message: message,
+                    recipientName: username,
+                    template: 'messageEmail',
+                    templateData: {
+                        subject: subject,
+                        message: message,
+                        recipientEmail: email,
+                        recipientName: username,
+                        dashboardUrl: `${window.location.origin}/profile.html`,
+                        githubUrl: 'https://github.com/devsync-opensource',
+                        websiteUrl: window.location.origin,
+                        discordUrl: 'https://discord.gg/vZnqjWaph8',
+                        unsubscribeUrl: `${window.location.origin}/unsubscribe?email=${encodeURIComponent(email)}`,
+                        preferencesUrl: `${window.location.origin}/email-preferences?email=${encodeURIComponent(email)}`
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            // Log the success
+            console.log('Email sent successfully:', {
+                to: email,
+                subject: subject,
+                template: 'messageEmail',
+                timestamp: new Date().toISOString(),
+                messageId: result.messageId
+            });
+
+            return result;
+        } catch (error) {
+            console.error('Error sending email:', error);
+            throw error;
+        }
     }
 
     openUserDetailsModal(user) {
+        const recentPRs = this.getUserRecentPRs(user._id || user.id, user.username);
         const modal = document.createElement('div');
         modal.className = 'user-details-modal modal-overlay';
         modal.innerHTML = `
@@ -551,15 +767,8 @@ class UserManagement {
                         <div class="detail-section">
                             <h3>Recent Merged PRs</h3>
                             <div class="pr-list">
-                                ${user.mergedPRs.slice(0, 5).map(pr => `
-                                    <div class="pr-item">
-                                        <span class="pr-title">${pr.title || 'Untitled PR'}</span>
-                                        <span class="pr-points">${pr.suggestedPoints || pr.points || 0} pts</span>
-                                        <span class="pr-date">${pr.mergedAt ? new Date(pr.mergedAt).toLocaleDateString() : 'Unknown'}</span>
-                                    </div>
-                                `).join('')}
-                                ${user.mergedPRs.length > 5 ? `<p>... and ${user.mergedPRs.length - 5} more PRs</p>` : ''}
-                            </div>
+                            ${this.createPRDetailsHTML(recentPRs)}
+                                </div>
                         </div>
                     ` : ''}
 
@@ -575,6 +784,114 @@ class UserManagement {
 
         document.body.appendChild(modal);
         modal.classList.add('show');
+    }
+
+    createPRDetailsHTML(prs) {
+        if (!prs || (prs.approved.length === 0 && prs.pending.length === 0 && prs.rejected.length === 0)) {
+            return '<div class="no-prs">No PRs found in database</div>';
+        }
+
+        let html = '<div class="user-prs-section">';
+
+        // Approved PRs
+        if (prs.approved.length > 0) {
+            html += `
+                <div class="pr-category approved">
+                    <h4><i class='bx bx-check-circle'></i> Recent Approved PRs (${prs.approved.length})</h4>
+                    <div class="pr-list">
+                        ${prs.approved.map(pr => this.createPRItemHTML(pr, 'approved')).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Pending PRs
+        if (prs.pending.length > 0) {
+            html += `
+                <div class="pr-category pending">
+                    <h4><i class='bx bx-time-five'></i> Pending PRs (${prs.pending.length})</h4>
+                    <div class="pr-list">
+                        ${prs.pending.map(pr => this.createPRItemHTML(pr, 'pending')).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Rejected PRs
+        if (prs.rejected.length > 0) {
+            html += `
+                <div class="pr-category rejected">
+                    <h4><i class='bx bx-x-circle'></i> Recent Rejected PRs (${prs.rejected.length})</h4>
+                    <div class="pr-list">
+                        ${prs.rejected.map(pr => this.createPRItemHTML(pr, 'rejected')).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    // Add method to create individual PR item HTML
+    createPRItemHTML(pr, status) {
+        const statusIcon = {
+            approved: 'bx-check',
+            pending: 'bx-time',
+            rejected: 'bx-x'
+        };
+
+        const formatDate = (dateStr) => {
+            return new Date(dateStr).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        };
+
+        return `
+            <div class="pr-item ${status}">
+                <div class="pr-header">
+                    <i class='bx ${statusIcon[status]}'></i>
+                    <span class="pr-title" title="${pr.title}">${pr.title.length > 40 ? pr.title.substring(0, 40) + '...' : pr.title}</span>
+                    <span class="pr-number">#${pr.prNumber}</span>
+                </div>
+                <div class="pr-meta">
+                    <span class="pr-repo" title="${pr.repoUrl}">
+                        <i class='bx bx-git-repo-forked'></i>
+                        ${pr.repository || pr.repoUrl.replace('https://github.com/', '')}
+                    </span>
+                    <span class="pr-points">
+                        <i class='bx bx-coin'></i>
+                        ${pr.suggestedPoints || 50} pts
+                    </span>
+                    <span class="pr-date">
+                        <i class='bx bx-calendar'></i>
+                        ${formatDate(pr.submittedAt)}
+                    </span>
+                </div>
+                ${pr.rejectionReason ? `
+                    <div class="pr-rejection-reason">
+                        <i class='bx bx-info-circle'></i>
+                        <span>${pr.rejectionReason}</span>
+                    </div>
+                ` : ''}
+                <div class="pr-actions">
+                    <a href="${pr.repoUrl}/pull/${pr.prNumber}" target="_blank" class="pr-link">
+                        <i class='bx bx-link-external'></i>
+                        View PR
+                    </a>
+                    ${status === 'pending' ? `
+                        <button class="approve-btn mini" onclick="this.dispatchEvent(new CustomEvent('approve-pr', {detail: '${pr._id}', bubbles: true}))">
+                            <i class='bx bx-check'></i>
+                        </button>
+                        <button class="reject-btn mini" onclick="this.dispatchEvent(new CustomEvent('reject-pr', {detail: '${pr._id}', bubbles: true}))">
+                            <i class='bx bx-x'></i>
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
     }
 
     openUserEditModal(user) {
