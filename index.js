@@ -1939,40 +1939,6 @@ async function startServer() {
     }
 }
 
-
-// Admin: Get all PRs from all users since PROGRAM_START_DATE
-app.get('/api/admin/all-prs', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
-    if (!adminIds.includes(req.user.username)) {
-        return res.status(403).json({ error: 'Not authorized' });
-    }
-
-    try {
-        const users = await User.find({}).select('username avatarUrl mergedPRs').lean();
-        // Flatten all PRs with user info
-        const allPRs = [];
-        users.forEach(user => {
-            (user.mergedPRs || []).forEach(pr => {
-                if (new Date(pr.mergedAt) >= new Date(PROGRAM_START_DATE)) {
-                    allPRs.push({
-                        username: user.username,
-                        avatarUrl: user.avatarUrl,
-                        ...pr
-                    });
-                }
-            });
-        });
-        // Sort by mergedAt descending
-        allPRs.sort((a, b) => new Date(b.mergedAt) - new Date(a.mergedAt));
-        res.json(allPRs);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch PRs' });
-    }
-});
-
 // Start the server
 startServer();
 
