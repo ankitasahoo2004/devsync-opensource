@@ -1582,6 +1582,198 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
+// Add dedicated admin users endpoint with comprehensive data
+app.get('/api/admin/users', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        // Fetch all users with comprehensive data
+        const users = await User.find({})
+            .select('githubId username displayName email avatarUrl mergedPRs cancelledPRs points totalPoints badges badge isAdmin createdAt lastLogin welcomeEmailSent')
+            .sort({ createdAt: -1 })
+            .lean();
+
+        // Get admin usernames for comparison
+        const adminUsernames = process.env.ADMIN_GITHUB_IDS.split(',');
+
+        // Enrich user data with additional statistics
+        const enrichedUsers = await Promise.all(users.map(async (user) => {
+            try {
+                // Get pending PRs count for this user
+                const pendingPRsCount = await PendingPR.countDocuments({
+                    $or: [
+                        { userId: user.githubId },
+                        { username: user.username }
+                    ],
+                    status: 'pending'
+                });
+
+                // Get approved PRs count
+                const approvedPRsCount = await PendingPR.countDocuments({
+                    $or: [
+                        { userId: user.githubId },
+                        { username: user.username }
+                    ],
+                    status: 'approved'
+                });
+
+                // Get rejected PRs count
+                const rejectedPRsCount = await PendingPR.countDocuments({
+                    $or: [
+                        { userId: user.githubId },
+                        { username: user.username }
+                    ],
+                    status: 'rejected'
+                });
+
+                // Calculate total points from approved PRs (more accurate)
+                const approvedPRs = await PendingPR.find({
+                    $or: [
+                        { userId: user.githubId },
+                        { username: user.username }
+                    ],
+                    status: 'approved'
+                }).select('suggestedPoints').lean();
+
+                const calculatedPoints = approvedPRs.reduce((sum, pr) => sum + (pr.suggestedPoints || 50), 0);
+
+                // Get current badge based on points
+                const currentBadge = await getCurrentBadge(calculatedPoints);
+
+                return {
+                    _id: user._id,
+                    githubId: user.githubId,
+                    username: user.username || 'unknown',
+                    displayName: user.displayName || user.username || 'Unknown User',
+                    email: user.email || 'No email provided',
+                    avatarUrl: user.avatarUrl || `https://github.com/${user.username || 'unknown'}.png`,
+                    isAdmin: adminUsernames.includes(user.username),
+
+                    // Points and achievements
+                    points: user.points || 0,
+                    totalPoints: calculatedPoints, // More accurate calculation
+                    badge: currentBadge,
+                    badges: user.badges || ['Newcomer'],
+
+                    // PR Statistics
+                    mergedPRs: user.mergedPRs || [],
+                    cancelledPRs: user.cancelledPRs || [],
+                    pendingPRsCount,
+                    approvedPRsCount,
+                    rejectedPRsCount,
+                    totalPRsSubmitted: pendingPRsCount + approvedPRsCount + rejectedPRsCount,
+
+                    // Activity information
+                    createdAt: user.createdAt || new Date(),
+                    lastLogin: user.lastLogin || null,
+                    welcomeEmailSent: user.welcomeEmailSent || false,
+
+                    // Profile completeness
+                    profileCompleteness: calculateProfileCompleteness(user),
+
+                    // Activity status
+                    isActive: (user.mergedPRs && user.mergedPRs.length > 0) || approvedPRsCount > 0,
+                    isNewUser: user.createdAt && (Date.now() - new Date(user.createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000) // 30 days
+                };
+            } catch (userError) {
+                console.error(`Error enriching user data for ${user.username}:`, userError);
+
+                // Return basic user data on error
+                return {
+                    _id: user._id,
+                    githubId: user.githubId,
+                    username: user.username || 'unknown',
+                    displayName: user.displayName || user.username || 'Unknown User',
+                    email: user.email || 'No email provided',
+                    avatarUrl: user.avatarUrl || `https://github.com/${user.username || 'unknown'}.png`,
+                    isAdmin: adminUsernames.includes(user.username),
+                    points: user.points || 0,
+                    totalPoints: user.totalPoints || user.points || 0,
+                    badge: user.badge || 'Beginner',
+                    badges: user.badges || ['Newcomer'],
+                    mergedPRs: user.mergedPRs || [],
+                    cancelledPRs: user.cancelledPRs || [],
+                    pendingPRsCount: 0,
+                    approvedPRsCount: 0,
+                    rejectedPRsCount: 0,
+                    totalPRsSubmitted: 0,
+                    createdAt: user.createdAt || new Date(),
+                    lastLogin: user.lastLogin || null,
+                    welcomeEmailSent: user.welcomeEmailSent || false,
+                    profileCompleteness: calculateProfileCompleteness(user),
+                    isActive: false,
+                    isNewUser: false,
+                    error: 'Partial data due to processing error'
+                };
+            }
+        }));
+
+        // Sort by creation date (newest first) and add additional metadata
+        const sortedUsers = enrichedUsers.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Add summary statistics
+        const summary = {
+            totalUsers: enrichedUsers.length,
+            adminUsers: enrichedUsers.filter(u => u.isAdmin).length,
+            activeUsers: enrichedUsers.filter(u => u.isActive).length,
+            newUsers: enrichedUsers.filter(u => u.isNewUser).length,
+            usersWithPendingPRs: enrichedUsers.filter(u => u.pendingPRsCount > 0).length,
+            usersWithPoints: enrichedUsers.filter(u => u.totalPoints > 0).length,
+            totalPointsAwarded: enrichedUsers.reduce((sum, u) => sum + u.totalPoints, 0),
+            totalPRsSubmitted: enrichedUsers.reduce((sum, u) => sum + u.totalPRsSubmitted, 0)
+        };
+
+        res.json({
+            users: sortedUsers,
+            summary,
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        console.error('Error fetching admin users:', error);
+        res.status(500).json({
+            error: 'Failed to fetch users',
+            details: error.message
+        });
+    }
+});
+
+// Helper function to calculate profile completeness
+function calculateProfileCompleteness(user) {
+    let completeness = 0;
+    const fields = ['username', 'displayName', 'email', 'avatarUrl'];
+
+    fields.forEach(field => {
+        if (user[field] && user[field].trim() !== '') {
+            completeness += 25; // Each field is worth 25%
+        }
+    });
+
+    return Math.min(completeness, 100);
+}
+
+// Helper function to get current badge based on points
+async function getCurrentBadge(points) {
+    if (points >= 10000) return 'Eternal Revenge | Undying ghost';
+    if (points >= 7500) return 'Demon Crafter | Shapes the cursed world';
+    if (points >= 5000) return 'Dark Sorcerer | Controls the dark arts';
+    if (points >= 3500) return 'Lord of Shadows | Master of the unseen';
+    if (points >= 2000) return 'Haunted Debugger | Haunting every broken line';
+    if (points >= 1000) return 'Phantom Architect | Builds from beyond';
+    if (points >= 500) return 'Skeleton of Structure | Casts magic on code';
+    if (points >= 250) return 'Night Stalker | Shadows are friends';
+    if (points >= 100) return 'Graveyard Shifter | Lost but curious';
+    if (points >= 0) return 'Cursed Newbie | Just awakened.....';
+    return 'Beginner';
+}
+
 // Create event
 app.post('/api/events', async (req, res) => {
     if (!req.isAuthenticated()) {

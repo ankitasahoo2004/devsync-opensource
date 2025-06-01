@@ -514,36 +514,13 @@ async function deleteRejectedPR(prId) {
 }
 
 async function loadUsers() {
-    const grid = document.getElementById('pendingPRsGrid');
-    if (!grid) return;
-
-    grid.innerHTML = '<div class="loading">Loading users...</div>';
-
-    try {
-        const response = await fetch(`${serverUrl}/api/users`, {
-            credentials: 'include'
-        });
-        const users = await response.json();
-
-        grid.innerHTML = `
-            <div class="users-grid">
-                ${users.map(user => `
-                    <div class="user-card">
-                        <img src="${user.avatarUrl}" alt="${user.username}" class="user-avatar">
-                        <div class="user-info">
-                            <h3>${user.displayName || user.username}</h3>
-                            <p>@${user.username}</p>
-                            <p>${user.email}</p>
-                            ${user.isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    } catch (error) {
-        console.error('Failed to load users:', error);
-        grid.innerHTML = '<div class="error">Failed to load users. Please try again.</div>';
+    // Initialize user management if not already done
+    if (!window.userManagement) {
+        window.userManagement = new UserManagement(serverUrl);
     }
+
+    // Load users using the dedicated user management system
+    await window.userManagement.loadUsers();
 }
 
 async function loadRepos() {
