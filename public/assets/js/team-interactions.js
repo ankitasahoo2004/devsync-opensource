@@ -130,33 +130,6 @@ function initializeModal() {
             github: 'https://github.com/Sayan-dev731',
             instagram: 'https://www.instagram.com/code_it884/'
         },
-        'member-kunal': {
-            name: 'Kunal Sharma',
-            role: 'Founder & Full Stack Developer',
-            description: `<p>Versatile developer experienced in both frontend and backend technologies. Capable of handling all aspects of web development from concept to deployment while ensuring cross-platform compatibility.</p>
-                     <p>Skills: React, Node.js, Express, MongoDB, RESTful APIs, Git, AWS Basics, CI/CD Pipelines</p>`,
-            linkedin: 'https://www.linkedin.com/in/kunal-kumar-2ab402263/',
-            github: 'https://github.com/ku12al',
-            instagram: 'https://www.instagram.com/kunal_sharma7739/'
-        },
-        'member-susmita': {
-            name: 'Susmita Mahato',
-            role: 'Graphic Designer',
-            description: `<p>Creative visual designer specializing in digital media with a strong understanding of branding principles. Creates compelling visual assets that enhance user engagement and communicate brand identity effectively.</p>
-                     <p>Skills: Adobe Photoshop, Illustrator, Figma, UI Design, Branding, Typography, Color Theory</p>`,
-            linkedin: 'https://www.linkedin.com/in/susmita-mahato-29707b31b/',
-            github: 'https://github.com/SusmitaMahato',
-            instagram: 'https://www.instagram.com/susmita_1282006/'
-        },
-        'member-aditya': {
-            name: 'Aditya Sinha',
-            role: 'Mern Stack Developer, Frontend Lead',
-            description: `<p>Technical lead specializing in MERN stack development with a focus on frontend architecture. Implements best practices for state management, component reuse, and performance optimization in complex applications.</p>
-                     <p>Skills: React Hooks, Redux, Context API, Next.js, TypeScript, Storybook, Jest Testing</p>`,
-            linkedin: 'https://www.linkedin.com/in/aditya-sinha-1952172a0/',
-            github: 'https://github.com/dev-adityasinha',
-            instagram: 'https://www.instagram.com/id.adityasinha/'
-        },
         'member-ansh': {
             name: 'Ansh Raj',
             role: 'Code Reviewer',
@@ -165,60 +138,6 @@ function initializeModal() {
             linkedin: 'https://www.linkedin.com/in/ansh-raj-b66960317/',
             github: 'https://github.com/anshraj-21',
             instagram: 'https://www.instagram.com/ansh_pvtx21?igsh=MTVzYmNmcjhraHloYw%3D%3D'
-        },
-        'member-riya': {
-            name: 'Riya Ghosh',
-            role: 'Graphic Designer',
-            description: `<p>Visual designer creating engaging digital experiences through thoughtful composition and brand-aligned aesthetics. Specializes in creating marketing materials, social media graphics, and UI components.</p>
-                     <p>Skills: Adobe Creative Suite, Canva, UI Prototyping, Illustration, Visual Hierarchy, Design Systems</p>`,
-            linkedin: 'https://www.linkedin.com/in/riya-ghosh-07b74732a/',
-            github: 'https://github.com/Riya-1606',
-            instagram: 'https://www.instagram.com/riya_160607/'
-        },
-        'member-tripti': {
-            name: 'Tripti Kumari',
-            role: 'Media Scheduling',
-            description: `<p>Content strategist responsible for planning and coordinating media distribution across platforms. Ensures consistent messaging and optimal timing for maximum audience engagement and brand visibility.</p>
-                     <p>Skills: Content Calendars, Social Media Platforms, Analytics Tools, Hootsuite, Buffer, Canva</p>`,
-            linkedin: 'https://www.linkedin.com/in/tripti-kumari-58405632a/',
-            github: 'https://github.com/Tripti-30',
-            instagram: 'https://www.instagram.com/triptik806/'
-        },
-        'member-subhalaxmi': {
-            name: 'A B Subhalaxmi',
-            role: 'Design Contributor',
-            description: `<p>Creative contributor assisting with design tasks including asset creation, layout refinement, and visual concept development. Supports the design team in maintaining visual consistency across platforms.</p>
-                     <p>Skills: Figma Components, Adobe XD, Design Collaboration, Asset Export, Style Guide Adherence</p>`,
-            linkedin: 'https://www.linkedin.com/in/a-b-subhalaxmi-1aa6a5344/',
-            github: 'https://github.com/subhalaxmi2307',
-            instagram: 'https://www.instagram.com/itsjusttt_a.b?igsh=MWZoY2k2amh5c3Z4Nw%3D%3D'
-        },
-        'member-tisha': {
-            name: 'Tisha Jeswani',
-            role: 'Sponsorship Outreach',
-            description: `<p>Partnership coordinator responsible for identifying and engaging potential sponsors. Develops sponsorship packages and maintains relationships with partners to support organizational goals.</p>
-                     <p>Skills: Proposal Writing, Networking, Partnership Development, CRM Tools, Communication</p>`,
-            linkedin: 'https://www.linkedin.com/in/tisha-jeswani-0a9441342/',
-            github: 'https://github.com/tishajeswani33',
-            instagram: 'https://www.instagram.com/_._tisha_2505/'
-        },
-        'member-umang': {
-            name: 'Umang Bhasin',
-            role: 'Sponsorship Outreach',
-            description: `<p>Business development specialist focused on creating sponsorship opportunities and strategic partnerships. Works to align sponsor objectives with organizational needs for mutual benefit.</p>
-                     <p>Skills: Negotiation, Market Research, Presentation Skills, Relationship Management</p>`,
-            linkedin: 'https://www.linkedin.com/in/umang-bhasin-b7878a294/',
-            github: 'https://github.com/UmangBhasin',
-            instagram: 'https://www.instagram.com/_umang__11?igsh=NjFudDdrMWY1dmFo'
-        },
-        'member-samriddhi': {
-            name: 'Samriddhi Chandak',
-            role: 'Sponsorship Outreach',
-            description: `<p>Engagement coordinator building relationships with potential sponsors and partners. Develops customized sponsorship proposals and tracks engagement metrics to measure success.</p>
-                     <p>Skills: Outreach Campaigns, Email Marketing, Follow-up Strategies, Benefit Fulfillment</p>`,
-            linkedin: 'https://www.linkedin.com/in/samriddhi-chandak-19b40430b/',
-            github: 'https://github.com/samm00711',
-            instagram: 'https://www.instagram.com/samriddhi.hie_/'
         },
         'member-rishikesh': {
             name: 'Rishikesh Raj',
@@ -229,51 +148,6 @@ function initializeModal() {
             github: 'https://github.com/Rishikesh-001',
             instagram: 'https://www.instagram.com/_raj_rishikesh'
         },
-        'member-bhavya': {
-            name: 'Bhavya Priyadarshani',
-            role: 'Project Verification',
-            description: `<p>Quality assurance specialist reviewing project deliverables against requirements and standards. Identifies inconsistencies and potential improvements before final release.</p>
-                     <p>Skills: Testing Procedures, Requirement Analysis, Feedback Delivery, Documentation Review</p>`,
-            linkedin: 'https://www.linkedin.com/in/bhavya-priyadarshani-ab127928a/',
-            github: 'https://github.com/05bhavs',
-            instagram: 'https://www.instagram.com/its_.bhavs?igsh=MWo5cmUwcndnODFkeQ%3D%3D&utm_source=qr'
-        },
-        'member-rishi': {
-            name: 'Rishi Soni',
-            role: 'AI Developer',
-            description: `<p>AI specialist developing intelligent systems and machine learning models. Implements algorithms for data processing, pattern recognition, and predictive analytics to enhance applications.</p>
-                     <p>Skills: Python, TensorFlow, PyTorch, NLP, Computer Vision, Model Training, Azure AI</p>`,
-            linkedin: 'https://www.linkedin.com/in/rishi-soni-28986923b/',
-            github: 'https://github.com/rishi02soni',
-            instagram: 'https://www.instagram.com/rishi.soni03/'
-        },
-        'member-vineet': {
-            name: 'Vineet Dubey',
-            role: 'Developer',
-            description: `<p>Software engineer contributing to application development across the stack. Implements features, troubleshoots issues, and collaborates with team members to deliver quality solutions.</p>
-                     <p>Skills: JavaScript, React Components, API Consumption, Debugging, Code Documentation</p>`,
-            linkedin: 'https://www.linkedin.com/in/vineet-dubey64/',
-            github: 'https://github.com/VineetDubey4',
-            instagram: 'https://www.instagram.com/theonly_vineet/'
-        },
-        'member-rudra': {
-            name: 'Rudra Prakash Sahu',
-            role: 'Social Media Manager',
-            description: `<p>Digital content strategist overseeing social media presence and engagement. Develops posting schedules, analyzes metrics, and implements campaigns to grow audience and interaction.</p>
-                     <p>Skills: Content Strategy, Community Management, Analytics, Platform Algorithms, Trend Analysis</p>`,
-            linkedin: 'https://www.linkedin.com/in/rudra-prakash-sahu-981b90315/',
-            github: 'https://github.com/hs-rudra-05',
-            instagram: 'https://www.instagram.com/rudra_prakash005/'
-        },
-        'member-karthik': {
-            name: 'Karthik Gupta',
-            role: 'Tester',
-            description: `<p>Quality assurance engineer ensuring software reliability through systematic testing. Identifies, documents, and helps resolve defects while verifying fixes meet quality standards.</p>
-                     <p>Skills: Test Case Development, Bug Tracking, Regression Testing, Selenium, Jest, Postman</p>`,
-            linkedin: 'https://www.linkedin.com/in/kartik-gupta-275873331/',
-            github: 'https://github.com/kartik-gupta-26',
-            instagram: 'https://www.instagram.com/'
-        },
         'member-krish': {
             name: 'Krish Maurya',
             role: 'Lead Editor',
@@ -282,33 +156,6 @@ function initializeModal() {
             linkedin: 'https://www.linkedin.com/in/krish-maurya-59699732b/',
             github: 'https://github.com/krishmaurya21',
             instagram: 'https://www.instagram.com/krrishmaurya21/'
-        },
-        'member-nitesh': {
-            name: 'Nitesh Raj',
-            role: 'Project Reviewer',
-            description: `<p>Technical reviewer evaluating project deliverables against specifications and best practices. Provides constructive feedback to improve code quality, architecture, and documentation.</p>
-                     <p>Skills: Code Review, Architectural Assessment, Technical Feedback, Quality Metrics</p>`,
-            linkedin: 'https://www.linkedin.com/in/',
-            github: 'https://github.com/niteshraj2310',
-            instagram: 'https://www.instagram.com/nitesh.svg'
-        },
-        'member-amritesh': {
-            name: 'Amritesh Raj',
-            role: 'Graphic Designer',
-            description: `<p>Visual designer creating digital assets for web and social media platforms. Develops graphics that communicate brand identity and enhance user engagement across channels.</p>
-                     <p>Skills: Adobe Creative Cloud, Brand Identity, Digital Illustration, Layout Design</p>`,
-            linkedin: 'https://www.linkedin.com/in/amritesh-raj-6710bb328/',
-            github: 'https://github.com/Amritesh-001',
-            instagram: 'https://www.instagram.com/amritesh.4709'
-        },
-        'member-khushboo': {
-            name: 'Khushboo Mahato',
-            role: 'Graphic Designer',
-            description: `<p>Visual designer creating digital assets for web and social media platforms. Develops graphics that communicate brand identity and enhance user engagement across channels.</p>
-                     <p>Skills: Adobe Creative Cloud, Brand Identity, Digital Illustration, Layout Design</p>`,
-            linkedin: 'https://www.linkedin.com/in/khushboo-mahato-6627a6344/',
-            github: 'https://github.com/Khushboo93849',
-            instagram: 'https://www.instagram.com/khushboo_80672?igsh=MWp1aGZjcWJhbG1wNA%3D%3D'
         },
         'member-divyanshu': {
             name: 'Divyanshu Soni',
