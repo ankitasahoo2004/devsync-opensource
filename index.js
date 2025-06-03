@@ -13,6 +13,7 @@ const Event = require('./models/Event');
 const PendingPR = require('./models/PendingPR');
 const MongoStore = require('connect-mongo');
 const emailService = require('./services/emailService');
+const dbSync = require('./utils/dbSync');
 const PORT = process.env.PORT || 5500;
 const serverUrl = process.env.SERVER_URL;
 
@@ -1501,7 +1502,7 @@ app.get('/api/user/profile/:username', async (req, res) => {
         const [userData, acceptedRepos, user] = await Promise.all([
             octokit.users.getByUsername({ username: req.params.username }),
             Repo.find({ reviewStatus: 'accepted' }, 'repoLink'),
-            User.findOne({ username: req.params.username }, 'mergedPRs')
+            User.findOne({ username: req.params.username }, 'mergedPRs cancelledPRs')
         ]);
 
         const { data } = await octokit.search.issuesAndPullRequests({
@@ -1523,9 +1524,14 @@ app.get('/api/user/profile/:username', async (req, res) => {
                 pull_number: pr.number
             });
 
-            // Check if PR is detected by DevSync
+            // Check if PR is detected by DevSync (approved)
             const isDevSyncDetected = user?.mergedPRs.some(
                 mergedPr => mergedPr.repoId === repoUrl && mergedPr.prNumber === pr.number
+            );
+
+            // Check if PR is in cancelled/rejected list
+            const isRejected = user?.cancelledPRs.some(
+                cancelledPr => cancelledPr.repoId === repoUrl && cancelledPr.prNumber === pr.number
             );
 
             return {
@@ -1539,7 +1545,8 @@ app.get('/api/user/profile/:username', async (req, res) => {
                 isDevSyncRepo,
                 merged: prDetails.merged,
                 closed: pr.state === 'closed' && !prDetails.merged,
-                isDevSyncDetected: isDevSyncRepo ? isDevSyncDetected : false
+                isDevSyncDetected: isDevSyncRepo ? isDevSyncDetected : false,
+                isRejected: isDevSyncRepo ? isRejected : false
             };
         }));
 
@@ -1574,6 +1581,198 @@ app.get('/api/users', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch users' });
     }
 });
+
+// Add dedicated admin users endpoint with comprehensive data
+app.get('/api/admin/users', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        // Fetch all users with comprehensive data
+        const users = await User.find({})
+            .select('githubId username displayName email avatarUrl mergedPRs cancelledPRs points totalPoints badges badge isAdmin createdAt lastLogin welcomeEmailSent')
+            .sort({ createdAt: -1 })
+            .lean();
+
+        // Get admin usernames for comparison
+        const adminUsernames = process.env.ADMIN_GITHUB_IDS.split(',');
+
+        // Enrich user data with additional statistics
+        const enrichedUsers = await Promise.all(users.map(async (user) => {
+            try {
+                // Get pending PRs count for this user
+                const pendingPRsCount = await PendingPR.countDocuments({
+                    $or: [
+                        { userId: user.githubId },
+                        { username: user.username }
+                    ],
+                    status: 'pending'
+                });
+
+                // Get approved PRs count
+                const approvedPRsCount = await PendingPR.countDocuments({
+                    $or: [
+                        { userId: user.githubId },
+                        { username: user.username }
+                    ],
+                    status: 'approved'
+                });
+
+                // Get rejected PRs count
+                const rejectedPRsCount = await PendingPR.countDocuments({
+                    $or: [
+                        { userId: user.githubId },
+                        { username: user.username }
+                    ],
+                    status: 'rejected'
+                });
+
+                // Calculate total points from approved PRs (more accurate)
+                const approvedPRs = await PendingPR.find({
+                    $or: [
+                        { userId: user.githubId },
+                        { username: user.username }
+                    ],
+                    status: 'approved'
+                }).select('suggestedPoints').lean();
+
+                const calculatedPoints = approvedPRs.reduce((sum, pr) => sum + (pr.suggestedPoints || 50), 0);
+
+                // Get current badge based on points
+                const currentBadge = await getCurrentBadge(calculatedPoints);
+
+                return {
+                    _id: user._id,
+                    githubId: user.githubId,
+                    username: user.username || 'unknown',
+                    displayName: user.displayName || user.username || 'Unknown User',
+                    email: user.email || 'No email provided',
+                    avatarUrl: user.avatarUrl || `https://github.com/${user.username || 'unknown'}.png`,
+                    isAdmin: adminUsernames.includes(user.username),
+
+                    // Points and achievements
+                    points: user.points || 0,
+                    totalPoints: calculatedPoints, // More accurate calculation
+                    badge: currentBadge,
+                    badges: user.badges || ['Newcomer'],
+
+                    // PR Statistics
+                    mergedPRs: user.mergedPRs || [],
+                    cancelledPRs: user.cancelledPRs || [],
+                    pendingPRsCount,
+                    approvedPRsCount,
+                    rejectedPRsCount,
+                    totalPRsSubmitted: pendingPRsCount + approvedPRsCount + rejectedPRsCount,
+
+                    // Activity information
+                    createdAt: user.createdAt || new Date(),
+                    lastLogin: user.lastLogin || null,
+                    welcomeEmailSent: user.welcomeEmailSent || false,
+
+                    // Profile completeness
+                    profileCompleteness: calculateProfileCompleteness(user),
+
+                    // Activity status
+                    isActive: (user.mergedPRs && user.mergedPRs.length > 0) || approvedPRsCount > 0,
+                    isNewUser: user.createdAt && (Date.now() - new Date(user.createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000) // 30 days
+                };
+            } catch (userError) {
+                console.error(`Error enriching user data for ${user.username}:`, userError);
+
+                // Return basic user data on error
+                return {
+                    _id: user._id,
+                    githubId: user.githubId,
+                    username: user.username || 'unknown',
+                    displayName: user.displayName || user.username || 'Unknown User',
+                    email: user.email || 'No email provided',
+                    avatarUrl: user.avatarUrl || `https://github.com/${user.username || 'unknown'}.png`,
+                    isAdmin: adminUsernames.includes(user.username),
+                    points: user.points || 0,
+                    totalPoints: user.totalPoints || user.points || 0,
+                    badge: user.badge || 'Beginner',
+                    badges: user.badges || ['Newcomer'],
+                    mergedPRs: user.mergedPRs || [],
+                    cancelledPRs: user.cancelledPRs || [],
+                    pendingPRsCount: 0,
+                    approvedPRsCount: 0,
+                    rejectedPRsCount: 0,
+                    totalPRsSubmitted: 0,
+                    createdAt: user.createdAt || new Date(),
+                    lastLogin: user.lastLogin || null,
+                    welcomeEmailSent: user.welcomeEmailSent || false,
+                    profileCompleteness: calculateProfileCompleteness(user),
+                    isActive: false,
+                    isNewUser: false,
+                    error: 'Partial data due to processing error'
+                };
+            }
+        }));
+
+        // Sort by creation date (newest first) and add additional metadata
+        const sortedUsers = enrichedUsers.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Add summary statistics
+        const summary = {
+            totalUsers: enrichedUsers.length,
+            adminUsers: enrichedUsers.filter(u => u.isAdmin).length,
+            activeUsers: enrichedUsers.filter(u => u.isActive).length,
+            newUsers: enrichedUsers.filter(u => u.isNewUser).length,
+            usersWithPendingPRs: enrichedUsers.filter(u => u.pendingPRsCount > 0).length,
+            usersWithPoints: enrichedUsers.filter(u => u.totalPoints > 0).length,
+            totalPointsAwarded: enrichedUsers.reduce((sum, u) => sum + u.totalPoints, 0),
+            totalPRsSubmitted: enrichedUsers.reduce((sum, u) => sum + u.totalPRsSubmitted, 0)
+        };
+
+        res.json({
+            users: sortedUsers,
+            summary,
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        console.error('Error fetching admin users:', error);
+        res.status(500).json({
+            error: 'Failed to fetch users',
+            details: error.message
+        });
+    }
+});
+
+// Helper function to calculate profile completeness
+function calculateProfileCompleteness(user) {
+    let completeness = 0;
+    const fields = ['username', 'displayName', 'email', 'avatarUrl'];
+
+    fields.forEach(field => {
+        if (user[field] && user[field].trim() !== '') {
+            completeness += 25; // Each field is worth 25%
+        }
+    });
+
+    return Math.min(completeness, 100);
+}
+
+// Helper function to get current badge based on points
+async function getCurrentBadge(points) {
+    if (points >= 10000) return 'Eternal Revenge | Undying ghost';
+    if (points >= 7500) return 'Demon Crafter | Shapes the cursed world';
+    if (points >= 5000) return 'Dark Sorcerer | Controls the dark arts';
+    if (points >= 3500) return 'Lord of Shadows | Master of the unseen';
+    if (points >= 2000) return 'Haunted Debugger | Haunting every broken line';
+    if (points >= 1000) return 'Phantom Architect | Builds from beyond';
+    if (points >= 500) return 'Skeleton of Structure | Casts magic on code';
+    if (points >= 250) return 'Night Stalker | Shadows are friends';
+    if (points >= 100) return 'Graveyard Shifter | Lost but curious';
+    if (points >= 0) return 'Cursed Newbie | Just awakened.....';
+    return 'Beginner';
+}
 
 // Create event
 app.post('/api/events', async (req, res) => {
@@ -1819,6 +2018,118 @@ app.post('/api/admin/submit-pr', async (req, res) => {
         console.error('Error submitting PR:', error);
         res.status(500).json({
             error: 'Failed to submit PR',
+            details: error.message
+        });
+    }
+});
+
+// Add new endpoint for PendingPR to User table synchronization
+app.post('/api/admin/sync-pending-prs', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        console.log(`Admin ${req.user.username} initiated PendingPR to User sync`);
+
+        // Optional: Create backup before sync
+        if (req.body.createBackup) {
+            await dbSync.backupUserTable();
+        }
+
+        // Perform the synchronization
+        const syncResults = await dbSync.syncPendingPRsToUserTable();
+
+        // Validate integrity after sync
+        const validation = await dbSync.validateSyncIntegrity();
+
+        const duration = syncResults.endTime - syncResults.startTime;
+
+        res.json({
+            success: true,
+            message: 'PendingPR to User table synchronization completed',
+            results: {
+                ...syncResults,
+                duration: `${Math.round(duration / 1000)}s`,
+                validation
+            },
+            timestamp: new Date().toISOString(),
+            performedBy: req.user.username
+        });
+
+    } catch (error) {
+        console.error('PendingPR sync failed:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to sync PendingPR data to User table',
+            details: error.message,
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+
+// Add admin email sending endpoint
+app.post('/api/admin/send-email', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { to, subject, message, recipientName, templateData } = req.body;
+
+        // Validate required fields
+        if (!to || !subject || !message) {
+            return res.status(400).json({
+                error: 'Missing required fields',
+                details: 'Recipient email, subject, and message are required'
+            });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(to)) {
+            return res.status(400).json({
+                error: 'Invalid email format'
+            });
+        }
+
+        // Send the email using the EmailService
+        const emailService = require('./services/emailService');
+        const result = await emailService.sendMessageEmail(
+            to,
+            recipientName || 'DevSync User',
+            subject,
+            message,
+            templateData
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Email sent successfully',
+            result: {
+                messageId: result.messageId,
+                recipient: result.recipient,
+                subject: result.subject,
+                sentAt: new Date().toISOString(),
+                sentBy: req.user.username
+            }
+        });
+
+    } catch (error) {
+        console.error('Error in admin email sending:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to send email',
             details: error.message
         });
     }

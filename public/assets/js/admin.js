@@ -309,7 +309,7 @@ function openUserPRModal(username, userData) {
     const prList = document.getElementById('modalPRList');
     prList.innerHTML = userData.prs.map(pr => createModalPRItem(pr)).join('');
 
-    // Show modal
+    // Show modal with proper centering
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
 }
@@ -420,6 +420,13 @@ async function approvePR(prId) {
 }
 
 async function rejectPR(prId) {
+    const confirmed = await showConfirmModal(
+        'Reject Pull Request',
+        'Are you sure you want to reject this PR?\n\nYou can optionally provide a reason in the next step.'
+    );
+
+    if (!confirmed) return;
+
     const reason = prompt('Please provide a reason for rejection (optional):');
 
     try {
@@ -480,9 +487,12 @@ async function adjustPoints(prId, currentPoints) {
 }
 
 async function deleteRejectedPR(prId) {
-    if (!confirm('Are you sure you want to delete this rejected PR? This action cannot be undone.')) {
-        return;
-    }
+    const confirmed = await showConfirmModal(
+        'Delete Rejected PR',
+        'Are you sure you want to delete this rejected PR?\n\nThis action cannot be undone.'
+    );
+
+    if (!confirmed) return;
 
     try {
         const response = await fetch(`${serverUrl}/api/admin/pr/${prId}`, {
@@ -504,36 +514,13 @@ async function deleteRejectedPR(prId) {
 }
 
 async function loadUsers() {
-    const grid = document.getElementById('pendingPRsGrid');
-    if (!grid) return;
-
-    grid.innerHTML = '<div class="loading">Loading users...</div>';
-
-    try {
-        const response = await fetch(`${serverUrl}/api/users`, {
-            credentials: 'include'
-        });
-        const users = await response.json();
-
-        grid.innerHTML = `
-            <div class="users-grid">
-                ${users.map(user => `
-                    <div class="user-card">
-                        <img src="${user.avatarUrl}" alt="${user.username}" class="user-avatar">
-                        <div class="user-info">
-                            <h3>${user.displayName || user.username}</h3>
-                            <p>@${user.username}</p>
-                            <p>${user.email}</p>
-                            ${user.isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    } catch (error) {
-        console.error('Failed to load users:', error);
-        grid.innerHTML = '<div class="error">Failed to load users. Please try again.</div>';
+    // Initialize user management if not already done
+    if (!window.userManagement) {
+        window.userManagement = new UserManagement(serverUrl);
     }
+
+    // Load users using the dedicated user management system
+    await window.userManagement.loadUsers();
 }
 
 async function loadRepos() {
@@ -603,6 +590,25 @@ async function loadAutomation() {
                     </button>
                 </div>
                 
+                <div class="setting-card critical">
+                    <div class="setting-icon">
+                        <i class='bx bx-data'></i>
+                    </div>
+                    <div class="setting-content">
+                        <h3>Database Synchronization</h3>
+                        <p>Sync approved PendingPR data to User table. This updates user points and badges from approved PRs.</p>
+                        <div class="setting-features">
+                            <span class="feature-tag">🔄 Data Migration</span>
+                            <span class="feature-tag">📈 Points Update</span>
+                            <span class="feature-tag">🏆 Badge Calculation</span>
+                        </div>
+                    </div>
+                    <button class="button critical sync-btn" onclick="syncPendingPRsToUsers()">
+                        <i class='bx bx-transfer'></i>
+                        Sync PR Data
+                    </button>
+                </div>
+                
                 <div class="setting-card">
                     <div class="setting-icon">
                         <i class='bx bx-refresh'></i>
@@ -652,13 +658,26 @@ async function loadAutomation() {
 function openAdvancedPRScan() {
     // Initialize the PR scanner if not already done
     if (!window.prScanManager) {
-        window.prScanManager = new PRScanManager();
+        // Import the class and create instance
+        if (typeof PRScanManager !== 'undefined') {
+            window.prScanManager = new PRScanManager();
+        } else {
+            showToast('error', 'PR Scanner not loaded. Please refresh the page.');
+            return;
+        }
     }
 
     // Open the scanner modal
     window.prScanManager.open();
     showToast('info', 'Advanced PR Scanner opened. Configure settings and start scanning!');
 }
+
+// Add global fallback function for modal close (in case inline onclick is still used)
+window.closePRScanModal = function () {
+    if (window.prScanManager) {
+        window.prScanManager.close();
+    }
+};
 
 function triggerPRUpdate() {
     if (confirm('This will trigger the legacy PR update system. This may take several minutes. Continue?')) {
@@ -691,24 +710,89 @@ function openDataManagement() {
     showToast('info', 'Data management panel coming soon...');
 }
 
+// Enhanced showToast function for admin panel
 function showToast(type, message) {
+    // Remove any existing toasts of the same type to prevent spam
+    const existingToasts = document.querySelectorAll(`.toast-${type}`);
+    existingToasts.forEach(toast => {
+        if (toast.textContent.includes(message.substring(0, 20))) {
+            toast.remove();
+        }
+    });
+
+    const toastContainer = getOrCreateToastContainer();
+
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
+
+    // Get appropriate icon for toast type
+    const icons = {
+        success: 'bx-check-circle',
+        error: 'bx-error-circle',
+        info: 'bx-info-circle',
+        warning: 'bx-error'
+    };
+
     toast.innerHTML = `
-        <i class='bx ${type === 'success' ? 'bx-check' : 'bx-x'}'></i>
+        <i class='bx ${icons[type] || 'bx-info-circle'}'></i>
         <span>${message}</span>
     `;
 
-    document.body.appendChild(toast);
+    toastContainer.appendChild(toast);
 
     // Trigger animation
-    setTimeout(() => toast.classList.add('show'), 10);
+    requestAnimationFrame(() => {
+        toast.classList.add('show');
+    });
 
-    // Remove toast after 3 seconds
+    // Auto remove toast after delay
+    const removeDelay = type === 'error' ? 5000 : 3000;
     setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
+        if (toast.parentNode) {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+
+                    // Remove container if empty
+                    if (toastContainer.children.length === 0) {
+                        toastContainer.remove();
+                    }
+                }
+            }, 300);
+        }
+    }, removeDelay);
+
+    return toast;
+}
+
+function getOrCreateToastContainer() {
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+    return container;
+}
+
+// Enhanced modal functions for admin
+async function showConfirmModal(title, message) {
+    if (window.showModal) {
+        return await window.showModal('confirm', title, message);
+    }
+
+    // Fallback to browser confirm if showModal is not available
+    return confirm(`${title}\n\n${message}`);
+}
+
+async function showInfoModal(title, message) {
+    if (window.showModal) {
+        return window.showModal('info', title, message);
+    }
+
+    // Fallback to browser alert if showModal is not available
+    alert(`${title}\n\n${message}`);
 }
 
 // Close modal when clicking outside
@@ -739,3 +823,169 @@ function addUserCardClickHandlers() {
 }
 
 // ... Additional functions for other admin operations ...
+
+async function syncPendingPRsToUsers() {
+    const confirmed = await showConfirmModal(
+        'Database Synchronization',
+        `This will sync all approved and rejected PendingPR data to the User table. This will:
+
+• Update user points based on current suggestedPoints values
+• Migrate approved PRs to user.mergedPRs
+• Migrate rejected PRs to user.cancelledPRs with rejection reasons
+• Recalculate user badges  
+• Update leaderboard rankings
+• Apply any point adjustments made to existing PRs
+
+This operation is safe but may take a few minutes. Continue?`
+    );
+
+    if (!confirmed) return;
+
+    // Disable button and show loading state
+    const syncBtn = document.querySelector('.sync-btn');
+    const originalHTML = syncBtn.innerHTML;
+    syncBtn.disabled = true;
+    syncBtn.innerHTML = '<div class="loading-spinner"></div> Syncing Data...';
+
+    try {
+        showToast('info', 'Starting database synchronization with approved and rejected PRs...');
+
+        const response = await fetch(`${serverUrl}/api/admin/sync-pending-prs`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                createBackup: true // Optional backup before sync
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showSyncResults(result.results);
+            const pointsRecalculatedMessage = result.results.updatedUsers > 0
+                ? ` Points recalculated for ${result.results.updatedUsers} users.`
+                : '';
+            const cancelledMessage = result.results.syncedCancelledPRs > 0
+                ? ` ${result.results.syncedCancelledPRs} rejected PRs synced to cancelledPRs.`
+                : '';
+            showToast('success', `Database sync completed! Updated ${result.results.updatedUsers} users with ${result.results.syncedPRs} new PRs.${cancelledMessage}${pointsRecalculatedMessage}`);
+        } else {
+            throw new Error(result.details || 'Sync failed');
+        }
+
+    } catch (error) {
+        console.error('Database sync error:', error);
+        showToast('error', `Database sync failed: ${error.message}`);
+    } finally {
+        // Restore button state
+        syncBtn.disabled = false;
+        syncBtn.innerHTML = originalHTML;
+    }
+}
+
+function showSyncResults(results) {
+    const modal = document.createElement('div');
+    modal.className = 'sync-results-modal';
+    modal.innerHTML = `
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>Database Sync Results</h2>
+                <button class="close-modal" onclick="this.closest('.sync-results-modal').remove()">
+                    <i class='bx bx-x'></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="sync-stats-grid">
+                    <div class="stat-item success">
+                        <i class='bx bx-user'></i>
+                        <span class="stat-number">${results.updatedUsers}</span>
+                        <span class="stat-label">Users Updated</span>
+                    </div>
+                    <div class="stat-item success">
+                        <i class='bx bx-git-pull-request'></i>
+                        <span class="stat-number">${results.syncedPRs}</span>
+                        <span class="stat-label">New PRs Synced</span>
+                    </div>
+                    <div class="stat-item warning">
+                        <i class='bx bx-x-circle'></i>
+                        <span class="stat-number">${results.syncedCancelledPRs || 0}</span>
+                        <span class="stat-label">Cancelled PRs Synced</span>
+                    </div>
+                    <div class="stat-item info">
+                        <i class='bx bx-calculator'></i>
+                        <span class="stat-number">${results.totalApprovedPRs}</span>
+                        <span class="stat-label">Points Recalculated</span>
+                    </div>
+                    <div class="stat-item info">
+                        <i class='bx bx-time'></i>
+                        <span class="stat-number">${results.duration}</span>
+                        <span class="stat-label">Duration</span>
+                    </div>
+                    <div class="stat-item ${results.errors.length > 0 ? 'warning' : 'success'}">
+                        <i class='bx ${results.errors.length > 0 ? 'bx-error' : 'bx-check'}'></i>
+                        <span class="stat-number">${results.errors.length}</span>
+                        <span class="stat-label">Errors</span>
+                    </div>
+                </div>
+                
+                <div class="sync-details">
+                    <h3>Summary</h3>
+                    <ul>
+                        <li>Total Users Processed: ${results.totalUsers}</li>
+                        <li>Total Approved PRs: ${results.totalApprovedPRs}</li>
+                        <li>Total Rejected PRs: ${results.totalRejectedPRs || 0}</li>
+                        <li>New PRs Synced: ${results.syncedPRs} PRs</li>
+                        <li>Cancelled PRs Synced: ${results.syncedCancelledPRs || 0} PRs</li>
+                        <li>Users Updated: ${results.updatedUsers}</li>
+                        <li><strong>All user points recalculated from current suggestedPoints values</strong></li>
+                        <li><strong>Rejected PRs synced to user.cancelledPRs with rejection reasons</strong></li>
+                    </ul>
+                    
+                    ${results.validation ? `
+                        <h3>Validation & Debug Info</h3>
+                        <ul>
+                            <li>Approved PRs in Database: ${results.validation.approvedPRCount}</li>
+                            <li>Rejected PRs in Database: ${results.validation.rejectedPRCount || 0}</li>
+                            <li>User Merged PRs: ${results.validation.userPRCount}</li>
+                            <li>User Cancelled PRs: ${results.validation.userCancelledPRCount || 0}</li>
+                            <li>Total Users in DB: ${results.validation.totalUsers}</li>
+                            <li>Users with PRs: ${results.validation.debugInfo?.usersWithPRs || 'N/A'}</li>
+                            <li>Users with Cancelled PRs: ${results.validation.debugInfo?.usersWithCancelledPRs || 'N/A'}</li>
+                            <li>Users with Points: ${results.validation.debugInfo?.usersWithPoints || 'N/A'}</li>
+                            <li>Integrity Check: ${results.validation.isValid ? '✅ Passed' : '❌ Failed'}</li>
+                        </ul>
+                        ${results.validation.userIdTypes ? `
+                            <h4>PendingPR User ID Types:</h4>
+                            <ul>
+                                ${Object.entries(results.validation.userIdTypes).map(([type, count]) =>
+        `<li>${type}: ${count} records</li>`
+    ).join('')}
+                            </ul>
+                        ` : ''}
+                    ` : ''}
+                    
+                    ${results.errors.length > 0 ? `
+                        <h3>Errors (${results.errors.length})</h3>
+                        <div class="error-list">
+                            ${results.errors.slice(0, 10).map(error => `
+                                <div class="error-item">
+                                    <strong>User ID:</strong> ${error.userId || 'N/A'}<br>
+                                    <strong>Username:</strong> ${error.username || 'N/A'}<br>
+                                    <strong>Error:</strong> ${error.error}
+                                </div>
+                            `).join('')}
+                            ${results.errors.length > 10 ? `<p>... and ${results.errors.length - 10} more errors</p>` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    modal.classList.add('show');
+}

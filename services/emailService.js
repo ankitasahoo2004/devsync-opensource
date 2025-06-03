@@ -222,6 +222,56 @@ class EmailService {
             throw error; // Re-throw to handle in the route
         }
     }
+
+    async sendMessageEmail(recipientEmail, recipientName, subject, message, templateData = {}) {
+        try {
+            const template = await this.loadTemplate('messageEmail');
+
+            if (!recipientEmail || !subject || !message) {
+                throw new Error('Missing required fields: recipientEmail, subject, and message are required');
+            }
+
+            // Merge provided template data with defaults
+            const defaultTemplateData = {
+                recipientName: recipientName || 'DevSync User',
+                recipientEmail: recipientEmail,
+                subject: subject,
+                message: message,
+                dashboardUrl: 'https://www.devsync.club/profile.html',
+                githubUrl: 'https://github.com/devsync-opensource',
+                websiteUrl: 'https://www.devsync.club',
+                discordUrl: 'https://discord.gg/vZnqjWaph8',
+                unsubscribeUrl: `https://www.devsync.club/unsubscribe?email=${encodeURIComponent(recipientEmail)}`,
+                preferencesUrl: `https://www.devsync.club/email-preferences?email=${encodeURIComponent(recipientEmail)}`
+            };
+
+            const finalTemplateData = { ...defaultTemplateData, ...templateData };
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: recipientEmail,
+                subject: `DevSync: ${subject}`,
+                html: template(finalTemplateData)
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+
+            if (!result || !result.messageId) {
+                throw new Error('Email failed to send - no message ID returned');
+            }
+
+            console.log(`Custom message email sent to ${recipientEmail} with subject "${subject}" - MessageID: ${result.messageId}`);
+            return {
+                success: true,
+                messageId: result.messageId,
+                recipient: recipientEmail,
+                subject: subject
+            };
+        } catch (error) {
+            console.error('Error sending custom message email:', error);
+            throw error; // Re-throw to handle in the route
+        }
+    }
 }
 
 module.exports = new EmailService();

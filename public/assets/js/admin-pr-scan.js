@@ -17,7 +17,17 @@ class PRScanManager {
             includePrivateRepos: false
         };
 
+        // Ensure modal utilities are available
+        this.ensureModalUtilities();
+
         this.init();
+    }
+
+    ensureModalUtilities() {
+        // Ensure showModal is available
+        if (!window.showModal && window.showAdminModal) {
+            window.showModal = window.showAdminModal;
+        }
     }
 
     init() {
@@ -37,7 +47,7 @@ class PRScanManager {
                         </div>
                         <span>Advanced PR Scanner</span>
                     </div>
-                    <button class="pr-scan-close" onclick="prScanManager.close()">
+                    <button class="pr-scan-close" data-action="close-modal">
                         <i class='bx bx-x'></i>
                     </button>
                 </div>
@@ -153,11 +163,11 @@ class PRScanManager {
                     </div>
 
                     <div class="pr-scan-actions">
-                        <button class="scan-btn secondary" onclick="prScanManager.close()">
+                        <button class="scan-btn secondary" data-action="close-modal">
                             <i class='bx bx-x'></i>
                             Cancel
                         </button>
-                        <button class="scan-btn primary" id="startScanBtn" onclick="prScanManager.startScan()">
+                        <button class="scan-btn primary" id="startScanBtn" data-action="start-scan">
                             <i class='bx bx-search'></i>
                             Start Advanced Scan
                         </button>
@@ -203,17 +213,35 @@ class PRScanManager {
             }
         });
 
+        // Handle all button clicks with data-action attributes
+        this.modal.addEventListener('click', (e) => {
+            const action = e.target.closest('[data-action]')?.dataset.action;
+
+            if (action === 'close-modal') {
+                e.preventDefault();
+                e.stopPropagation();
+                this.close();
+            } else if (action === 'start-scan') {
+                e.preventDefault();
+                e.stopPropagation();
+                this.startScan();
+            }
+        });
+
         // Close modal on escape key
-        document.addEventListener('keydown', (e) => {
+        this.handleEscapeKey = (e) => {
             if (e.key === 'Escape' && this.modal.classList.contains('show')) {
                 this.close();
             }
-        });
+        };
+
+        document.addEventListener('keydown', this.handleEscapeKey);
     }
 
     open() {
         this.modal.classList.add('show');
         document.body.style.overflow = 'hidden';
+        document.body.style.scrollBehavior = 'smooth';
         this.resetScan();
     }
 
@@ -226,7 +254,13 @@ class PRScanManager {
 
         this.modal.classList.remove('show');
         document.body.style.overflow = '';
+        document.body.style.scrollBehavior = 'smooth';
         this.isScanning = false;
+
+        // Clean up escape key listener to prevent memory leaks
+        if (this.handleEscapeKey) {
+            document.removeEventListener('keydown', this.handleEscapeKey);
+        }
     }
 
     resetScan() {

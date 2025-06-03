@@ -26,7 +26,8 @@ const userSchema = new mongoose.Schema({
         repoId: String,
         prNumber: Number,
         title: String,
-        cancelledAt: Date
+        cancelledAt: Date,
+        rejectionReason: String  // Add rejection reason field
     }],
     points: {
         type: Number,

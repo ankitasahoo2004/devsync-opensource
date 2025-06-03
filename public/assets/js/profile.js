@@ -56,7 +56,7 @@ function updateProfileInfo(data) {
     // Add banner customization with dynamic update handling
     const bannerElement = document.querySelector('.profile__cover-wrapper');
     const coverImage = document.getElementById('profile-cover');
-    
+
     const updateBanner = (bannerId) => {
         const newImage = new Image();
         newImage.onload = () => {
@@ -217,11 +217,11 @@ function openBannerSidebar() {
         option.addEventListener('click', () => {
             const bannerId = option.dataset.banner;
             const coverImage = document.getElementById('profile-cover');
-            
+
             // Add fade out effect
             coverImage.style.transition = 'opacity 0.3s ease';
             coverImage.style.opacity = '0';
-            
+
             // Load new image
             const newImage = new Image();
             newImage.onload = () => {
@@ -233,7 +233,7 @@ function openBannerSidebar() {
                 }, 300);
             };
             newImage.src = `assets/img/banners/${bannerId}`;
-            
+
             localStorage.setItem('profileBanner', bannerId);
 
             // Add selection effect
@@ -549,6 +549,7 @@ function displayPullRequests(prs) {
 
 function getStatusClass(pr) {
     if (!pr.isDevSyncRepo) return 'non-devsync';
+    if (pr.isRejected) return 'rejected';
     if (pr.merged && !pr.isDevSyncDetected) return 'waiting';
     if (pr.merged) return 'merged';
     if (pr.closed) return 'closed';
@@ -557,6 +558,7 @@ function getStatusClass(pr) {
 
 function getStatusText(pr) {
     if (!pr.isDevSyncRepo) return 'Not a DevSync Repository';
+    if (pr.isRejected) return 'rejected';
     if (pr.merged && !pr.isDevSyncDetected) return 'Waiting for Approval';
     if (pr.merged) return 'Successfully Merged';
     if (pr.closed) return 'Closed';
@@ -565,6 +567,7 @@ function getStatusText(pr) {
 
 function getStatusIcon(pr) {
     if (!pr.isDevSyncRepo) return 'bx-x-circle';
+    if (pr.isRejected) return 'bx-x-circle';
     if (pr.merged && !pr.isDevSyncDetected) return 'bx-time-five';
     if (pr.merged) return 'bx-check-circle';
     if (pr.closed) return 'bx-x-circle';
