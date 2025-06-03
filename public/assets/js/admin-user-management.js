@@ -221,6 +221,356 @@ class UserManagement {
         return this.filteredUsers.map(user => this.createUserCard(user)).join('');
     }
 
+    // Add new method for scanning individual user PRs
+    async scanUserPRs(userId) {
+        const user = this.users.find(u => (u._id || u.id) === userId);
+        if (!user) {
+            showToast('error', 'User not found');
+            return;
+        }
+
+        // Show scanning modal
+        this.showUserPRScanModal(user);
+    }
+
+    showUserPRScanModal(user) {
+        const modal = document.createElement('div');
+        modal.className = 'user-pr-scan-modal modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2>Scan PRs for ${user.username}</h2>
+                    <button class="close-modal" onclick="this.closest('.modal-overlay').remove()">
+                        <i class='bx bx-x'></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="scan-info">
+                        <div class="user-info">
+                            <img src="${user.avatarUrl || user.photos?.[0]?.value || '/assets/img/default-avatar.png'}" 
+                                 alt="${user.displayName || user.username}" class="user-avatar">
+                            <div>
+                                <h3>${user.displayName || user.username}</h3>
+                                <p>@${user.username}</p>
+                            </div>
+                        </div>
+                        <div class="scan-description">
+                            <p>This will scan for merged PRs from <strong>${user.username}</strong> in registered repositories since the program start date (March 14, 2025).</p>
+                            <p>Only new PRs not already in the system will be submitted for admin approval.</p>
+                        </div>
+                    </div>
+
+                    <div class="scan-progress" id="userScanProgress" style="display: none;">
+                        <div class="progress-header">
+                            <div class="progress-title">Scanning Progress</div>
+                            <div class="progress-stats" id="userProgressStats">Initializing...</div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="userProgressBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="scan-results" id="userScanResults" style="display: none;">
+                        <div class="results-header">
+                            <div class="results-icon success">
+                                <i class='bx bx-check'></i>
+                            </div>
+                            <h3 class="results-title">Scan Complete</h3>
+                        </div>
+                        
+                        <div class="results-grid">
+                            <div class="result-card">
+                                <span class="result-number" id="userNewPRsResult">0</span>
+                                <span class="result-label">New PRs Found</span>
+                            </div>
+                            <div class="result-card">
+                                <span class="result-number" id="userSkippedPRsResult">0</span>
+                                <span class="result-label">Duplicates Skipped</span>
+                            </div>
+                            <div class="result-card">
+                                <span class="result-number" id="userProcessingTimeResult">0s</span>
+                                <span class="result-label">Processing Time</span>
+                            </div>
+                        </div>
+
+                        <div class="scan-log" id="userScanLog">
+                            <!-- Log entries will be added here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="cancel-btn" onclick="this.closest('.modal-overlay').remove()">
+                        <i class='bx bx-x'></i>
+                        Cancel
+                    </button>
+                    <button class="scan-btn" id="startUserScanBtn" onclick="userManagement.executeUserPRScan('${user._id || user.id}', this)">
+                        <i class='bx bx-search'></i>
+                        Start PR Scan
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        modal.classList.add('show');
+    }
+
+    async executeUserPRScan(userId, button) {
+        const user = this.users.find(u => (u._id || u.id) === userId);
+        if (!user) return;
+
+        const modal = button.closest('.modal-overlay');
+        const progressSection = modal.querySelector('#userScanProgress');
+        const resultsSection = modal.querySelector('#userScanResults');
+        const progressBar = modal.querySelector('#userProgressBar');
+        const progressStats = modal.querySelector('#userProgressStats');
+        const logContainer = modal.querySelector('#userScanLog');
+
+        // Show scanning state
+        button.disabled = true;
+        button.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Scanning...';
+        progressSection.style.display = 'block';
+
+        const scanResults = {
+            newPRs: 0,
+            skippedDuplicates: 0,
+            startTime: Date.now(),
+            endTime: null
+        };
+
+        try {
+            this.addUserLogEntry(logContainer, 'info', 'Starting PR scan...');
+            progressStats.textContent = 'Fetching registered repositories...';
+            progressBar.style.width = '10%';
+
+            // Fetch registered repositories
+            const registeredRepos = await this.fetchRegisteredRepos();
+            this.addUserLogEntry(logContainer, 'success', `Found ${registeredRepos.length} registered repositories`);
+
+            progressStats.textContent = 'Scanning user PRs...';
+            progressBar.style.width = '30%';
+
+            // Scan user PRs using GraphQL
+            const userPRResults = await this.scanIndividualUserPRs(user, registeredRepos, logContainer, progressBar, progressStats);
+
+            scanResults.newPRs = userPRResults.newPRs;
+            scanResults.skippedDuplicates = userPRResults.skippedDuplicates;
+            scanResults.endTime = Date.now();
+
+            // Update results
+            const duration = Math.round((scanResults.endTime - scanResults.startTime) / 1000);
+            modal.querySelector('#userNewPRsResult').textContent = scanResults.newPRs;
+            modal.querySelector('#userSkippedPRsResult').textContent = scanResults.skippedDuplicates;
+            modal.querySelector('#userProcessingTimeResult').textContent = `${duration}s`;
+
+            // Show results section
+            resultsSection.style.display = 'block';
+            progressStats.textContent = 'Scan completed';
+            progressBar.style.width = '100%';
+
+            this.addUserLogEntry(logContainer, 'success', `✅ Scan completed in ${duration} seconds`);
+            this.addUserLogEntry(logContainer, 'info', `Found ${scanResults.newPRs} new PRs for admin review`);
+
+            // Show success toast
+            if (scanResults.newPRs > 0) {
+                showToast('success', `Found ${scanResults.newPRs} new PRs for ${user.username}!`);
+            } else {
+                showToast('info', `No new PRs found for ${user.username}`);
+            }
+
+        } catch (error) {
+            this.addUserLogEntry(logContainer, 'error', `Scan failed: ${error.message}`);
+            showToast('error', `PR scan failed: ${error.message}`);
+        } finally {
+            button.disabled = false;
+            button.innerHTML = '<i class="bx bx-refresh"></i> Scan Again';
+        }
+    }
+
+    async fetchRegisteredRepos() {
+        const response = await fetch(`${serverUrl}/api/admin/projects`, {
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch repositories');
+        }
+
+        const allRepos = await response.json();
+        return allRepos.filter(repo => repo.reviewStatus === 'accepted');
+    }
+
+    async scanIndividualUserPRs(user, registeredRepos, logContainer, progressBar, progressStats) {
+        try {
+            this.addUserLogEntry(logContainer, 'info', `Scanning PRs for @${user.username}...`);
+            progressStats.textContent = `Fetching PRs for ${user.username}...`;
+            progressBar.style.width = '50%';
+
+            // Use GraphQL for more efficient querying
+            const query = `
+                query($username: String!, $after: String) {
+                    user(login: $username) {
+                        pullRequests(
+                            first: 100,
+                            after: $after,
+                            states: MERGED,
+                            orderBy: { field: UPDATED_AT, direction: DESC }
+                        ) {
+                            pageInfo {
+                                hasNextPage
+                                endCursor
+                            }
+                            nodes {
+                                number
+                                title
+                                mergedAt
+                                repository {
+                                    nameWithOwner
+                                }
+                                baseRepository {
+                                    nameWithOwner
+                                }
+                            }
+                        }
+                    }
+                }
+            `;
+
+            const response = await fetch(`${serverUrl}/api/github/graphql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    query,
+                    variables: { username: user.username }
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`GraphQL query failed for ${user.username}`);
+            }
+
+            const data = await response.json();
+            const pullRequests = data.data?.user?.pullRequests?.nodes || [];
+
+            progressStats.textContent = `Processing ${pullRequests.length} merged PRs...`;
+            progressBar.style.width = '70%';
+
+            // Filter PRs that match registered repositories
+            let newPRs = 0;
+            let skippedDuplicates = 0;
+            const programStartDate = new Date('2025-03-14');
+
+            for (const pr of pullRequests) {
+                const mergedDate = new Date(pr.mergedAt);
+                if (mergedDate < programStartDate) continue;
+
+                const repoUrl = `https://github.com/${pr.baseRepository.nameWithOwner}`;
+                const isRegistered = registeredRepos.some(repo => repo.repoLink === repoUrl);
+
+                if (isRegistered) {
+                    // Check for duplicates first
+                    const isDuplicate = await this.checkPRDuplicate(user, pr, repoUrl);
+
+                    if (isDuplicate) {
+                        skippedDuplicates++;
+                        this.addUserLogEntry(logContainer, 'info', `⚠️ Skipped duplicate: ${pr.title} in ${pr.baseRepository.nameWithOwner}`);
+                        continue;
+                    }
+
+                    // Submit PR for approval
+                    const submitted = await this.submitUserPRForApproval(user, pr, repoUrl);
+                    if (submitted) {
+                        newPRs++;
+                        this.addUserLogEntry(logContainer, 'success', `✅ Found new PR: ${pr.title} in ${pr.baseRepository.nameWithOwner}`);
+                    }
+                }
+            }
+
+            progressStats.textContent = 'Finalizing results...';
+            progressBar.style.width = '90%';
+
+            if (newPRs > 0) {
+                this.addUserLogEntry(logContainer, 'success', `✅ ${user.username}: ${newPRs} new PRs found`);
+            } else {
+                this.addUserLogEntry(logContainer, 'info', `ℹ️ ${user.username}: No new PRs found`);
+            }
+
+            return { newPRs, skippedDuplicates };
+
+        } catch (error) {
+            this.addUserLogEntry(logContainer, 'error', `❌ ${user.username}: ${error.message}`);
+            throw error;
+        }
+    }
+
+    async checkPRDuplicate(user, pr, repoUrl) {
+        try {
+            const response = await fetch(`${serverUrl}/api/admin/all-prs`, {
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                return false; // If we can't check, proceed with submission
+            }
+
+            const allPRs = await response.json();
+
+            // Check if PR already exists
+            const exists = allPRs.some(existingPR =>
+                (existingPR.userId === (user.githubId || user._id) || existingPR.username === user.username) &&
+                existingPR.repoUrl === repoUrl &&
+                existingPR.prNumber === pr.number
+            );
+
+            return exists;
+        } catch (error) {
+            console.error('Error checking PR duplicate:', error);
+            return false; // If check fails, proceed with submission
+        }
+    }
+
+    async submitUserPRForApproval(user, pr, repoUrl) {
+        try {
+            const response = await fetch(`${serverUrl}/api/admin/submit-pr`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    userId: user.githubId || user._id,
+                    username: user.username,
+                    repoUrl: repoUrl,
+                    prNumber: pr.number,
+                    title: pr.title,
+                    mergedAt: pr.mergedAt
+                })
+            });
+
+            return response.ok;
+        } catch (error) {
+            console.error('Failed to submit PR:', error);
+            return false;
+        }
+    }
+
+    addUserLogEntry(logContainer, type, message) {
+        const timestamp = new Date().toLocaleTimeString();
+
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry ${type}`;
+        logEntry.innerHTML = `
+            <span class="log-timestamp">${timestamp}</span>
+            <span>${message}</span>
+        `;
+
+        logContainer.appendChild(logEntry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
     createUserCard(user) {
         const joinDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown';
         const lastActive = user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never';
@@ -266,6 +616,9 @@ class UserManagement {
                                 <i class='bx bx-edit'></i>
                             </button>
                         ` : ''}
+                        <button class="quick-action-btn scan-btn" onclick="userManagement.scanUserPRs('${user._id || user.id}')" title="Scan for new PRs">
+                            <i class='bx bx-search'></i>
+                        </button>
                         ${user.email && user.email !== 'No email provided' ? `
                             <button class="quick-action-btn email-btn" onclick="userManagement.sendEmail('${user.email}', '${user.username}')">
                                 <i class='bx bx-envelope'></i>
@@ -895,10 +1248,441 @@ class UserManagement {
     }
 
     openUserEditModal(user) {
-        // Placeholder for user editing functionality
-        if (window.showToast) {
-            window.showToast('info', 'User editing functionality coming soon!');
+        const modal = document.createElement('div');
+        modal.className = 'user-edit-modal modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2>Edit User: ${user.displayName || user.username}</h2>
+                    <button class="close-modal" onclick="this.closest('.modal-overlay').remove()">
+                        <i class='bx bx-x'></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="userEditForm" class="user-edit-form">
+                        <div class="form-sections">
+                            <!-- Basic Information Section -->
+                            <div class="form-section">
+                                <h3>Basic Information</h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="editDisplayName">Display Name</label>
+                                        <input type="text" id="editDisplayName" value="${user.displayName || ''}" 
+                                               placeholder="Enter display name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editUsername">Username</label>
+                                        <input type="text" id="editUsername" value="${user.username || ''}" 
+                                               placeholder="Enter username" readonly>
+                                        <small class="field-note">Username cannot be changed</small>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="editEmail">Email Address</label>
+                                        <input type="email" id="editEmail" value="${user.email || ''}" 
+                                               placeholder="Enter email address">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editAvatarUrl">Avatar URL</label>
+                                        <input type="url" id="editAvatarUrl" value="${user.avatarUrl || ''}" 
+                                               placeholder="Enter avatar image URL">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Points and Achievements Section -->
+                            <div class="form-section">
+                                <h3>Points and Achievements</h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="editPoints">Total Points</label>
+                                        <input type="number" id="editPoints" value="${user.totalPoints || user.points || 0}" 
+                                               min="0" placeholder="Enter total points">
+                                        <small class="field-note">Manual point adjustment (use carefully)</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editBadge">Current Badge</label>
+                                        <select id="editBadge">
+                                            <option value="Cursed Newbie | Just awakened....." ${user.badge === 'Cursed Newbie | Just awakened.....' ? 'selected' : ''}>Cursed Newbie</option>
+                                            <option value="Graveyard Shifter | Lost but curious" ${user.badge === 'Graveyard Shifter | Lost but curious' ? 'selected' : ''}>Graveyard Shifter</option>
+                                            <option value="Night Stalker | Shadows are friends" ${user.badge === 'Night Stalker | Shadows are friends' ? 'selected' : ''}>Night Stalker</option>
+                                            <option value="Skeleton of Structure | Casts magic on code" ${user.badge === 'Skeleton of Structure | Casts magic on code' ? 'selected' : ''}>Skeleton of Structure</option>
+                                            <option value="Phantom Architect | Builds from beyond" ${user.badge === 'Phantom Architect | Builds from beyond' ? 'selected' : ''}>Phantom Architect</option>
+                                            <option value="Haunted Debugger | Haunting every broken line" ${user.badge === 'Haunted Debugger | Haunting every broken line' ? 'selected' : ''}>Haunted Debugger</option>
+                                            <option value="Lord of Shadows | Master of the unseen" ${user.badge === 'Lord of Shadows | Master of the unseen' ? 'selected' : ''}>Lord of Shadows</option>
+                                            <option value="Dark Sorcerer | Controls the dark arts" ${user.badge === 'Dark Sorcerer | Controls the dark arts' ? 'selected' : ''}>Dark Sorcerer</option>
+                                            <option value="Demon Crafter | Shapes the cursed world" ${user.badge === 'Demon Crafter | Shapes the cursed world' ? 'selected' : ''}>Demon Crafter</option>
+                                            <option value="Eternal Revenge | Undying ghost" ${user.badge === 'Eternal Revenge | Undying ghost' ? 'selected' : ''}>Eternal Revenge</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Account Settings Section -->
+                            <div class="form-section">
+                                <h3>Account Settings</h3>
+                                <div class="form-row">
+                                    <div class="form-group checkbox-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="editWelcomeEmailSent" ${user.welcomeEmailSent ? 'checked' : ''}>
+                                            <span class="checkmark"></span>
+                                            Welcome Email Sent
+                                        </label>
+                                        <small class="field-note">Mark if welcome email has been sent to user</small>
+                                    </div>
+                                    <div class="form-group checkbox-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="editIsActive" ${user.isActive ? 'checked' : ''}>
+                                            <span class="checkmark"></span>
+                                            Active Account
+                                        </label>
+                                        <small class="field-note">Deactivate to suspend user account</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Admin Actions Section -->
+                            <div class="form-section danger-section">
+                                <h3>Administrative Actions</h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="editAdminNote">Admin Notes</label>
+                                        <textarea id="editAdminNote" rows="3" placeholder="Add administrative notes about this user...">${user.adminNotes || ''}</textarea>
+                                        <small class="field-note">Internal notes for admin reference</small>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Account Actions</label>
+                                        <div class="action-buttons">
+                                            <button type="button" class="action-btn reset-password-btn" onclick="userManagement.resetUserPassword('${user._id || user.id}')">
+                                                <i class='bx bx-key'></i>
+                                                Reset Authentication
+                                            </button>
+                                            <button type="button" class="action-btn resync-data-btn" onclick="userManagement.resyncUserData('${user._id || user.id}')">
+                                                <i class='bx bx-refresh'></i>
+                                                Resync PR Data
+                                            </button>
+                                            <button type="button" class="action-btn send-welcome-btn" onclick="userManagement.resendWelcomeEmail('${user._id || user.id}')">
+                                                <i class='bx bx-envelope'></i>
+                                                Resend Welcome Email
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                ${!user.isAdmin ? `
+                                <div class="form-row">
+                                    <div class="form-group danger-group">
+                                        <label class="danger-label">Danger Zone</label>
+                                        <div class="danger-actions">
+                                            <button type="button" class="danger-btn suspend-btn" onclick="userManagement.suspendUser('${user._id || user.id}')">
+                                                <i class='bx bx-user-x'></i>
+                                                Suspend Account
+                                            </button>
+                                            <button type="button" class="danger-btn delete-btn" onclick="userManagement.deleteUser('${user._id || user.id}')">
+                                                <i class='bx bx-trash'></i>
+                                                Delete Account
+                                            </button>
+                                        </div>
+                                        <small class="danger-note">These actions are permanent and cannot be undone</small>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="cancel-btn" onclick="this.closest('.modal-overlay').remove()">
+                        <i class='bx bx-x'></i>
+                        Cancel
+                    </button>
+                    <button class="save-btn" onclick="userManagement.saveUserChanges('${user._id || user.id}', this)">
+                        <i class='bx bx-save'></i>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        modal.classList.add('show');
+
+        // Focus on first input
+        setTimeout(() => {
+            modal.querySelector('#editDisplayName').focus();
+        }, 100);
+    }
+
+    async saveUserChanges(userId, button) {
+        const modal = button.closest('.modal-overlay');
+        const form = modal.querySelector('#userEditForm');
+
+        // Get form data - including all admin-editable fields
+        const formData = {
+            displayName: form.querySelector('#editDisplayName').value.trim(),
+            email: form.querySelector('#editEmail').value.trim(),
+            avatarUrl: form.querySelector('#editAvatarUrl').value.trim(),
+            totalPoints: parseInt(form.querySelector('#editPoints').value) || 0,
+            badge: form.querySelector('#editBadge').value,
+            welcomeEmailSent: form.querySelector('#editWelcomeEmailSent').checked,
+            isActive: form.querySelector('#editIsActive').checked,
+            adminNotes: form.querySelector('#editAdminNote').value.trim(),
+            // Ensure points field is also mapped correctly for legacy compatibility
+            points: parseInt(form.querySelector('#editPoints').value) || 0
+        };
+
+        // Validation
+        if (!formData.displayName) {
+            window.showToast && window.showToast('error', 'Display name is required');
+            form.querySelector('#editDisplayName').focus();
+            return;
         }
+
+        if (formData.email && !this.validateEmail(formData.email)) {
+            window.showToast && window.showToast('error', 'Please enter a valid email address');
+            form.querySelector('#editEmail').focus();
+            return;
+        }
+
+        if (formData.totalPoints < 0) {
+            window.showToast && window.showToast('error', 'Points cannot be negative');
+            form.querySelector('#editPoints').focus();
+            return;
+        }
+
+        // Show loading state
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Saving...';
+
+        try {
+            const response = await fetch(`${this.serverUrl}/api/admin/users/${userId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            // Update local user data with all changed fields
+            const userIndex = this.users.findIndex(u => (u._id || u.id) === userId);
+            if (userIndex !== -1) {
+                // Sync all admin-edited fields to local user object
+                this.users[userIndex] = {
+                    ...this.users[userIndex],
+                    ...result.user,
+                    // Ensure critical fields are properly updated
+                    displayName: formData.displayName,
+                    email: formData.email,
+                    avatarUrl: formData.avatarUrl,
+                    totalPoints: formData.totalPoints,
+                    points: formData.totalPoints, // Legacy field sync
+                    badge: formData.badge,
+                    welcomeEmailSent: formData.welcomeEmailSent,
+                    isActive: formData.isActive,
+                    adminNotes: formData.adminNotes,
+                    // Update timestamp for tracking
+                    lastUpdatedByAdmin: new Date().toISOString()
+                };
+
+                // Also update filtered users if this user is currently displayed
+                const filteredIndex = this.filteredUsers.findIndex(u => (u._id || u.id) === userId);
+                if (filteredIndex !== -1) {
+                    this.filteredUsers[filteredIndex] = { ...this.users[userIndex] };
+                }
+            }
+
+            // Refresh the display to show updated data
+            this.filteredUsers = this.applyFilter([...this.users]);
+            this.updateUsersGrid();
+
+            // Close modal
+            modal.remove();
+
+            // Show success message with specific field updates
+            const updatedFields = [];
+            if (formData.displayName !== (result.originalUser?.displayName || '')) updatedFields.push('Display Name');
+            if (formData.email !== (result.originalUser?.email || '')) updatedFields.push('Email');
+            if (formData.avatarUrl !== (result.originalUser?.avatarUrl || '')) updatedFields.push('Avatar');
+            if (formData.totalPoints !== (result.originalUser?.totalPoints || 0)) updatedFields.push('Points');
+            if (formData.badge !== (result.originalUser?.badge || '')) updatedFields.push('Badge');
+
+            const updateMessage = updatedFields.length > 0
+                ? `User ${formData.displayName} updated successfully! Updated: ${updatedFields.join(', ')}`
+                : `User ${formData.displayName} updated successfully!`;
+
+            window.showToast && window.showToast('success', updateMessage);
+
+            // Log the update for debugging
+            console.log('User data synchronized:', {
+                userId: userId,
+                updatedFields: formData,
+                timestamp: new Date().toISOString()
+            });
+
+        } catch (error) {
+            console.error('Error saving user changes:', error);
+
+            // Reset button
+            button.disabled = false;
+            button.innerHTML = originalText;
+
+            // Show error message
+            window.showToast && window.showToast('error', `Failed to save changes: ${error.message}`);
+        }
+    }
+
+    async resetUserPassword(userId) {
+        if (!confirm('This will reset the user\'s authentication and they will need to log in again with GitHub. Continue?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.serverUrl}/api/admin/users/${userId}/reset-auth`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to reset user authentication');
+            }
+
+            window.showToast && window.showToast('success', 'User authentication reset successfully');
+        } catch (error) {
+            console.error('Error resetting user auth:', error);
+            window.showToast && window.showToast('error', 'Failed to reset user authentication');
+        }
+    }
+
+    async resyncUserData(userId) {
+        if (!confirm('This will resynchronize the user\'s PR data from GitHub. This may take a moment. Continue?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.serverUrl}/api/admin/users/${userId}/resync`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to resync user data');
+            }
+
+            const result = await response.json();
+
+            window.showToast && window.showToast('success', `User data resynchronized successfully. Found ${result.newPRs || 0} new PRs.`);
+
+            // Reload user data
+            this.loadUsers();
+        } catch (error) {
+            console.error('Error resyncing user data:', error);
+            window.showToast && window.showToast('error', 'Failed to resync user data');
+        }
+    }
+
+    async resendWelcomeEmail(userId) {
+        if (!confirm('This will send a welcome email to the user. Continue?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.serverUrl}/api/admin/users/${userId}/welcome-email`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to send welcome email');
+            }
+
+            window.showToast && window.showToast('success', 'Welcome email sent successfully');
+        } catch (error) {
+            console.error('Error sending welcome email:', error);
+            window.showToast && window.showToast('error', 'Failed to send welcome email');
+        }
+    }
+
+    async suspendUser(userId) {
+        const user = this.users.find(u => (u._id || u.id) === userId);
+        if (!user) return;
+
+        if (!confirm(`This will suspend ${user.displayName || user.username}'s account. They will not be able to access the platform. Continue?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.serverUrl}/api/admin/users/${userId}/suspend`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to suspend user account');
+            }
+
+            window.showToast && window.showToast('success', 'User account suspended successfully');
+
+            // Reload user data
+            this.loadUsers();
+        } catch (error) {
+            console.error('Error suspending user:', error);
+            window.showToast && window.showToast('error', 'Failed to suspend user account');
+        }
+    }
+
+    async deleteUser(userId) {
+        const user = this.users.find(u => (u._id || u.id) === userId);
+        if (!user) return;
+
+        if (!confirm(`⚠️ WARNING: This will permanently delete ${user.displayName || user.username}'s account and ALL associated data. This action CANNOT be undone.\n\nType "${user.username}" to confirm deletion:`)) {
+            return;
+        }
+
+        const confirmUsername = prompt(`Type "${user.username}" to confirm account deletion:`);
+        if (confirmUsername !== user.username) {
+            window.showToast && window.showToast('error', 'Username confirmation does not match. Deletion cancelled.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.serverUrl}/api/admin/users/${userId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete user account');
+            }
+
+            window.showToast && window.showToast('success', 'User account deleted successfully');
+
+            // Remove user from local data
+            this.users = this.users.filter(u => (u._id || u.id) !== userId);
+            this.filteredUsers = this.applyFilter([...this.users]);
+            this.updateUsersGrid();
+
+            // Close any open modals
+            document.querySelectorAll('.modal-overlay').forEach(modal => modal.remove());
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            window.showToast && window.showToast('error', 'Failed to delete user account');
+        }
+    }
+
+    validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
     }
 }
 

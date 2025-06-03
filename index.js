@@ -2134,3 +2134,328 @@ app.post('/api/admin/send-email', async (req, res) => {
         });
     }
 });
+
+// Add admin user update endpoint
+app.patch('/api/admin/users/:userId', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { userId } = req.params;
+        const updates = req.body;
+
+        // Validate input
+        if (updates.totalPoints && updates.totalPoints < 0) {
+            return res.status(400).json({ error: 'Points cannot be negative' });
+        }
+
+        if (updates.email && !isValidEmail(updates.email)) {
+            return res.status(400).json({ error: 'Invalid email format' });
+        }
+
+        // Find and update user
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Apply updates
+        const allowedUpdates = [
+            'displayName', 'email', 'avatarUrl', 'totalPoints',
+            'badge', 'welcomeEmailSent', 'isActive', 'adminNotes'
+        ];
+
+        allowedUpdates.forEach(field => {
+            if (updates[field] !== undefined) {
+                if (field === 'totalPoints') {
+                    user.points = updates[field];
+                } else {
+                    user[field] = updates[field];
+                }
+            }
+        });
+
+        // Update badges if points changed
+        if (updates.totalPoints !== undefined) {
+            user.badges = await checkBadges(user.mergedPRs || [], updates.totalPoints);
+        }
+
+        user.lastModified = new Date();
+        user.lastModifiedBy = req.user.username;
+
+        await user.save();
+
+        res.json({
+            success: true,
+            message: 'User updated successfully',
+            user: {
+                _id: user._id,
+                displayName: user.displayName,
+                email: user.email,
+                avatarUrl: user.avatarUrl,
+                points: user.points,
+                badge: user.badge,
+                welcomeEmailSent: user.welcomeEmailSent,
+                isActive: user.isActive,
+                adminNotes: user.adminNotes
+            }
+        });
+
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).json({
+            error: 'Failed to update user',
+            details: error.message
+        });
+    }
+});
+
+// Reset user authentication endpoint
+app.post('/api/admin/users/:userId/reset-auth', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Clear any session data for this user (implementation depends on session store)
+        // For now, we'll just update a flag
+        user.authResetAt = new Date();
+        user.authResetBy = req.user.username;
+        await user.save();
+
+        res.json({
+            success: true,
+            message: 'User authentication reset successfully'
+        });
+
+    } catch (error) {
+        console.error('Error resetting user auth:', error);
+        res.status(500).json({ error: 'Failed to reset user authentication' });
+    }
+});
+
+// Resync user data endpoint
+app.post('/api/admin/users/:userId/resync', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Resync PR data for this user
+        const prData = await fetchPRDetails(user.username);
+        const newSubmissions = [];
+
+        const acceptedRepos = await Repo.find({ reviewStatus: 'accepted' }, 'repoLink').lean();
+
+        for (const pr of prData.items) {
+            const [owner, repo] = pr.repository_url.split('/repos/')[1].split('/');
+            const repoUrl = `https://github.com/${owner}/${repo}`;
+
+            const registeredRepo = acceptedRepos.find(repo => repo.repoLink === repoUrl);
+
+            if (registeredRepo) {
+                const existingPR = await PendingPR.findOne({
+                    userId: user.githubId,
+                    repoUrl: repoUrl,
+                    prNumber: pr.number
+                });
+
+                if (!existingPR) {
+                    const prDetails = await octokit.pulls.get({
+                        owner,
+                        repo,
+                        pull_number: pr.number
+                    });
+
+                    if (prDetails.data.merged) {
+                        const submission = await submitPRForApproval(
+                            user.githubId,
+                            user.username,
+                            repoUrl,
+                            prDetails.data
+                        );
+
+                        if (submission) {
+                            newSubmissions.push(submission);
+                        }
+                    }
+                }
+            }
+        }
+
+        res.json({
+            success: true,
+            message: 'User data resynchronized successfully',
+            newPRs: newSubmissions.length
+        });
+
+    } catch (error) {
+        console.error('Error resyncing user data:', error);
+        res.status(500).json({ error: 'Failed to resync user data' });
+    }
+});
+
+// Resend welcome email endpoint
+app.post('/api/admin/users/:userId/welcome-email', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        if (!user.email) {
+            return res.status(400).json({ error: 'User has no email address' });
+        }
+
+        // Send welcome email
+        const emailSent = await emailService.sendWelcomeEmail(user.email, user.username);
+
+        if (emailSent) {
+            user.welcomeEmailSent = true;
+            user.welcomeEmailSentAt = new Date();
+            await user.save();
+        }
+
+        res.json({
+            success: true,
+            message: 'Welcome email sent successfully'
+        });
+
+    } catch (error) {
+        console.error('Error sending welcome email:', error);
+        res.status(500).json({ error: 'Failed to send welcome email' });
+    }
+});
+
+// Suspend user endpoint
+app.post('/api/admin/users/:userId/suspend', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Check if trying to suspend an admin
+        if (adminIds.includes(user.username)) {
+            return res.status(403).json({ error: 'Cannot suspend admin users' });
+        }
+
+        user.isActive = false;
+        user.suspendedAt = new Date();
+        user.suspendedBy = req.user.username;
+        await user.save();
+
+        res.json({
+            success: true,
+            message: 'User suspended successfully'
+        });
+
+    } catch (error) {
+        console.error('Error suspending user:', error);
+        res.status(500).json({ error: 'Failed to suspend user' });
+    }
+});
+
+// Delete user endpoint
+app.delete('/api/admin/users/:userId', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Check if trying to delete an admin
+        if (adminIds.includes(user.username)) {
+            return res.status(403).json({ error: 'Cannot delete admin users' });
+        }
+
+        // Delete associated data
+        await PendingPR.deleteMany({
+            $or: [
+                { userId: user.githubId },
+                { username: user.username }
+            ]
+        });
+
+        // Delete user
+        await User.findByIdAndDelete(userId);
+
+        res.json({
+            success: true,
+            message: 'User and associated data deleted successfully'
+        });
+
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).json({ error: 'Failed to delete user' });
+    }
+});
+
+// Helper function to validate email
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
