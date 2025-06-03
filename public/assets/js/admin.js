@@ -1,6 +1,6 @@
 // Server URL from auth.js
-const serverUrl = 'https://www.devsync.club';
-// const serverUrl = 'http://localhost:3000';
+// const serverUrl = 'https://www.devsync.club';
+const serverUrl = 'http://localhost:3000';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Check admin authorization
