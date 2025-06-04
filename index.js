@@ -14,6 +14,7 @@ const PendingPR = require('./models/PendingPR');
 const MongoStore = require('connect-mongo');
 const emailService = require('./services/emailService');
 const dbSync = require('./utils/dbSync');
+const Ticket = require('./models/ticket');
 const PORT = process.env.PORT || 5500;
 const serverUrl = process.env.SERVER_URL;
 
@@ -1912,5 +1913,141 @@ app.post('/api/admin/sync-pending-prs', async (req, res) => {
             details: error.message,
             timestamp: new Date().toISOString()
         });
+    }
+});
+
+// ticket management endpoints
+// Create a new ticket
+app.post('/api/tickets', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    try {
+        const { title, description, priority, type } = req.body;
+        if (!title || !description) {
+            return res.status(400).json({ error: 'Title and description are required' });
+        }
+        const ticket = await Ticket.create({
+            title,
+            description,
+            priority: priority || 'medium',
+            type: type || 'general',
+            status: 'open',
+            createdBy: req.user.username,
+            createdAt: new Date()
+        });
+        res.status(201).json(ticket);
+    } catch (error) {
+        console.error('Error creating ticket:', error);
+        res.status(500).json({ error: 'Failed to create ticket' });
+    }
+});
+
+// Get all tickets (admin only)
+app.get('/api/tickets', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+    try {
+        const tickets = await Ticket.find({}).sort({ createdAt: -1 });
+        res.json(tickets);
+    } catch (error) {
+        console.error('Error fetching tickets:', error);
+        res.status(500).json({ error: 'Failed to fetch tickets' });
+    }
+});
+
+// Get tickets created by the authenticated user
+app.get('/api/tickets/my', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    try {
+        const tickets = await Ticket.find({ createdBy: req.user.username }).sort({ createdAt: -1 });
+        res.json(tickets);
+    } catch (error) {
+        console.error('Error fetching user tickets:', error);
+        res.status(500).json({ error: 'Failed to fetch tickets' });
+    }
+});
+
+// Update ticket status (admin only)
+app.patch('/api/tickets/:ticketId/status', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+    try {
+        const { status } = req.body;
+        const ticket = await Ticket.findById(req.params.ticketId);
+        if (!ticket) {
+            return res.status(404).json({ error: 'Ticket not found' });
+        }
+        ticket.status = status;
+        ticket.updatedAt = new Date();
+        ticket.updatedBy = req.user.username;
+        await ticket.save();
+        res.json(ticket);
+    } catch (error) {
+        console.error('Error updating ticket status:', error);
+        res.status(500).json({ error: 'Failed to update ticket status' });
+    }
+});
+
+// Add a comment to a ticket
+app.post('/api/tickets/:ticketId/comments', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    try {
+        const { comment } = req.body;
+        if (!comment) {
+            return res.status(400).json({ error: 'Comment is required' });
+        }
+        const ticket = await Ticket.findById(req.params.ticketId);
+        if (!ticket) {
+            return res.status(404).json({ error: 'Ticket not found' });
+        }
+        ticket.comments = ticket.comments || [];
+        ticket.comments.push({
+            text: comment,
+            author: req.user.username,
+            createdAt: new Date()
+        });
+        ticket.updatedAt = new Date();
+        await ticket.save();
+        res.json(ticket);
+    } catch (error) {
+        console.error('Error adding comment:', error);
+        res.status(500).json({ error: 'Failed to add comment' });
+    }
+});
+
+// Delete a ticket (admin or ticket creator)
+app.delete('/api/tickets/:ticketId', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    try {
+        const ticket = await Ticket.findById(req.params.ticketId);
+        if (!ticket) {
+            return res.status(404).json({ error: 'Ticket not found' });
+        }
+        const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+        if (ticket.createdBy !== req.user.username && !adminIds.includes(req.user.username)) {
+            return res.status(403).json({ error: 'Not authorized to delete this ticket' });
+        }
+        await Ticket.findByIdAndDelete(req.params.ticketId);
+        res.json({ message: 'Ticket deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting ticket:', error);
+        res.status(500).json({ error: 'Failed to delete ticket' });
     }
 });
