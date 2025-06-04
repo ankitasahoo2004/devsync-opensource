@@ -1,6 +1,6 @@
 // Server URL from auth.js
-const serverUrl = 'https://www.devsync.club';
-// const serverUrl = 'http://localhost:3000';
+// const serverUrl = 'https://www.devsync.club';
+const serverUrl = 'http://localhost:3000';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Check admin authorization
@@ -517,36 +517,13 @@ async function deleteRejectedPR(prId) {
 }
 
 async function loadUsers() {
-    const grid = document.getElementById('pendingPRsGrid');
-    if (!grid) return;
-
-    grid.innerHTML = '<div class="loading">Loading users...</div>';
-
-    try {
-        const response = await fetch(`${serverUrl}/api/users`, {
-            credentials: 'include'
-        });
-        const users = await response.json();
-
-        grid.innerHTML = `
-            <div class="users-grid">
-                ${users.map(user => `
-                    <div class="user-card">
-                        <img src="${user.avatarUrl}" alt="${user.username}" class="user-avatar">
-                        <div class="user-info">
-                            <h3>${user.displayName || user.username}</h3>
-                            <p>@${user.username}</p>
-                            <p>${user.email}</p>
-                            ${user.isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    } catch (error) {
-        console.error('Failed to load users:', error);
-        grid.innerHTML = '<div class="error">Failed to load users. Please try again.</div>';
+    // Initialize user management if not already done
+    if (!window.userManagement) {
+        window.userManagement = new UserManagement(serverUrl);
     }
+
+    // Load users using the dedicated user management system
+    await window.userManagement.loadUsers();
 }
 
 async function loadRepos() {
@@ -684,13 +661,26 @@ async function loadAutomation() {
 function openAdvancedPRScan() {
     // Initialize the PR scanner if not already done
     if (!window.prScanManager) {
-        window.prScanManager = new PRScanManager();
+        // Import the class and create instance
+        if (typeof PRScanManager !== 'undefined') {
+            window.prScanManager = new PRScanManager();
+        } else {
+            showToast('error', 'PR Scanner not loaded. Please refresh the page.');
+            return;
+        }
     }
 
     // Open the scanner modal
     window.prScanManager.open();
     showToast('info', 'Advanced PR Scanner opened. Configure settings and start scanning!');
 }
+
+// Add global fallback function for modal close (in case inline onclick is still used)
+window.closePRScanModal = function () {
+    if (window.prScanManager) {
+        window.prScanManager.close();
+    }
+};
 
 function triggerPRUpdate() {
     if (confirm('This will trigger the legacy PR update system. This may take several minutes. Continue?')) {

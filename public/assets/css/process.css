@@ -3797,7 +3797,7 @@ blockquote {
     grid-column-gap: 30px;
     grid-row-gap: 30px;
     grid-template-rows: auto;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     grid-auto-columns: 1fr;
     display: grid;
 }

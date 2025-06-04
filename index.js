@@ -1583,6 +1583,198 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
+// Add dedicated admin users endpoint with comprehensive data
+app.get('/api/admin/users', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        // Fetch all users with comprehensive data
+        const users = await User.find({})
+            .select('githubId username displayName email avatarUrl mergedPRs cancelledPRs points totalPoints badges badge isAdmin createdAt lastLogin welcomeEmailSent')
+            .sort({ createdAt: -1 })
+            .lean();
+
+        // Get admin usernames for comparison
+        const adminUsernames = process.env.ADMIN_GITHUB_IDS.split(',');
+
+        // Enrich user data with additional statistics
+        const enrichedUsers = await Promise.all(users.map(async (user) => {
+            try {
+                // Get pending PRs count for this user
+                const pendingPRsCount = await PendingPR.countDocuments({
+                    $or: [
+                        { userId: user.githubId },
+                        { username: user.username }
+                    ],
+                    status: 'pending'
+                });
+
+                // Get approved PRs count
+                const approvedPRsCount = await PendingPR.countDocuments({
+                    $or: [
+                        { userId: user.githubId },
+                        { username: user.username }
+                    ],
+                    status: 'approved'
+                });
+
+                // Get rejected PRs count
+                const rejectedPRsCount = await PendingPR.countDocuments({
+                    $or: [
+                        { userId: user.githubId },
+                        { username: user.username }
+                    ],
+                    status: 'rejected'
+                });
+
+                // Calculate total points from approved PRs (more accurate)
+                const approvedPRs = await PendingPR.find({
+                    $or: [
+                        { userId: user.githubId },
+                        { username: user.username }
+                    ],
+                    status: 'approved'
+                }).select('suggestedPoints').lean();
+
+                const calculatedPoints = approvedPRs.reduce((sum, pr) => sum + (pr.suggestedPoints || 50), 0);
+
+                // Get current badge based on points
+                const currentBadge = await getCurrentBadge(calculatedPoints);
+
+                return {
+                    _id: user._id,
+                    githubId: user.githubId,
+                    username: user.username || 'unknown',
+                    displayName: user.displayName || user.username || 'Unknown User',
+                    email: user.email || 'No email provided',
+                    avatarUrl: user.avatarUrl || `https://github.com/${user.username || 'unknown'}.png`,
+                    isAdmin: adminUsernames.includes(user.username),
+
+                    // Points and achievements
+                    points: user.points || 0,
+                    totalPoints: calculatedPoints, // More accurate calculation
+                    badge: currentBadge,
+                    badges: user.badges || ['Newcomer'],
+
+                    // PR Statistics
+                    mergedPRs: user.mergedPRs || [],
+                    cancelledPRs: user.cancelledPRs || [],
+                    pendingPRsCount,
+                    approvedPRsCount,
+                    rejectedPRsCount,
+                    totalPRsSubmitted: pendingPRsCount + approvedPRsCount + rejectedPRsCount,
+
+                    // Activity information
+                    createdAt: user.createdAt || new Date(),
+                    lastLogin: user.lastLogin || null,
+                    welcomeEmailSent: user.welcomeEmailSent || false,
+
+                    // Profile completeness
+                    profileCompleteness: calculateProfileCompleteness(user),
+
+                    // Activity status
+                    isActive: (user.mergedPRs && user.mergedPRs.length > 0) || approvedPRsCount > 0,
+                    isNewUser: user.createdAt && (Date.now() - new Date(user.createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000) // 30 days
+                };
+            } catch (userError) {
+                console.error(`Error enriching user data for ${user.username}:`, userError);
+
+                // Return basic user data on error
+                return {
+                    _id: user._id,
+                    githubId: user.githubId,
+                    username: user.username || 'unknown',
+                    displayName: user.displayName || user.username || 'Unknown User',
+                    email: user.email || 'No email provided',
+                    avatarUrl: user.avatarUrl || `https://github.com/${user.username || 'unknown'}.png`,
+                    isAdmin: adminUsernames.includes(user.username),
+                    points: user.points || 0,
+                    totalPoints: user.totalPoints || user.points || 0,
+                    badge: user.badge || 'Beginner',
+                    badges: user.badges || ['Newcomer'],
+                    mergedPRs: user.mergedPRs || [],
+                    cancelledPRs: user.cancelledPRs || [],
+                    pendingPRsCount: 0,
+                    approvedPRsCount: 0,
+                    rejectedPRsCount: 0,
+                    totalPRsSubmitted: 0,
+                    createdAt: user.createdAt || new Date(),
+                    lastLogin: user.lastLogin || null,
+                    welcomeEmailSent: user.welcomeEmailSent || false,
+                    profileCompleteness: calculateProfileCompleteness(user),
+                    isActive: false,
+                    isNewUser: false,
+                    error: 'Partial data due to processing error'
+                };
+            }
+        }));
+
+        // Sort by creation date (newest first) and add additional metadata
+        const sortedUsers = enrichedUsers.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Add summary statistics
+        const summary = {
+            totalUsers: enrichedUsers.length,
+            adminUsers: enrichedUsers.filter(u => u.isAdmin).length,
+            activeUsers: enrichedUsers.filter(u => u.isActive).length,
+            newUsers: enrichedUsers.filter(u => u.isNewUser).length,
+            usersWithPendingPRs: enrichedUsers.filter(u => u.pendingPRsCount > 0).length,
+            usersWithPoints: enrichedUsers.filter(u => u.totalPoints > 0).length,
+            totalPointsAwarded: enrichedUsers.reduce((sum, u) => sum + u.totalPoints, 0),
+            totalPRsSubmitted: enrichedUsers.reduce((sum, u) => sum + u.totalPRsSubmitted, 0)
+        };
+
+        res.json({
+            users: sortedUsers,
+            summary,
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        console.error('Error fetching admin users:', error);
+        res.status(500).json({
+            error: 'Failed to fetch users',
+            details: error.message
+        });
+    }
+});
+
+// Helper function to calculate profile completeness
+function calculateProfileCompleteness(user) {
+    let completeness = 0;
+    const fields = ['username', 'displayName', 'email', 'avatarUrl'];
+
+    fields.forEach(field => {
+        if (user[field] && user[field].trim() !== '') {
+            completeness += 25; // Each field is worth 25%
+        }
+    });
+
+    return Math.min(completeness, 100);
+}
+
+// Helper function to get current badge based on points
+async function getCurrentBadge(points) {
+    if (points >= 10000) return 'Eternal Revenge | Undying ghost';
+    if (points >= 7500) return 'Demon Crafter | Shapes the cursed world';
+    if (points >= 5000) return 'Dark Sorcerer | Controls the dark arts';
+    if (points >= 3500) return 'Lord of Shadows | Master of the unseen';
+    if (points >= 2000) return 'Haunted Debugger | Haunting every broken line';
+    if (points >= 1000) return 'Phantom Architect | Builds from beyond';
+    if (points >= 500) return 'Skeleton of Structure | Casts magic on code';
+    if (points >= 250) return 'Night Stalker | Shadows are friends';
+    if (points >= 100) return 'Graveyard Shifter | Lost but curious';
+    if (points >= 0) return 'Cursed Newbie | Just awakened.....';
+    return 'Beginner';
+}
+
 // Create event
 app.post('/api/events', async (req, res) => {
     if (!req.isAuthenticated()) {
@@ -1748,40 +1940,6 @@ async function startServer() {
     }
 }
 
-
-// Admin: Get all PRs from all users since PROGRAM_START_DATE
-app.get('/api/admin/all-prs', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
-    if (!adminIds.includes(req.user.username)) {
-        return res.status(403).json({ error: 'Not authorized' });
-    }
-
-    try {
-        const users = await User.find({}).select('username avatarUrl mergedPRs').lean();
-        // Flatten all PRs with user info
-        const allPRs = [];
-        users.forEach(user => {
-            (user.mergedPRs || []).forEach(pr => {
-                if (new Date(pr.mergedAt) >= new Date(PROGRAM_START_DATE)) {
-                    allPRs.push({
-                        username: user.username,
-                        avatarUrl: user.avatarUrl,
-                        ...pr
-                    });
-                }
-            });
-        });
-        // Sort by mergedAt descending
-        allPRs.sort((a, b) => new Date(b.mergedAt) - new Date(a.mergedAt));
-        res.json(allPRs);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch PRs' });
-    }
-});
-
 // Start the server
 startServer();
 
@@ -1916,138 +2074,389 @@ app.post('/api/admin/sync-pending-prs', async (req, res) => {
     }
 });
 
-// ticket management endpoints
-// Create a new ticket
-app.post('/api/tickets', async (req, res) => {
+// Add admin email sending endpoint
+app.post('/api/admin/send-email', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
-    try {
-        const { title, description, priority, type } = req.body;
-        if (!title || !description) {
-            return res.status(400).json({ error: 'Title and description are required' });
-        }
-        const ticket = await Ticket.create({
-            title,
-            description,
-            priority: priority || 'medium',
-            type: type || 'general',
-            status: 'open',
-            createdBy: req.user.username,
-            createdAt: new Date()
-        });
-        res.status(201).json(ticket);
-    } catch (error) {
-        console.error('Error creating ticket:', error);
-        res.status(500).json({ error: 'Failed to create ticket' });
-    }
-});
 
-// Get all tickets (admin only)
-app.get('/api/tickets', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
     const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
     if (!adminIds.includes(req.user.username)) {
         return res.status(403).json({ error: 'Not authorized' });
     }
+
     try {
-        const tickets = await Ticket.find({}).sort({ createdAt: -1 });
-        res.json(tickets);
+        const { to, subject, message, recipientName, templateData } = req.body;
+
+        // Validate required fields
+        if (!to || !subject || !message) {
+            return res.status(400).json({
+                error: 'Missing required fields',
+                details: 'Recipient email, subject, and message are required'
+            });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(to)) {
+            return res.status(400).json({
+                error: 'Invalid email format'
+            });
+        }
+
+        // Send the email using the EmailService
+        const emailService = require('./services/emailService');
+        const result = await emailService.sendMessageEmail(
+            to,
+            recipientName || 'DevSync User',
+            subject,
+            message,
+            templateData
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Email sent successfully',
+            result: {
+                messageId: result.messageId,
+                recipient: result.recipient,
+                subject: result.subject,
+                sentAt: new Date().toISOString(),
+                sentBy: req.user.username
+            }
+        });
+
     } catch (error) {
-        console.error('Error fetching tickets:', error);
-        res.status(500).json({ error: 'Failed to fetch tickets' });
+        console.error('Error in admin email sending:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to send email',
+            details: error.message
+        });
     }
 });
 
-// Get tickets created by the authenticated user
-app.get('/api/tickets/my', async (req, res) => {
+// Add admin user update endpoint
+app.patch('/api/admin/users/:userId', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
-    try {
-        const tickets = await Ticket.find({ createdBy: req.user.username }).sort({ createdAt: -1 });
-        res.json(tickets);
-    } catch (error) {
-        console.error('Error fetching user tickets:', error);
-        res.status(500).json({ error: 'Failed to fetch tickets' });
-    }
-});
 
-// Update ticket status (admin only)
-app.patch('/api/tickets/:ticketId/status', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
     const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
     if (!adminIds.includes(req.user.username)) {
         return res.status(403).json({ error: 'Not authorized' });
     }
-    try {
-        const { status } = req.body;
-        const ticket = await Ticket.findById(req.params.ticketId);
-        if (!ticket) {
-            return res.status(404).json({ error: 'Ticket not found' });
-        }
-        ticket.status = status;
-        ticket.updatedAt = new Date();
-        ticket.updatedBy = req.user.username;
-        await ticket.save();
-        res.json(ticket);
-    } catch (error) {
-        console.error('Error updating ticket status:', error);
-        res.status(500).json({ error: 'Failed to update ticket status' });
-    }
-});
 
-// Add a comment to a ticket
-app.post('/api/tickets/:ticketId/comments', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
     try {
-        const { comment } = req.body;
-        if (!comment) {
-            return res.status(400).json({ error: 'Comment is required' });
+        const { userId } = req.params;
+        const updates = req.body;
+
+        // Validate input
+        if (updates.totalPoints && updates.totalPoints < 0) {
+            return res.status(400).json({ error: 'Points cannot be negative' });
         }
-        const ticket = await Ticket.findById(req.params.ticketId);
-        if (!ticket) {
-            return res.status(404).json({ error: 'Ticket not found' });
+
+        if (updates.email && !isValidEmail(updates.email)) {
+            return res.status(400).json({ error: 'Invalid email format' });
         }
-        ticket.comments = ticket.comments || [];
-        ticket.comments.push({
-            text: comment,
-            author: req.user.username,
-            createdAt: new Date()
+
+        // Find and update user
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Apply updates
+        const allowedUpdates = [
+            'displayName', 'email', 'avatarUrl', 'totalPoints',
+            'badge', 'welcomeEmailSent', 'isActive', 'adminNotes'
+        ];
+
+        allowedUpdates.forEach(field => {
+            if (updates[field] !== undefined) {
+                if (field === 'totalPoints') {
+                    user.points = updates[field];
+                } else {
+                    user[field] = updates[field];
+                }
+            }
         });
-        ticket.updatedAt = new Date();
-        await ticket.save();
-        res.json(ticket);
+
+        // Update badges if points changed
+        if (updates.totalPoints !== undefined) {
+            user.badges = await checkBadges(user.mergedPRs || [], updates.totalPoints);
+        }
+
+        user.lastModified = new Date();
+        user.lastModifiedBy = req.user.username;
+
+        await user.save();
+
+        res.json({
+            success: true,
+            message: 'User updated successfully',
+            user: {
+                _id: user._id,
+                displayName: user.displayName,
+                email: user.email,
+                avatarUrl: user.avatarUrl,
+                points: user.points,
+                badge: user.badge,
+                welcomeEmailSent: user.welcomeEmailSent,
+                isActive: user.isActive,
+                adminNotes: user.adminNotes
+            }
+        });
+
     } catch (error) {
-        console.error('Error adding comment:', error);
-        res.status(500).json({ error: 'Failed to add comment' });
+        console.error('Error updating user:', error);
+        res.status(500).json({
+            error: 'Failed to update user',
+            details: error.message
+        });
     }
 });
 
-// Delete a ticket (admin or ticket creator)
-app.delete('/api/tickets/:ticketId', async (req, res) => {
+// Reset user authentication endpoint
+app.post('/api/admin/users/:userId/reset-auth', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
     try {
-        const ticket = await Ticket.findById(req.params.ticketId);
-        if (!ticket) {
-            return res.status(404).json({ error: 'Ticket not found' });
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
         }
-        const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
-        if (ticket.createdBy !== req.user.username && !adminIds.includes(req.user.username)) {
-            return res.status(403).json({ error: 'Not authorized to delete this ticket' });
-        }
-        await Ticket.findByIdAndDelete(req.params.ticketId);
-        res.json({ message: 'Ticket deleted successfully' });
+
+        // Clear any session data for this user (implementation depends on session store)
+        // For now, we'll just update a flag
+        user.authResetAt = new Date();
+        user.authResetBy = req.user.username;
+        await user.save();
+
+        res.json({
+            success: true,
+            message: 'User authentication reset successfully'
+        });
+
     } catch (error) {
-        console.error('Error deleting ticket:', error);
-        res.status(500).json({ error: 'Failed to delete ticket' });
+        console.error('Error resetting user auth:', error);
+        res.status(500).json({ error: 'Failed to reset user authentication' });
     }
 });
+
+// Resync user data endpoint
+app.post('/api/admin/users/:userId/resync', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Resync PR data for this user
+        const prData = await fetchPRDetails(user.username);
+        const newSubmissions = [];
+
+        const acceptedRepos = await Repo.find({ reviewStatus: 'accepted' }, 'repoLink').lean();
+
+        for (const pr of prData.items) {
+            const [owner, repo] = pr.repository_url.split('/repos/')[1].split('/');
+            const repoUrl = `https://github.com/${owner}/${repo}`;
+
+            const registeredRepo = acceptedRepos.find(repo => repo.repoLink === repoUrl);
+
+            if (registeredRepo) {
+                const existingPR = await PendingPR.findOne({
+                    userId: user.githubId,
+                    repoUrl: repoUrl,
+                    prNumber: pr.number
+                });
+
+                if (!existingPR) {
+                    const prDetails = await octokit.pulls.get({
+                        owner,
+                        repo,
+                        pull_number: pr.number
+                    });
+
+                    if (prDetails.data.merged) {
+                        const submission = await submitPRForApproval(
+                            user.githubId,
+                            user.username,
+                            repoUrl,
+                            prDetails.data
+                        );
+
+                        if (submission) {
+                            newSubmissions.push(submission);
+                        }
+                    }
+                }
+            }
+        }
+
+        res.json({
+            success: true,
+            message: 'User data resynchronized successfully',
+            newPRs: newSubmissions.length
+        });
+
+    } catch (error) {
+        console.error('Error resyncing user data:', error);
+        res.status(500).json({ error: 'Failed to resync user data' });
+    }
+});
+
+// Resend welcome email endpoint
+app.post('/api/admin/users/:userId/welcome-email', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        if (!user.email) {
+            return res.status(400).json({ error: 'User has no email address' });
+        }
+
+        // Send welcome email
+        const emailSent = await emailService.sendWelcomeEmail(user.email, user.username);
+
+        if (emailSent) {
+            user.welcomeEmailSent = true;
+            user.welcomeEmailSentAt = new Date();
+            await user.save();
+        }
+
+        res.json({
+            success: true,
+            message: 'Welcome email sent successfully'
+        });
+
+    } catch (error) {
+        console.error('Error sending welcome email:', error);
+        res.status(500).json({ error: 'Failed to send welcome email' });
+    }
+});
+
+// Suspend user endpoint
+app.post('/api/admin/users/:userId/suspend', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Check if trying to suspend an admin
+        if (adminIds.includes(user.username)) {
+            return res.status(403).json({ error: 'Cannot suspend admin users' });
+        }
+
+        user.isActive = false;
+        user.suspendedAt = new Date();
+        user.suspendedBy = req.user.username;
+        await user.save();
+
+        res.json({
+            success: true,
+            message: 'User suspended successfully'
+        });
+
+    } catch (error) {
+        console.error('Error suspending user:', error);
+        res.status(500).json({ error: 'Failed to suspend user' });
+    }
+});
+
+// Delete user endpoint
+app.delete('/api/admin/users/:userId', async (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+    if (!adminIds.includes(req.user.username)) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Check if trying to delete an admin
+        if (adminIds.includes(user.username)) {
+            return res.status(403).json({ error: 'Cannot delete admin users' });
+        }
+
+        // Delete associated data
+        await PendingPR.deleteMany({
+            $or: [
+                { userId: user.githubId },
+                { username: user.username }
+            ]
+        });
+
+        // Delete user
+        await User.findByIdAndDelete(userId);
+
+        res.json({
+            success: true,
+            message: 'User and associated data deleted successfully'
+        });
+
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).json({ error: 'Failed to delete user' });
+    }
+});
+
+// Helper function to validate email
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
