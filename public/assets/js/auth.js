@@ -1,6 +1,6 @@
 // const serverUrl = 'https://devsync-opensource.tech';
-// const serverUrl = 'https://www.devsync.club';
-const serverUrl = 'http://localhost:3000';
+const serverUrl = 'https://www.devsync.club';
+// const serverUrl = 'http://localhost:3000';
 
 async function checkAuthStatus() {
     try {
