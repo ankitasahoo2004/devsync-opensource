@@ -211,6 +211,9 @@ async function loadSection(section, forceRefresh = false) {
         case 'automation':
             loadAutomation();
             break;
+        case 'tickets':
+            loadTickets();
+            break;
         default:
             loadPendingPRs();
             break;
@@ -801,6 +804,43 @@ function testEmailSystem() {
 
 function openDataManagement() {
     showToast('info', 'Data management panel coming soon...');
+}
+
+// Load tickets for admin panel
+async function loadTickets() {
+    const ticketList = document.getElementById('ticketList');
+    ticketList.innerHTML = 'Loading...';
+    try {
+        const res = await fetch('/api/tickets', { credentials: 'include' });
+        const tickets = await res.json();
+        ticketList.innerHTML = tickets.map(ticket => `
+            <div class="ticket-card">
+                <h4>${ticket.title}</h4>
+                <p>${ticket.description}</p>
+                <p>Priority: ${ticket.priority}</p>
+                <p>Status: 
+                    <select onchange="updateTicketStatus('${ticket._id}', this.value)">
+                        <option value="open" ${ticket.status === 'open' ? 'selected' : ''}>Open</option>
+                        <option value="in_progress" ${ticket.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
+                        <option value="closed" ${ticket.status === 'closed' ? 'selected' : ''}>Closed</option>
+                    </select>
+                </p>
+                <p>Github ID: ${ticket.githubId}</p>
+                <p>Created: ${new Date(ticket.createdAt).toLocaleString()}</p>
+            </div>
+        `).join('');
+    } catch (err) {
+        ticketList.innerHTML = 'Failed to load tickets.';
+    }
+}
+
+async function updateTicketStatus(id, status) {
+    await fetch(`/api/tickets/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+    });
+    loadTickets();
 }
 
 // Enhanced showToast function for admin panel

@@ -14,6 +14,7 @@ const PendingPR = require('./models/PendingPR');
 const MongoStore = require('connect-mongo');
 const emailService = require('./services/emailService');
 const dbSync = require('./utils/dbSync');
+const Ticket = require('./models/ticket');
 const PORT = process.env.PORT || 5500;
 const serverUrl = process.env.SERVER_URL;
 
