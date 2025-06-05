@@ -19,6 +19,14 @@ class UserManagement {
         }
     }
 
+    // Add method to remove CSS when switching away from user management
+    removeCSS() {
+        const existingLink = document.querySelector('link[href*="admin-user-management.css"]');
+        if (existingLink) {
+            existingLink.remove();
+        }
+    }
+
     async loadUsers() {
         const grid = document.getElementById('userPRGrid');
         if (!grid) return;
