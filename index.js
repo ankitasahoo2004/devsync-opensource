@@ -1979,13 +1979,12 @@ app.post('/api/admin/submit-pr', async (req, res) => {
     }
 
     try {
-        const { userId, username, repoUrl, prNumber, title, mergedAt } = req.body;
-
-        // Check if this PR already exists
+        const { userId, username, repoUrl, prNumber, title, mergedAt } = req.body;        // Check if this PR already exists - use more comprehensive duplicate checking
         const existingPR = await PendingPR.findOne({
-            userId: userId,
-            repoUrl: repoUrl,
-            prNumber: prNumber
+            $or: [
+                { userId: userId, repoUrl: repoUrl, prNumber: prNumber },
+                { username: username, repoUrl: repoUrl, prNumber: prNumber }
+            ]
         });
 
         if (existingPR) {

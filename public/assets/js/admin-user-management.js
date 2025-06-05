@@ -504,9 +504,7 @@ class UserManagement {
             this.addUserLogEntry(logContainer, 'error', `❌ ${user.username}: ${error.message}`);
             throw error;
         }
-    }
-
-    async checkPRDuplicate(user, pr, repoUrl) {
+    } async checkPRDuplicate(user, pr, repoUrl) {
         try {
             const response = await fetch(`${serverUrl}/api/admin/all-prs`, {
                 credentials: 'include'
@@ -518,21 +516,28 @@ class UserManagement {
 
             const allPRs = await response.json();
 
-            // Check if PR already exists
-            const exists = allPRs.some(existingPR =>
-                (existingPR.userId === (user.githubId || user._id) || existingPR.username === user.username) &&
-                existingPR.repoUrl === repoUrl &&
-                existingPR.prNumber === pr.number
-            );
+            // Check if PR already exists using multiple criteria for better accuracy
+            const exists = allPRs.some(existingPR => {
+                const sameRepo = existingPR.repoUrl === repoUrl;
+                const samePR = existingPR.prNumber === pr.number;
+
+                // Check user match using multiple approaches
+                const userIdMatch = existingPR.userId === (user.githubId || user._id);
+                const usernameMatch = existingPR.username === user.username;
+                const altUserIdMatch = user.githubId && existingPR.userId === user.githubId;
+                const altInternalIdMatch = user._id && existingPR.userId === user._id;
+
+                const userMatch = userIdMatch || usernameMatch || altUserIdMatch || altInternalIdMatch;
+
+                return sameRepo && samePR && userMatch;
+            });
 
             return exists;
         } catch (error) {
             console.error('Error checking PR duplicate:', error);
             return false; // If check fails, proceed with submission
         }
-    }
-
-    async submitUserPRForApproval(user, pr, repoUrl) {
+    } async submitUserPRForApproval(user, pr, repoUrl) {
         try {
             const response = await fetch(`${serverUrl}/api/admin/submit-pr`, {
                 method: 'POST',
@@ -549,6 +554,13 @@ class UserManagement {
                     mergedAt: pr.mergedAt
                 })
             });
+
+            if (response.status === 409) {
+                // Server detected duplicate - this shouldn't happen if client-side check works
+                const data = await response.json();
+                console.warn('Server detected duplicate that client missed:', data);
+                return false;
+            }
 
             return response.ok;
         } catch (error) {
