@@ -105,56 +105,63 @@ function initializeModal() {
     const teamData = {
         'member-ankita': {
             name: 'Ankita Priyadarshini Sahoo',
-            role: 'Founder & CEO',
-            description: `<p>Creative Frontend Developer passionate about building responsive, user-friendly interfaces. I specialize in translating design concepts into functional, accessible web experiences while maintaining clean code standards and performance optimization.</p>`,
+            role: 'Founder & Frontend Developer',
+            description: `<p>Creative Frontend Developer passionate about building responsive, user-friendly interfaces. I specialize in translating design concepts into functional, accessible web experiences while maintaining clean code standards and performance optimization.</p>
+                     <p>Skills: HTML5, CSS3, JavaScript, React, Responsive Design, UI/UX Principles, Figma, Git</p>`,
             linkedin: 'https://www.linkedin.com/in/ankita-priyadarshini-sahoo-529517291/',
             github: 'https://github.com/ankitasahoo2004',
             instagram: 'https://www.instagram.com/_.ankitasahoo._/'
         },
         'member-shubham': {
             name: 'Shubham Kumar',
-            role: 'Founder & COO',
-            description: `<p>Full-stack developer specializing in the MERN stack with experience in building scalable web applications. Focused on creating efficient server-side architectures and seamless frontend-backend integration.</p>`,
+            role: 'Founder & Mern Stack Developer',
+            description: `<p>Full-stack developer specializing in the MERN stack with experience in building scalable web applications. Focused on creating efficient server-side architectures and seamless frontend-backend integration.</p>
+                     <p>Skills: MongoDB, Express.js, React, Node.js, REST APIs, JWT Authentication, Mongoose</p>`,
             linkedin: 'https://www.linkedin.com/in/shubham-yadav-07199a24b/',
             github: 'https://github.com/Shubham66020',
             instagram: 'https://www.instagram.com/shubham._.yadav._/'
         },
         'member-sayan': {
             name: 'Sayan Karmakar',
-            role: 'Founder & CTO',
-            description: `<p>Backend specialist focused on server-side logic, database architecture, and API development. Committed to building secure, high-performance systems that power seamless user experiences.</p>`,
+            role: 'Founder & Backend Developer',
+            description: `<p>Backend specialist focused on server-side logic, database architecture, and API development. Committed to building secure, high-performance systems that power seamless user experiences.</p>
+                     <p>Skills: Node.js, Express, MongoDB, SQL, API Development, Authentication, Performance Optimization</p>`,
             linkedin: 'https://www.linkedin.com/in/sayan-karmakar-01239a242/',
             github: 'https://github.com/Sayan-dev731',
             instagram: 'https://www.instagram.com/code_it884/'
         },
         'member-ansh': {
             name: 'Ansh Raj',
-            role: 'Community Manager',
-            description: `<p>Detail-oriented developer focused on maintaining code quality through comprehensive reviews. Ensures adherence to coding standards, identifies potential issues, and suggests optimizations for better maintainability.</p>`,
+            role: 'Code Reviewer',
+            description: `<p>Detail-oriented developer focused on maintaining code quality through comprehensive reviews. Ensures adherence to coding standards, identifies potential issues, and suggests optimizations for better maintainability.</p>
+                     <p>Skills: Code Analysis, Debugging, Performance Review, Documentation, ESLint, Prettier, Git</p>`,
             linkedin: 'https://www.linkedin.com/in/ansh-raj-b66960317/',
             github: 'https://github.com/anshraj-21',
             instagram: 'https://www.instagram.com/ansh_pvtx21?igsh=MTVzYmNmcjhraHloYw%3D%3D'
         },
         'member-rishikesh': {
             name: 'Rishikesh Raj',
-            role: 'Partnership Manager',
-            description: `<p>Operations lead coordinating team activities and workflows. Facilitates communication between departments and ensures projects stay on track through effective planning and resource allocation.</p>`,
+            role: 'Team Management',
+            description: `<p>Operations lead coordinating team activities and workflows. Facilitates communication between departments and ensures projects stay on track through effective planning and resource allocation.</p>
+                     <p>Skills: Agile Methodologies, Task Delegation, Conflict Resolution, Productivity Tools, Jira</p>`,
             linkedin: 'https://www.linkedin.com/in/rishikesh-raj-b68642250/',
             github: 'https://github.com/Rishikesh-001',
             instagram: 'https://www.instagram.com/_raj_rishikesh'
         },
         'member-krish': {
             name: 'Krish Maurya',
-            role: 'Creative Producer',
-            description: `<p>Content editor ensuring all published materials meet quality standards. Reviews technical documentation, blog posts, and marketing content for clarity, accuracy, and consistency.</p>`,
+            role: 'Lead Editor',
+            description: `<p>Content editor ensuring all published materials meet quality standards. Reviews technical documentation, blog posts, and marketing content for clarity, accuracy, and consistency.</p>
+                     <p>Skills: Copy Editing, Technical Writing, Style Guides, SEO Basics, Content Management</p>`,
             linkedin: 'https://www.linkedin.com/in/krish-maurya-59699732b/',
             github: 'https://github.com/krishmaurya21',
             instagram: 'https://www.instagram.com/krrishmaurya21/'
         },
         'member-divyanshu': {
             name: 'Divyanshu Soni',
-            role: 'Creative Designer',
-            description: `<p>Community manager overseeing Discord server operations and engagement. Facilitates discussions, enforces guidelines, and creates welcoming environments for members to connect.</p>`,
+            role: 'Discord Moderator',
+            description: `<p>Community manager overseeing Discord server operations and engagement. Facilitates discussions, enforces guidelines, and creates welcoming environments for members to connect.</p>
+                     <p>Skills: Community Guidelines, Conflict Resolution, Engagement Strategies, Bot Management</p>`,
             linkedin: 'https://www.linkedin.com/in/divyanshu-soni-938468334/',
             github: 'https://github.com/DivyanshuXOR',
             instagram: 'https://www.instagram.com/divyanshu._.soni_22/'
