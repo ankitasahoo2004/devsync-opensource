@@ -6,6 +6,7 @@ class PRScanManager {
             totalUsers: 0,
             processedUsers: 0,
             newPRs: 0,
+            skippedDuplicates: 0,
             errors: 0,
             startTime: null,
             endTime: null
@@ -261,13 +262,12 @@ class PRScanManager {
         if (this.handleEscapeKey) {
             document.removeEventListener('keydown', this.handleEscapeKey);
         }
-    }
-
-    resetScan() {
+    } resetScan() {
         this.scanResults = {
             totalUsers: 0,
             processedUsers: 0,
             newPRs: 0,
+            skippedDuplicates: 0,
             errors: 0,
             startTime: null,
             endTime: null
@@ -374,12 +374,11 @@ class PRScanManager {
             );
 
             try {
-                const batchResults = await Promise.all(batchPromises);
-
-                // Update results
+                const batchResults = await Promise.all(batchPromises);                // Update results
                 batchResults.forEach(result => {
                     this.scanResults.processedUsers++;
                     this.scanResults.newPRs += result.newPRs;
+                    this.scanResults.skippedDuplicates += (result.skippedDuplicates || 0);
                     if (result.error) {
                         this.scanResults.errors++;
                     }
@@ -451,10 +450,9 @@ class PRScanManager {
             }
 
             const data = await response.json();
-            const pullRequests = data.data?.user?.pullRequests?.nodes || [];
-
-            // Filter PRs that match registered repositories
+            const pullRequests = data.data?.user?.pullRequests?.nodes || [];            // Filter PRs that match registered repositories
             let newPRs = 0;
+            let skippedDuplicates = 0;
             const programStartDate = new Date('2025-03-14');
 
             for (const pr of pullRequests) {
@@ -462,14 +460,23 @@ class PRScanManager {
                 if (mergedDate < programStartDate) continue;
 
                 const repoUrl = `https://github.com/${pr.baseRepository.nameWithOwner}`;
-                const isRegistered = registeredRepos.some(repo => repo.repoLink === repoUrl);
+                const isRegistered = registeredRepos.some(repo => repo.repoLink === repoUrl); if (isRegistered) {
+                    // Check for duplicates first
+                    const isDuplicate = await this.checkPRDuplicate(user, pr, repoUrl);
 
-                if (isRegistered) {
+                    if (isDuplicate) {
+                        skippedDuplicates++;
+                        this.addLogEntry('info', `⚠️ Skipped duplicate: PR #${pr.number} "${pr.title}" by @${user.username} in ${pr.baseRepository.nameWithOwner}`);
+                        continue;
+                    }
+
                     // Submit PR for approval
                     const submitted = await this.submitPRForApproval(user, pr, repoUrl);
                     if (submitted) {
                         newPRs++;
-                        this.addLogEntry('success', `Found new PR: ${pr.title} in ${pr.baseRepository.nameWithOwner}`);
+                        this.addLogEntry('success', `✅ Found new PR: #${pr.number} "${pr.title}" by @${user.username} in ${pr.baseRepository.nameWithOwner}`);
+                    } else {
+                        this.addLogEntry('error', `❌ Failed to submit PR: #${pr.number} "${pr.title}" by @${user.username} in ${pr.baseRepository.nameWithOwner}`);
                     }
                 }
             }
@@ -480,15 +487,16 @@ class PRScanManager {
                 this.addLogEntry('info', `○ ${user.username}: No new PRs`);
             }
 
-            return { newPRs, error: false };
+            if (skippedDuplicates > 0) {
+                this.addLogEntry('info', `ℹ️ ${user.username}: ${skippedDuplicates} duplicates skipped`);
+            }
 
+            return { newPRs, skippedDuplicates, error: false };
         } catch (error) {
             this.addLogEntry('error', `✗ ${user.username}: ${error.message}`);
-            return { newPRs: 0, error: true };
+            return { newPRs: 0, skippedDuplicates: 0, error: true };
         }
-    }
-
-    async submitPRForApproval(user, pr, repoUrl) {
+    } async submitPRForApproval(user, pr, repoUrl) {
         try {
             const response = await fetch(`${serverUrl}/api/admin/submit-pr`, {
                 method: 'POST',
@@ -506,10 +514,50 @@ class PRScanManager {
                 })
             });
 
+            if (response.status === 409) {
+                // Server detected duplicate - log it but don't treat as error
+                const data = await response.json();
+                this.addLogEntry('info', `🔍 Server detected duplicate: PR #${pr.number} "${pr.title}" by @${user.username}`);
+                return false;
+            }
+
             return response.ok;
         } catch (error) {
             console.error('Failed to submit PR:', error);
             return false;
+        }
+    } async checkPRDuplicate(user, pr, repoUrl) {
+        try {
+            const response = await fetch(`${serverUrl}/api/admin/all-prs`, {
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                return false; // If we can't check, proceed with submission
+            }
+
+            const allPRs = await response.json();
+
+            // Check if PR already exists using multiple criteria for better accuracy
+            const exists = allPRs.some(existingPR => {
+                const sameRepo = existingPR.repoUrl === repoUrl;
+                const samePR = existingPR.prNumber === pr.number;
+
+                // Check user match using multiple approaches
+                const userIdMatch = existingPR.userId === (user.githubId || user._id);
+                const usernameMatch = existingPR.username === user.username;
+                const altUserIdMatch = user.githubId && existingPR.userId === user.githubId;
+                const altInternalIdMatch = user._id && existingPR.userId === user._id;
+
+                const userMatch = userIdMatch || usernameMatch || altUserIdMatch || altInternalIdMatch;
+
+                return sameRepo && samePR && userMatch;
+            });
+
+            return exists;
+        } catch (error) {
+            console.error('Error checking PR duplicate:', error);
+            return false; // If check fails, proceed with submission
         }
     }
 

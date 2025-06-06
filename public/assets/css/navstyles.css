@@ -151,8 +151,9 @@
 
 .active-link {
   position: relative;
+  color: var(--first-color) !important; /* or #e51837 to match your brand color */
 }
-
+/* 
 .active-link::before {
   content: "";
   position: absolute;
@@ -162,6 +163,12 @@
   height: 5px;
   background-color: var(--title-color);
   border-radius: 50%;
+} */
+
+/* Also add hover effect for better UX */
+.nav__link:hover {
+  color: var(--first-color); /* or #e51837 */
+  transition: color 0.3s ease;
 }
 
 @media screen and (max-width: 960px) {

@@ -1,6 +1,6 @@
 // Server URL from auth.js
-// const serverUrl = 'https://www.devsync.club';
-const serverUrl = 'http://localhost:3000';
+const serverUrl = 'https://www.devsync.club';
+// const serverUrl = 'http://localhost:3000';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Check admin authorization
@@ -96,8 +96,101 @@ function showSearchHintToast() {
     showToast('info', `💡 Pro tip: Press ${shortcut} to search anything in the admin panel!`);
 }
 
+// CSS Management System for Admin Sections
+function manageSectionCSS(newSection) {
+    // Define CSS files for each section
+    const sectionCSSMap = {
+        'users': 'admin-user-management.css',
+        'pending': null, // Uses main admin.css only
+        'approved': null, // Uses main admin.css only  
+        'rejected': null, // Uses main admin.css only
+        'repos': null, // Uses main admin.css only
+        'automation': 'admin-pr-scan.css' // Automation section uses PR scan styles
+    };
+
+    // Get current section CSS file
+    const newCSSFile = sectionCSSMap[newSection];
+
+    // Remove only section-specific CSS files that are not needed for the new section
+    removeUnneededSectionCSS(newCSSFile);
+
+    // Load CSS for the new section if it has a specific CSS file
+    if (newCSSFile) {
+        loadSectionCSS(newCSSFile);
+    }
+
+    // Handle user management special case
+    if (newSection === 'users' && window.userManagement) {
+        // User management handles its own CSS loading
+        window.userManagement.loadCSS();
+    } else if (newSection !== 'users' && window.userManagement) {
+        // Remove user management CSS when switching away from users section
+        window.userManagement.removeCSS();
+    }
+}
+
+function removeUnneededSectionCSS(newCSSFile) {
+    // Define all section-specific CSS files
+    const allSectionCSSFiles = [
+        'admin-user-management.css',
+        'admin-pr-scan.css',
+        'admin-search.css'
+    ];
+
+    // Remove only CSS files that are not needed for the new section
+    allSectionCSSFiles.forEach(cssFile => {
+        if (cssFile !== newCSSFile) {
+            removeSectionCSS(cssFile);
+        }
+    });
+}
+
+function removeAllSectionCSS() {
+    // Remove user management CSS
+    if (window.userManagement) {
+        window.userManagement.removeCSS();
+    }
+
+    // Remove other section-specific CSS files
+    const sectionCSSFiles = [
+        'admin-user-management.css',
+        'admin-pr-scan.css',
+        'admin-search.css'
+    ];
+
+    sectionCSSFiles.forEach(cssFile => {
+        removeSectionCSS(cssFile);
+    });
+}
+
+function loadSectionCSS(cssFile) {
+    // Check if CSS is already loaded to avoid duplicates
+    const existingLink = document.querySelector(`link[href*="${cssFile}"]`);
+    if (existingLink) {
+        return; // CSS already loaded
+    }
+
+    // Create and append CSS link
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `assets/css/${cssFile}`;
+    link.dataset.sectionCss = 'true'; // Mark as section-specific CSS
+    document.head.appendChild(link);
+}
+
+function removeSectionCSS(cssFile) {
+    // Find and remove the CSS link
+    const link = document.querySelector(`link[href*="${cssFile}"]`);
+    if (link) {
+        link.remove();
+    }
+}
+
 async function loadSection(section, forceRefresh = false) {
     const contentArea = document.querySelector('.main-content') || document.getElementById('pendingSection');
+
+    // Handle CSS management for section switching
+    manageSectionCSS(section);
 
     switch (section) {
         case 'pending':
@@ -117,6 +210,9 @@ async function loadSection(section, forceRefresh = false) {
             break;
         case 'automation':
             loadAutomation();
+            break;
+        case 'tickets':
+            loadTickets();
             break;
         default:
             loadPendingPRs();
@@ -708,6 +804,43 @@ function testEmailSystem() {
 
 function openDataManagement() {
     showToast('info', 'Data management panel coming soon...');
+}
+
+// Load tickets for admin panel
+async function loadTickets() {
+    const ticketList = document.getElementById('ticketList');
+    ticketList.innerHTML = 'Loading...';
+    try {
+        const res = await fetch('/api/tickets', { credentials: 'include' });
+        const tickets = await res.json();
+        ticketList.innerHTML = tickets.map(ticket => `
+            <div class="ticket-card">
+                <h4>${ticket.title}</h4>
+                <p>${ticket.description}</p>
+                <p>Priority: ${ticket.priority}</p>
+                <p>Status: 
+                    <select onchange="updateTicketStatus('${ticket._id}', this.value)">
+                        <option value="open" ${ticket.status === 'open' ? 'selected' : ''}>Open</option>
+                        <option value="in_progress" ${ticket.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
+                        <option value="closed" ${ticket.status === 'closed' ? 'selected' : ''}>Closed</option>
+                    </select>
+                </p>
+                <p>Github ID: ${ticket.githubId}</p>
+                <p>Created: ${new Date(ticket.createdAt).toLocaleString()}</p>
+            </div>
+        `).join('');
+    } catch (err) {
+        ticketList.innerHTML = 'Failed to load tickets.';
+    }
+}
+
+async function updateTicketStatus(id, status) {
+    await fetch(`/api/tickets/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+    });
+    loadTickets();
 }
 
 // Enhanced showToast function for admin panel
