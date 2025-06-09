@@ -11,6 +11,7 @@ const User = require('./models/User');
 const Repo = require('./models/Repo');
 const Event = require('./models/Event');
 const PendingPR = require('./models/PendingPR');
+const Ticket = require('./models/Ticket'); // Add Ticket model
 const MongoStore = require('connect-mongo');
 const emailService = require('./services/emailService');
 const dbSync = require('./utils/dbSync');
@@ -29,7 +30,25 @@ const octokit = new Octokit({
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('Connected to MongoDB'))
+    .then(async () => {
+        console.log('Connected to MongoDB');
+
+        // Clean up old indexes that might cause issues
+        try {
+            const Ticket = require('./models/Ticket');
+            await Ticket.cleanupOldIndexes();
+
+            // Also try to drop the specific problematic index
+            try {
+                await mongoose.connection.db.collection('tickets').dropIndex('ticketId_1');
+                console.log('Dropped problematic ticketId_1 index');
+            } catch (dropError) {
+                console.log('Note: ticketId_1 index may not exist or was already dropped');
+            }
+        } catch (error) {
+            console.log('Note: Could not clean up old indexes:', error.message);
+        }
+    })
     .catch(err => console.error('MongoDB connection error:', err));
 
 // Calculate points based on contributions from registered repos
@@ -1893,12 +1912,37 @@ app.post('/api/sponsorship/inquiry', async (req, res) => {
     }
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Add ticket routes BEFORE the catch-all route and AFTER other API routes
+const ticketRoutes = require('./routes/ticketRoutes');
+app.use('/api/tickets', ticketRoutes);
 
-// Serve index.html for all routes to support client-side routing
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+// Add ticket cleanup job
+const cleanupExpiredTickets = async () => {
+    try {
+        const now = new Date();
+        const expiredTickets = await Ticket.find({
+            scheduledForDeletion: { $lte: now },
+            status: 'closed'
+        });
+
+        if (expiredTickets.length > 0) {
+            await Ticket.deleteMany({
+                scheduledForDeletion: { $lte: now },
+                status: 'closed'
+            });
+
+            console.log(`Cleaned up ${expiredTickets.length} expired tickets`);
+        }
+    } catch (error) {
+        console.error('Error cleaning up expired tickets:', error);
+    }
+};
+
+// Run cleanup every hour
+setInterval(cleanupExpiredTickets, 60 * 60 * 1000);
+
+// Run cleanup on startup
+cleanupExpiredTickets();
 
 // Update static file serving
 app.use(express.static(path.join(__dirname, 'public')));
@@ -1917,9 +1961,14 @@ async function startServer() {
 
         // Ensure all routes are registered before the catch-all
 
-        // Catch-all route for SPA - must be after API routes
+        // Catch-all route for SPA - must be LAST after ALL API routes
         app.get('*', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public', 'index.html'));
+            // Only serve index.html for non-API routes
+            if (!req.path.startsWith('/api/')) {
+                res.sendFile(path.join(__dirname, 'public', 'index.html'));
+            } else {
+                res.status(404).json({ error: 'API endpoint not found' });
+            }
         });
 
         app.listen(PORT, () => {
@@ -2141,6 +2190,7 @@ app.patch('/api/admin/users/:userId', async (req, res) => {
     }
 
     const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+
     if (!adminIds.includes(req.user.username)) {
         return res.status(403).json({ error: 'Not authorized' });
     }

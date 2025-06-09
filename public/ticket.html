@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Management - DevSync 2025</title>
+    <!--=============== FAVICON ===============-->
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+
+    <!--=============== BOXICONS ===============-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/ticket.css">
+    <link rel="stylesheet" href="assets/css/navstyles.css">
+</head>
+
+<body>
+    <!--==================== HEADER ====================-->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="index.html" class="nav__logo">
+                <img src="assets/img/logo.png" alt="" class="nav__logo-img">
+                DevSync
+            </a>
+
+            <div class="nav__menu" id="nav-menu">
+                <div class="nav__close" id="nav-close">
+                    <i class='bx bx-x'></i>
+                </div>
+
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <a href="index.html" class="nav__link">Home</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="projects.html" class="nav__link">Projects</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="team.html" class="nav__link">Team</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="events.html" class="nav__link">Schedule</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="ticket.html" class="nav__link active-link">Support</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="leaderboard.html" class="nav__link">Leaderboard</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav__buttons">
+                <div class="nav__toggle" id="nav-toggle">
+                    <i class='bx bx-menu'></i>
+                </div>
+                <a href="login.html" class="button button--ghost">Login</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main">
+        <!-- Ticket Management Section -->
+        <section class="ticket-section section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section__title">Support & Tickets</h2>
+                    <p class="section__subtitle">Create tickets, track your issues, and get help from our team</p>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div class="ticket-tabs">
+                    <button class="tab-btn active" data-tab="create">
+                        <i class='bx bx-plus-circle'></i>
+                        Create Ticket
+                    </button>
+                    <button class="tab-btn" data-tab="my-tickets">
+                        <i class='bx bx-list-ul'></i>
+                        My Tickets
+                    </button>
+                    <button class="tab-btn admin-only" data-tab="admin-panel" style="display: none;">
+                        <i class='bx bx-shield-check'></i>
+                        Admin Panel
+                    </button>
+                </div>
+
+                <!-- Create Ticket Tab -->
+                <div class="tab-content active" id="create-tab">
+                    <div class="create-ticket-container">
+                        <div class="auth-message" id="createAuthMessage" style="display: none;">
+                            <i class='bx bx-info-circle'></i>
+                            <p>Please <a href="login.html">login</a> to create a support ticket.</p>
+                        </div>
+
+                        <form id="createTicketForm" class="ticket-form" style="display: none;">
+                            <div class="form-group">
+                                <label for="ticketTitle">Title *</label>
+                                <input type="text" id="ticketTitle" name="title"
+                                    placeholder="Brief description of your issue" required maxlength="200">
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="ticketPriority">Priority *</label>
+                                    <select id="ticketPriority" name="priority" required>
+                                        <option value="">Select Priority</option>
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="urgent">Urgent</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ticketCategory">Category *</label>
+                                    <select id="ticketCategory" name="category" required>
+                                        <option value="">Select Category</option>
+                                        <option value="technical">Technical Issue</option>
+                                        <option value="account">Account Issue</option>
+                                        <option value="feature">Feature Request</option>
+                                        <option value="bug">Bug Report</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ticketDescription">Description *</label>
+                                <textarea id="ticketDescription" name="description"
+                                    placeholder="Please provide detailed information about your issue..." required
+                                    rows="6" maxlength="2000"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ticketContact">Contact Email (Optional)</label>
+                                <input type="email" id="ticketContact" name="contactEmail"
+                                    placeholder="Alternative contact email">
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="button">
+                                    <i class='bx bx-send'></i>
+                                    Submit Ticket
+                                </button>
+                                <button type="reset" class="button button--ghost">
+                                    <i class='bx bx-reset'></i>
+                                    Reset Form
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- My Tickets Tab -->
+                <div class="tab-content" id="my-tickets-tab">
+                    <div class="my-tickets-container">
+                        <div class="auth-message" id="ticketsAuthMessage" style="display: none;">
+                            <i class='bx bx-info-circle'></i>
+                            <p>Please <a href="login.html">login</a> to view your tickets.</p>
+                        </div>
+
+                        <div id="myTicketsContent" style="display: none;">
+                            <div class="tickets-header">
+                                <h3>My Support Tickets</h3>
+                                <div class="tickets-stats" id="ticketsStats">
+                                    <!-- Stats will be populated by JavaScript -->
+                                </div>
+                            </div>
+
+                            <div class="tickets-filters">
+                                <select id="statusFilter">
+                                    <option value="">All Status</option>
+                                    <option value="open">Open</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="closed">Closed</option>
+                                </select>
+                                <select id="priorityFilter">
+                                    <option value="">All Priorities</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="urgent">Urgent</option>
+                                </select>
+                            </div>
+
+                            <div id="myTicketsList" class="tickets-list">
+                                <!-- Tickets will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Panel Tab -->
+                <div class="tab-content" id="admin-panel-tab">
+                    <div class="admin-tickets-container">
+                        <div class="admin-header">
+                            <h3><i class='bx bx-shield-check'></i> Admin Ticket Management</h3>
+                            <div class="admin-stats" id="adminTicketsStats">
+                                <!-- Stats will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="admin-filters">
+                            <select id="adminStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="open">Open</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                            <select id="adminPriorityFilter">
+                                <option value="">All Priorities</option>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                            <input type="text" id="adminSearchFilter"
+                                placeholder="Search tickets, users, or descriptions...">
+                        </div>
+
+                        <div id="adminTicketsList" class="admin-tickets-list">
+                            <!-- Admin tickets will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Ticket Details Modal -->
+    <div id="ticketModal" class="ticket-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 id="modalTicketTitle"></h3>
+                <button class="close-modal" onclick="closeTicketModal()">
+                    <i class='bx bx-x'></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalTicketBody">
+                <!-- Ticket details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/ticket.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>

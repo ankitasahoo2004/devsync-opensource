@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Ticket Notification - DevSync Admin</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.95) 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+            padding: 32px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 32px;
+        }
+
+        .ticket-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-low {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+        }
+
+        .priority-medium {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .priority-high {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+        }
+
+        .priority-urgent {
+            background: rgba(156, 39, 176, 0.1);
+            color: #9c27b0;
+            animation: pulse 2s infinite;
+        }
+
+        .user-info {
+            background: rgba(124, 58, 237, 0.1);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 32px;
+            background: rgba(96, 95, 95, 0.3);
+            font-size: 14px;
+            color: #000000;
+        }
+
+        .content p,
+        .ticket-card p,
+        h1,
+        h3,
+        h4,
+        strong {
+            color: #1f2937 !important;
+        }
+
+        a {
+            color: #7c3aed !important;
+            text-decoration: underline;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 New Support Ticket</h1>
+        </div>
+        <div class="content">
+            <p>A new support ticket has been created and requires your attention.</p>
+
+            <div class="ticket-card">
+                <h3>{{ticketTitle}}</h3>
+                <p><strong>Ticket #:</strong> {{ticketNumber}}</p>
+                <p><strong>Priority:</strong> <span class="priority-badge priority-{{priority}}">{{priority}}</span></p>
+                <p><strong>Category:</strong> {{category}}</p>
+                <p><strong>Created:</strong> {{createdAt}}</p>
+
+                <div class="user-info">
+                    <h4 style="margin-top: 0; color: #7c3aed;">👤 User Information</h4>
+                    <p style="margin: 4px 0;"><strong>Username:</strong> {{userName}}</p>
+                    <p style="margin: 4px 0;"><strong>Email:</strong> {{userEmail}}</p>
+                </div>
+
+                <div
+                    style="background: #f7fafc; padding: 16px; border-radius: 8px; border-left: 4px solid #7c3aed; margin: 16px 0;">
+                    <h4 style="margin-top: 0; color: #7c3aed;">📄 Description</h4>
+                    <p style="margin-bottom: 0;">{{description}}</p>
+                </div>
+            </div>
+
+            <div
+                style="background: rgba(124, 58, 237, 0.1); border: 1px solid rgba(124, 58, 237, 0.2); padding: 20px; border-radius: 12px; margin: 24px 0;">
+                <h4 style="margin-top: 0; color: #7c3aed;">🎯 Quick Actions</h4>
+                <ul style="margin: 0; padding-left: 20px;">
+                    <li>Review and update ticket status</li>
+                    <li>Assign ticket to a team member</li>
+                    <li>Respond to the user if needed</li>
+                    <li>Close ticket with resolution when complete</li>
+                </ul>
+            </div>
+
+            <a href="{{adminUrl}}" class="button">View in Admin Panel</a>
+        </div>
+        <div class="footer">
+            <p>© 2025 DevSync. All rights reserved.</p>
+            <p>Admin notification system</p>
+        </div>
+    </div>
+</body>
+
+</html>

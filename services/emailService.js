@@ -272,6 +272,217 @@ class EmailService {
             throw error; // Re-throw to handle in the route
         }
     }
+
+    // Ticket-related email methods
+    async sendTicketCreatedEmail(ticketData) {
+        try {
+            const template = await this.loadTemplate('ticketCreatedEmail');
+
+            const emailData = {
+                ticketTitle: ticketData.title,
+                ticketId: ticketData._id,
+                ticketNumber: ticketData._id.toString().slice(-8),
+                priority: ticketData.priority,
+                category: ticketData.category,
+                description: ticketData.description,
+                userName: ticketData.githubUsername,
+                createdAt: new Date(ticketData.createdAt).toLocaleDateString(),
+                dashboardUrl: `${process.env.FRONTEND_URL}/ticket.html`,
+                websiteUrl: process.env.FRONTEND_URL
+            };
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: ticketData.userEmail,
+                subject: `Ticket Created: ${ticketData.title} #${ticketData._id.toString().slice(-8)}`,
+                html: template(emailData)
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log(`Ticket created email sent to ${ticketData.userEmail}`);
+
+            return {
+                success: true,
+                messageId: result.messageId,
+                recipient: ticketData.userEmail,
+                subject: mailOptions.subject
+            };
+        } catch (error) {
+            console.error('Error sending ticket created email:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async sendTicketStatusUpdateEmail(ticketData, oldStatus, updatedBy) {
+        try {
+            const template = await this.loadTemplate('ticketStatusUpdateEmail');
+
+            const emailData = {
+                ticketTitle: ticketData.title,
+                ticketId: ticketData._id,
+                ticketNumber: ticketData._id.toString().slice(-8),
+                oldStatus: oldStatus.replace('_', ' '),
+                newStatus: ticketData.status.replace('_', ' '),
+                priority: ticketData.priority,
+                category: ticketData.category,
+                userName: ticketData.githubUsername,
+                updatedBy: updatedBy,
+                updatedAt: new Date(ticketData.updatedAt).toLocaleDateString(),
+                dashboardUrl: `${process.env.FRONTEND_URL}/ticket.html`,
+                websiteUrl: process.env.FRONTEND_URL
+            };
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: ticketData.userEmail,
+                subject: `Ticket Status Updated: ${ticketData.title} #${ticketData._id.toString().slice(-8)}`,
+                html: template(emailData)
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log(`Ticket status update email sent to ${ticketData.userEmail}`);
+
+            return {
+                success: true,
+                messageId: result.messageId,
+                recipient: ticketData.userEmail,
+                subject: mailOptions.subject
+            };
+        } catch (error) {
+            console.error('Error sending ticket status update email:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async sendTicketClosedEmail(ticketData, resolution, resolvedBy) {
+        try {
+            const template = await this.loadTemplate('ticketClosedEmail');
+
+            const emailData = {
+                ticketTitle: ticketData.title,
+                ticketId: ticketData._id,
+                ticketNumber: ticketData._id.toString().slice(-8),
+                priority: ticketData.priority,
+                category: ticketData.category,
+                description: ticketData.description,
+                resolution: resolution,
+                userName: ticketData.githubUsername,
+                resolvedBy: resolvedBy,
+                resolvedAt: new Date(ticketData.resolvedAt).toLocaleDateString(),
+                scheduledDeletion: new Date(ticketData.scheduledForDeletion).toLocaleDateString(),
+                dashboardUrl: `${process.env.FRONTEND_URL}/ticket.html`,
+                websiteUrl: process.env.FRONTEND_URL
+            };
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: ticketData.userEmail,
+                subject: `Ticket Resolved: ${ticketData.title} #${ticketData._id.toString().slice(-8)}`,
+                html: template(emailData)
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log(`Ticket closed email sent to ${ticketData.userEmail}`);
+
+            return {
+                success: true,
+                messageId: result.messageId,
+                recipient: ticketData.userEmail,
+                subject: mailOptions.subject
+            };
+        } catch (error) {
+            console.error('Error sending ticket closed email:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async sendTicketDeletedEmail(ticketData, deletedBy) {
+        try {
+            const template = await this.loadTemplate('ticketDeletedEmail');
+
+            const emailData = {
+                ticketTitle: ticketData.title,
+                ticketId: ticketData._id,
+                ticketNumber: ticketData._id.toString().slice(-8),
+                priority: ticketData.priority,
+                category: ticketData.category,
+                description: ticketData.description,
+                userName: ticketData.githubUsername,
+                deletedBy: deletedBy,
+                deletedAt: new Date().toLocaleDateString(),
+                dashboardUrl: `${process.env.FRONTEND_URL}/ticket.html`,
+                websiteUrl: process.env.FRONTEND_URL
+            };
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: ticketData.userEmail,
+                subject: `Ticket Deleted: ${ticketData.title} #${ticketData._id.toString().slice(-8)}`,
+                html: template(emailData)
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log(`Ticket deleted email sent to ${ticketData.userEmail}`);
+
+            return {
+                success: true,
+                messageId: result.messageId,
+                recipient: ticketData.userEmail,
+                subject: mailOptions.subject
+            };
+        } catch (error) {
+            console.error('Error sending ticket deleted email:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    // Admin notification emails
+    async sendAdminTicketNotification(ticketData, notificationType) {
+        try {
+            const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
+            if (adminEmails.length === 0) {
+                console.log('No admin emails configured for ticket notifications');
+                return { success: false, error: 'No admin emails configured' };
+            }
+
+            const template = await this.loadTemplate('adminTicketNotificationEmail');
+
+            const emailData = {
+                notificationType: notificationType,
+                ticketTitle: ticketData.title,
+                ticketId: ticketData._id,
+                ticketNumber: ticketData._id.toString().slice(-8),
+                priority: ticketData.priority,
+                category: ticketData.category,
+                description: ticketData.description,
+                userName: ticketData.githubUsername,
+                userEmail: ticketData.userEmail,
+                createdAt: new Date(ticketData.createdAt).toLocaleDateString(),
+                adminUrl: `${process.env.FRONTEND_URL}/ticket.html#admin-panel`,
+                websiteUrl: process.env.FRONTEND_URL
+            };
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: adminEmails,
+                subject: `[DevSync Admin] New Ticket: ${ticketData.title} #${ticketData._id.toString().slice(-8)}`,
+                html: template(emailData)
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log(`Admin ticket notification sent to ${adminEmails.join(', ')}`);
+
+            return {
+                success: true,
+                messageId: result.messageId,
+                recipients: adminEmails,
+                subject: mailOptions.subject
+            };
+        } catch (error) {
+            console.error('Error sending admin ticket notification:', error);
+            return { success: false, error: error.message };
+        }
+    }
 }
 
 module.exports = new EmailService();
