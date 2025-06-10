@@ -132,9 +132,7 @@ function manageSectionCSS(newSection) {
 function removeUnneededSectionCSS(newCSSFile) {
     // Define all section-specific CSS files
     const allSectionCSSFiles = [
-        'admin-user-management.css',
-        'admin-pr-scan.css',
-        'admin-search.css'
+        
     ];
 
     // Remove only CSS files that are not needed for the new section
@@ -153,9 +151,7 @@ function removeAllSectionCSS() {
 
     // Remove other section-specific CSS files
     const sectionCSSFiles = [
-        'admin-user-management.css',
-        'admin-pr-scan.css',
-        'admin-search.css'
+        
     ];
 
     sectionCSSFiles.forEach(cssFile => {
