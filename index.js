@@ -142,6 +142,7 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
 }));
 
+// Added
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your_session_secret',
     resave: false,
@@ -485,6 +486,7 @@ async function normalizeAndValidateGitHubUrl(url) {
 }
 
 // Update the project submission route
+// Added
 app.post('/api/projects', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -546,6 +548,7 @@ app.post('/api/projects', async (req, res) => {
 });
 
 // Delete project route
+// Added
 app.delete('/api/projects/:projectId', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -603,6 +606,7 @@ app.get('/api/accepted-projects', async (req, res) => {
 });
 
 // Get user's projects
+// Added
 app.get('/api/projects/:userId', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -625,6 +629,7 @@ app.get('/api/projects/:userId', async (req, res) => {
 });
 
 // Admin verification endpoint
+// Added
 app.get('/api/admin/verify', (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ isAdmin: false });
@@ -637,6 +642,7 @@ app.get('/api/admin/verify', (req, res) => {
 });
 
 // Admin projects endpoint
+// Added
 app.get('/api/admin/projects', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -657,6 +663,7 @@ app.get('/api/admin/projects', async (req, res) => {
 });
 
 // Add review project endpoint
+// Added
 app.post('/api/admin/projects/:projectId/review', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -706,6 +713,7 @@ app.post('/api/admin/projects/:projectId/review', async (req, res) => {
 });
 
 // Update points update endpoint
+// Added
 app.patch('/api/admin/projects/:projectId/points', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -1962,6 +1970,7 @@ async function startServer() {
         // Ensure all routes are registered before the catch-all
 
         // Catch-all route for SPA - must be LAST after ALL API routes
+        // Added
         app.get('*', (req, res) => {
             // Only serve index.html for non-API routes
             if (!req.path.startsWith('/api/')) {
