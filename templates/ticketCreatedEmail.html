@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Created - DevSync</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.95) 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            padding: 32px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 32px;
+        }
+
+        .ticket-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .ticket-number {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white !important;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 16px 0;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-low {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+        }
+
+        .priority-medium {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .priority-high {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+        }
+
+        .priority-urgent {
+            background: rgba(156, 39, 176, 0.1);
+            color: #9c27b0;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 32px;
+            background: rgba(96, 95, 95, 0.3);
+            font-size: 14px;
+            color: #000000;
+        }
+
+        .content p,
+        .ticket-card p,
+        h1,
+        h3,
+        strong {
+            color: #1f2937 !important;
+        }
+
+        a {
+            color: #059669 !important;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎫 Support Ticket Created</h1>
+        </div>
+        <div class="content">
+            <p>Hello {{userName}},</p>
+            <p>Your support ticket has been successfully created and submitted to our team.</p>
+
+            <div class="ticket-card">
+                <h3>{{ticketTitle}}</h3>
+                <div class="ticket-number">Ticket #{{ticketNumber}}</div>
+                <p><strong>Priority:</strong> <span class="priority-badge priority-{{priority}}">{{priority}}</span></p>
+                <p><strong>Category:</strong> {{category}}</p>
+                <p><strong>Created:</strong> {{createdAt}}</p>
+                <p><strong>Description:</strong></p>
+                <div style="background: #f7fafc; padding: 16px; border-radius: 8px; border-left: 4px solid #059669;">
+                    {{description}}
+                </div>
+            </div>
+
+            <div
+                style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 20px; border-radius: 12px; margin: 24px 0;">
+                <h4 style="margin-top: 0; color: #059669;">What happens next?</h4>
+                <ul style="margin: 0; padding-left: 20px;">
+                    <li>Our team will review your ticket</li>
+                    <li>You'll receive email updates on progress</li>
+                    <li>We'll work to resolve your issue promptly</li>
+                    <li>You can track your ticket status in the dashboard</li>
+                </ul>
+            </div>
+
+            <a href="{{dashboardUrl}}" class="button">View Ticket Dashboard</a>
+        </div>
+        <div class="footer">
+            <p>© 2025 DevSync. All rights reserved.</p>
+            <p>Made with ❤️ for open source</p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Resolved - DevSync</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.95) 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            padding: 32px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 32px;
+        }
+
+        .ticket-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .resolution-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .deletion-notice {
+            background: rgba(251, 146, 60, 0.1);
+            border: 1px solid rgba(251, 146, 60, 0.2);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-low {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+        }
+
+        .priority-medium {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .priority-high {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+        }
+
+        .priority-urgent {
+            background: rgba(156, 39, 176, 0.1);
+            color: #9c27b0;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 32px;
+            background: rgba(96, 95, 95, 0.3);
+            font-size: 14px;
+            color: #000000;
+        }
+
+        .content p,
+        .ticket-card p,
+        h1,
+        h3,
+        h4,
+        strong {
+            color: #1f2937 !important;
+        }
+
+        a {
+            color: #059669 !important;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✅ Ticket Resolved</h1>
+        </div>
+        <div class="content">
+            <p>Hello {{userName}},</p>
+            <p>Great news! Your support ticket has been resolved by our team.</p>
+
+            <div class="ticket-card">
+                <h3>{{ticketTitle}}</h3>
+                <p><strong>Ticket #:</strong> {{ticketNumber}}</p>
+                <p><strong>Priority:</strong> <span class="priority-badge priority-{{priority}}">{{priority}}</span></p>
+                <p><strong>Category:</strong> {{category}}</p>
+                <p><strong>Resolved By:</strong> {{resolvedBy}}</p>
+                <p><strong>Resolved On:</strong> {{resolvedAt}}</p>
+
+                <div class="resolution-box">
+                    <h4 style="margin-top: 0; color: #059669;">📋 Resolution</h4>
+                    <p style="margin-bottom: 0;">{{resolution}}</p>
+                </div>
+            </div>
+
+            <div class="deletion-notice">
+                <span style="font-size: 24px;">⏰</span>
+                <div>
+                    <strong>Important:</strong> This ticket will be automatically deleted on {{scheduledDeletion}} to
+                    keep our system organized. Please save any important information from this ticket.
+                </div>
+            </div>
+
+            <p>If you have any follow-up questions or need additional assistance, please feel free to create a new
+                ticket.</p>
+
+            <a href="{{dashboardUrl}}" class="button">Create New Ticket</a>
+        </div>
+        <div class="footer">
+            <p>© 2025 DevSync. All rights reserved.</p>
+            <p>Made with ❤️ for open source</p>
+        </div>
+    </div>
+</body>
+
+</html>

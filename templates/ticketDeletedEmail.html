@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Deleted - DevSync</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.95) 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            padding: 32px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 32px;
+        }
+
+        .ticket-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-low {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+        }
+
+        .priority-medium {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .priority-high {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+        }
+
+        .priority-urgent {
+            background: rgba(156, 39, 176, 0.1);
+            color: #9c27b0;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 32px;
+            background: rgba(96, 95, 95, 0.3);
+            font-size: 14px;
+            color: #000000;
+        }
+
+        .content p,
+        .ticket-card p,
+        h1,
+        h3,
+        strong {
+            color: #1f2937 !important;
+        }
+
+        a {
+            color: #dc2626 !important;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗑️ Ticket Deleted</h1>
+        </div>
+        <div class="content">
+            <p>Hello {{userName}},</p>
+            <p>This is to inform you that your support ticket has been deleted from our system.</p>
+
+            <div class="ticket-card">
+                <h3>{{ticketTitle}}</h3>
+                <p><strong>Ticket #:</strong> {{ticketNumber}}</p>
+                <p><strong>Priority:</strong> <span class="priority-badge priority-{{priority}}">{{priority}}</span></p>
+                <p><strong>Category:</strong> {{category}}</p>
+                <p><strong>Deleted By:</strong> {{deletedBy}}</p>
+                <p><strong>Deleted On:</strong> {{deletedAt}}</p>
+
+                <div
+                    style="background: #f7fafc; padding: 16px; border-radius: 8px; border-left: 4px solid #dc2626; margin: 16px 0;">
+                    <p style="margin: 0;"><strong>Original Description:</strong></p>
+                    <p style="margin: 8px 0 0 0;">{{description}}</p>
+                </div>
+            </div>
+
+            <div
+                style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.2); padding: 20px; border-radius: 12px; margin: 24px 0;">
+                <p style="margin: 0;"><strong>Note:</strong> If you believe this ticket was deleted in error or if you
+                    still need assistance with this matter, please don't hesitate to create a new support ticket with
+                    the details.</p>
+            </div>
+
+            <a href="{{dashboardUrl}}" class="button">Create New Ticket</a>
+        </div>
+        <div class="footer">
+            <p>© 2025 DevSync. All rights reserved.</p>
+            <p>Made with ❤️ for open source</p>
+        </div>
+    </div>
+</body>
+
+</html>
