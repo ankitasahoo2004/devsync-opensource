@@ -1,11 +1,11 @@
 const express = require('express');
 const emailService = require('../services/emailService');
-const app = express();
+const router = express.Router();
 const dotenv = require('dotenv');
 dotenv.config();
 
 // Add sponsorship inquiry endpoint
-app.post('/api/sponsorship/inquiry', async (req, res) => {
+router.post('/inquiry', async (req, res) => {
     try {
         if (!req.body.email || !req.body.organization || !req.body.sponsorshipType) {
             return res.status(400).json({
@@ -33,4 +33,4 @@ app.post('/api/sponsorship/inquiry', async (req, res) => {
     }
 });
 
-module.exports = app;
+module.exports = router;

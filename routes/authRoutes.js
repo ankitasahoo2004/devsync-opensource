@@ -2,17 +2,17 @@ const express = require('express');
 const passport = require('passport');
 const dotenv = require('dotenv');
 dotenv.config();
-const app = express();
+const router = express.Router();
 
-app.get('/auth/github',
+router.get('/',
     passport.authenticate('github', { scope: ['user'] })
 );
 
-app.get('/auth/github/callback',
+router.get('/callback',
     passport.authenticate('github', { failureRedirect: '/login' }),
     (req, res) => {
         res.redirect(process.env.FRONTEND_URL);
     }
 );
 
-module.exports = app;
+module.exports = router;

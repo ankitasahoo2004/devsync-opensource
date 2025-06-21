@@ -1,11 +1,11 @@
 const express = require('express');
 const Event = require('../models/Event');
-const app = express();
+const router = express.Router();
 const dotenv = require('dotenv');
 dotenv.config();
 
 // Create event
-app.post('/api/events', async (req, res) => {
+router.post('/', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -30,8 +30,9 @@ app.post('/api/events', async (req, res) => {
 });
 
 // Get all events
-app.get('/api/events', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
+        // console.log('Fetching all events');
         const events = await Event.find({}).sort({ date: 1 });
         res.json(events);
     } catch (error) {
@@ -40,7 +41,7 @@ app.get('/api/events', async (req, res) => {
 });
 
 // Update event slots
-app.patch('/api/events/:eventId/slots', async (req, res) => {
+router.patch('/:eventId/slots', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -72,7 +73,7 @@ app.patch('/api/events/:eventId/slots', async (req, res) => {
 });
 
 // Delete event
-app.delete('/api/events/:eventId', async (req, res) => {
+router.delete('/:eventId', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -94,4 +95,4 @@ app.delete('/api/events/:eventId', async (req, res) => {
     }
 });
 
-module.exports = app;
+module.exports = router;

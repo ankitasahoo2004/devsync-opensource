@@ -1,10 +1,10 @@
 const express = require('express');
 const User = require('../models/User');
-const app = express();
+const router = express.Router();
 const dotenv = require('dotenv');
 dotenv.config();
 
-app.get('/api/users', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
         const users = await User.find({}, 'username displayName avatarUrl email')
@@ -22,4 +22,4 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
-module.exports = app;
+module.exports = router;

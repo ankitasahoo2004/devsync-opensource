@@ -1,12 +1,12 @@
 const express = require('express');
 const User = require('../models/User');
 const Repo = require('../models/Repo');
-const app = express(); 
+const router = express.Router();
 const dotenv = require('dotenv');
 dotenv.config();
 
 // Add global stats endpoint
-app.get('/api/stats/global', async (req, res) => {
+router.get('/global', async (req, res) => {
     try {
         // Get all users and accepted repos
         const [users, acceptedRepos] = await Promise.all([
@@ -34,4 +34,4 @@ app.get('/api/stats/global', async (req, res) => {
     }
 });
 
-module.exports = app;
+module.exports = router;

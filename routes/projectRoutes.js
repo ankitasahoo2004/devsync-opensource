@@ -3,11 +3,11 @@ const Repo = require('../models/Repo');
 const User = require('../models/User');
 const emailService = require('../services/emailService');
 const { normalizeAndValidateGitHubUrl } = require('../utils/githubUtils');
-const app = express();
+const router = express.Router();
 const dotenv = require('dotenv');
 dotenv.config();
 
-app.post('/api/projects', async (req, res) => {
+router.post('/', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -68,7 +68,7 @@ app.post('/api/projects', async (req, res) => {
 });
 
 // Delete project route
-app.delete('/api/projects/:projectId', async (req, res) => {
+router.delete('/:projectId', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -111,7 +111,7 @@ app.delete('/api/projects/:projectId', async (req, res) => {
     }
 });
 
-app.get('/api/projects/:userId', async (req, res) => {
+router.get('/:userId', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -132,4 +132,4 @@ app.get('/api/projects/:userId', async (req, res) => {
     }
 });
 
-module.exports = app;
+module.exports = router;

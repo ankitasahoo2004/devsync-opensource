@@ -1,11 +1,11 @@
 const express = require('express');
 const Repo = require('../models/Repo');
-const app = express();
+const router = express.Router();
 const dotenv = require('dotenv');
 dotenv.config();
 
 // Get all accepted projects
-app.get('/api/accepted-projects', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const projects = await Repo.find({ reviewStatus: 'accepted' })
             .select('repoLink ownerName technology description reviewStatus reviewedAt')
@@ -17,4 +17,4 @@ app.get('/api/accepted-projects', async (req, res) => {
     }
 });
 
-module.exports = app;
+module.exports = router;

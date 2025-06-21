@@ -4,11 +4,11 @@ const Repo = require('../models/Repo');
 const { Octokit } = require('@octokit/rest');
 const dotenv = require('dotenv');
 dotenv.config();
-const app = express();
+const router = express.Router();
 const octokit = new Octokit({ auth: process.env.GITHUB_ACCESS_TOKEN });
 const PROGRAM_START_DATE = '2025-03-14';
 
-app.get('/api/user', (req, res) => {
+router.get('/', (req, res) => {
     if (req.isAuthenticated()) {
         res.json({
             isAuthenticated: true,
@@ -24,7 +24,7 @@ app.get('/api/user', (req, res) => {
     }
 });
 
-app.get('/api/user/stats', async (req, res) => {
+router.get('/stats', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -47,7 +47,7 @@ app.get('/api/user/stats', async (req, res) => {
 });
 
 // Add new comprehensive user profile endpoint
-app.get('/api/user/profile/:username', async (req, res) => {
+router.get('/profile/:username', async (req, res) => {
     try {
         // Get GitHub user data and DevSync data
         const [userData, acceptedRepos, user] = await Promise.all([
@@ -114,4 +114,4 @@ app.get('/api/user/profile/:username', async (req, res) => {
     }
 });
 
-module.exports = app;
+module.exports = router;
