@@ -10,6 +10,8 @@ const User = require('../models/User');
 const emailService = require('../services/emailService');
 const app = express();
 dotenv.config();
+const router = express.Router();
+const adminController = require('../controllers/adminController');
 
 // Admin verification endpoint
 app.get('/api/admin/verify', (req, res) => {
@@ -627,109 +629,111 @@ app.get('/api/admin/users', async (req, res) => {
 });
 
 // Add PR submission endpoint for advanced scanner
-app.post('/api/admin/submit-pr', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
+router.post('/submit-pr', adminController.submitPr);
+// app.post('/api/admin/submit-pr', async (req, res) => {
+//     if (!req.isAuthenticated()) {
+//         return res.status(401).json({ error: 'Unauthorized' });
+//     }
 
-    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
-    if (!adminIds.includes(req.user.username)) {
-        return res.status(403).json({ error: 'Not authorized' });
-    }
+//     const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+//     if (!adminIds.includes(req.user.username)) {
+//         return res.status(403).json({ error: 'Not authorized' });
+//     }
 
-    try {
-        const { userId, username, repoUrl, prNumber, title, mergedAt } = req.body;        // Check if this PR already exists - use more comprehensive duplicate checking
-        const existingPR = await PendingPR.findOne({
-            $or: [
-                { userId: userId, repoUrl: repoUrl, prNumber: prNumber },
-                { username: username, repoUrl: repoUrl, prNumber: prNumber }
-            ]
-        });
+//     try {
+//         const { userId, username, repoUrl, prNumber, title, mergedAt } = req.body;        // Check if this PR already exists - use more comprehensive duplicate checking
+//         const existingPR = await PendingPR.findOne({
+//             $or: [
+//                 { userId: userId, repoUrl: repoUrl, prNumber: prNumber },
+//                 { username: username, repoUrl: repoUrl, prNumber: prNumber }
+//             ]
+//         });
 
-        if (existingPR) {
-            return res.status(409).json({
-                error: 'PR already exists',
-                pr: existingPR
-            });
-        }
+//         if (existingPR) {
+//             return res.status(409).json({
+//                 error: 'PR already exists',
+//                 pr: existingPR
+//             });
+//         }
 
-        // Get repo details for suggested points
-        const repo = await Repo.findOne({ repoLink: repoUrl });
-        const suggestedPoints = repo ? repo.successPoints || 50 : 50;
+//         // Get repo details for suggested points
+//         const repo = await Repo.findOne({ repoLink: repoUrl });
+//         const suggestedPoints = repo ? repo.successPoints || 50 : 50;
 
-        const pendingPR = await PendingPR.create({
-            userId: userId,
-            username: username,
-            repoId: repoUrl,
-            repoUrl: repoUrl,
-            prNumber: prNumber,
-            title: title,
-            mergedAt: new Date(mergedAt),
-            suggestedPoints: suggestedPoints
-        });
+//         const pendingPR = await PendingPR.create({
+//             userId: userId,
+//             username: username,
+//             repoId: repoUrl,
+//             repoUrl: repoUrl,
+//             prNumber: prNumber,
+//             title: title,
+//             mergedAt: new Date(mergedAt),
+//             suggestedPoints: suggestedPoints
+//         });
 
-        res.status(201).json({
-            message: 'PR submitted for approval',
-            pr: pendingPR
-        });
-    } catch (error) {
-        console.error('Error submitting PR:', error);
-        res.status(500).json({
-            error: 'Failed to submit PR',
-            details: error.message
-        });
-    }
-});
+//         res.status(201).json({
+//             message: 'PR submitted for approval',
+//             pr: pendingPR
+//         });
+//     } catch (error) {
+//         console.error('Error submitting PR:', error);
+//         res.status(500).json({
+//             error: 'Failed to submit PR',
+//             details: error.message
+//         });
+//     }
+// });
 
+router.post('/sync-pending-prs', adminController.syncPendingPRs);
 // Add new endpoint for PendingPR to User table synchronization
-app.post('/api/admin/sync-pending-prs', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
+// app.post('/api/admin/sync-pending-prs', async (req, res) => {
+//     if (!req.isAuthenticated()) {
+//         return res.status(401).json({ error: 'Unauthorized' });
+//     }
 
-    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
-    if (!adminIds.includes(req.user.username)) {
-        return res.status(403).json({ error: 'Not authorized' });
-    }
+//     const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+//     if (!adminIds.includes(req.user.username)) {
+//         return res.status(403).json({ error: 'Not authorized' });
+//     }
 
-    try {
-        console.log(`Admin ${req.user.username} initiated PendingPR to User sync`);
+//     try {
+//         console.log(`Admin ${req.user.username} initiated PendingPR to User sync`);
 
-        // Optional: Create backup before sync
-        if (req.body.createBackup) {
-            await dbSync.backupUserTable();
-        }
+//         // Optional: Create backup before sync
+//         if (req.body.createBackup) {
+//             await dbSync.backupUserTable();
+//         }
 
-        // Perform the synchronization
-        const syncResults = await dbSync.syncPendingPRsToUserTable();
+//         // Perform the synchronization
+//         const syncResults = await dbSync.syncPendingPRsToUserTable();
 
-        // Validate integrity after sync
-        const validation = await dbSync.validateSyncIntegrity();
+//         // Validate integrity after sync
+//         const validation = await dbSync.validateSyncIntegrity();
 
-        const duration = syncResults.endTime - syncResults.startTime;
+//         const duration = syncResults.endTime - syncResults.startTime;
 
-        res.json({
-            success: true,
-            message: 'PendingPR to User table synchronization completed',
-            results: {
-                ...syncResults,
-                duration: `${Math.round(duration / 1000)}s`,
-                validation
-            },
-            timestamp: new Date().toISOString(),
-            performedBy: req.user.username
-        });
+//         res.json({
+//             success: true,
+//             message: 'PendingPR to User table synchronization completed',
+//             results: {
+//                 ...syncResults,
+//                 duration: `${Math.round(duration / 1000)}s`,
+//                 validation
+//             },
+//             timestamp: new Date().toISOString(),
+//             performedBy: req.user.username
+//         });
 
-    } catch (error) {
-        console.error('PendingPR sync failed:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to sync PendingPR data to User table',
-            details: error.message,
-            timestamp: new Date().toISOString()
-        });
-    }
-});
+//     } catch (error) {
+//         console.error('PendingPR sync failed:', error);
+//         res.status(500).json({
+//             success: false,
+//             error: 'Failed to sync PendingPR data to User table',
+//             details: error.message,
+//             timestamp: new Date().toISOString()
+//         });
+//     }
+// });
 
 // Add admin email sending endpoint
 app.post('/api/admin/send-email', async (req, res) => {

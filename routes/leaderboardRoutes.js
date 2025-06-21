@@ -1,13 +1,14 @@
 const express = require('express');
 const User = require('../models/User');
 const { calculateTrends } = require('../utils/trendCalculator');
-const app = express();
+const router = express.Router();
 const dotenv = require('dotenv');
 dotenv.config();
 
 // Update leaderboard endpoint
-app.get('/api/leaderboard', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
+        console.log('Fetching leaderboard data...');
         // Add cache control headers
         res.set({
             'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -48,4 +49,4 @@ app.get('/api/leaderboard', async (req, res) => {
     }
 });
 
-module.exports = app;
+module.exports = router;

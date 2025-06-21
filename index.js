@@ -283,80 +283,82 @@ app.get('/api/user/stats', async (req, res) => {
 });
 
 // Add helper function to calculate trends
-async function calculateTrends(users) {
-    try {
-        // Get previous rankings from 24 hours ago
-        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-        const oldRankings = await User.find(
-            { 'mergedPRs.mergedAt': { $lt: oneDayAgo } },
-            'username points'
-        ).lean();
+// async function calculateTrends(users) {
+//     try {
+//         // Get previous rankings from 24 hours ago
+//         const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+//         const oldRankings = await User.find(
+//             { 'mergedPRs.mergedAt': { $lt: oneDayAgo } },
+//             'username points'
+//         ).lean();
 
-        // Sort old rankings by points
-        const oldRanked = oldRankings.sort((a, b) => b.points - a.points);
-        const oldRankMap = new Map(oldRanked.map((user, index) => [user.username, index + 1]));
+//         // Sort old rankings by points
+//         const oldRanked = oldRankings.sort((a, b) => b.points - a.points);
+//         const oldRankMap = new Map(oldRanked.map((user, index) => [user.username, index + 1]));
 
-        // Sort current users by points
-        const currentRanked = users.sort((a, b) => b.points - a.points);
+//         // Sort current users by points
+//         const currentRanked = users.sort((a, b) => b.points - a.points);
 
-        // Calculate trend for each user
-        return currentRanked.map((user, currentRank) => {
-            const oldRank = oldRankMap.get(user.username) || currentRank + 1;
-            const rankChange = oldRank - (currentRank + 1);
-            const trend = oldRank !== 0 ? Math.round((rankChange / oldRank) * 100) : 0;
-            return {
-                ...user,
-                trend
-            };
-        });
-    } catch (error) {
-        console.error('Error calculating trends:', error);
-        return users.map(user => ({ ...user, trend: 0 }));
-    }
-}
+//         // Calculate trend for each user
+//         return currentRanked.map((user, currentRank) => {
+//             const oldRank = oldRankMap.get(user.username) || currentRank + 1;
+//             const rankChange = oldRank - (currentRank + 1);
+//             const trend = oldRank !== 0 ? Math.round((rankChange / oldRank) * 100) : 0;
+//             return {
+//                 ...user,
+//                 trend
+//             };
+//         });
+//     } catch (error) {
+//         console.error('Error calculating trends:', error);
+//         return users.map(user => ({ ...user, trend: 0 }));
+//     }
+// }
 
 // Update leaderboard endpoint
-app.get('/api/leaderboard', async (req, res) => {
-    try {
-        // Add cache control headers
-        res.set({
-            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-        });
+const leaderboard = require('./routes/leaderboardRoutes');
+app.use('/api/leaderboard', leaderboard);
+// app.get('/api/leaderboard', async (req, res) => {
+//     try {
+//         // Add cache control headers
+//         res.set({
+//             'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+//             'Pragma': 'no-cache',
+//             'Expires': '0'
+//         });
 
-        const users = await User.find({})
-            .select('username points badges mergedPRs')
-            .lean();
+//         const users = await User.find({})
+//             .select('username points badges mergedPRs')
+//             .lean();
 
-        // Format user data with required fields only
-        let formattedUsers = users.map(user => ({
-            username: user.username,
-            points: user.points || 0,
-            mergedPRs: (user.mergedPRs || []).map(pr => ({
-                title: pr.title,
-                mergedAt: pr.mergedAt
-            })),
-            badges: user.badges || ['Newcomer'],
-            trend: 0
-        }));
+//         // Format user data with required fields only
+//         let formattedUsers = users.map(user => ({
+//             username: user.username,
+//             points: user.points || 0,
+//             mergedPRs: (user.mergedPRs || []).map(pr => ({
+//                 title: pr.title,
+//                 mergedAt: pr.mergedAt
+//             })),
+//             badges: user.badges || ['Newcomer'],
+//             trend: 0
+//         }));
 
-        // Calculate and add trends
-        formattedUsers = await calculateTrends(formattedUsers);
+//         // Calculate and add trends
+//         formattedUsers = await calculateTrends(formattedUsers);
 
-        // Sort by points and add ranks
-        formattedUsers.sort((a, b) => b.points - a.points);
-        formattedUsers = formattedUsers.map((user, index) => ({
-            ...user,
-            rank: index + 1
-        }));
+//         // Sort by points and add ranks
+//         formattedUsers.sort((a, b) => b.points - a.points);
+//         formattedUsers = formattedUsers.map((user, index) => ({
+//             ...user,
+//             rank: index + 1
+//         }));
 
-        res.json(formattedUsers);
-    } catch (error) {
-        console.error('Error fetching leaderboard:', error);
-        res.status(500).json({ error: 'Failed to fetch leaderboard' });
-    }
-});
+//         res.json(formattedUsers);
+//     } catch (error) {
+//         console.error('Error fetching leaderboard:', error);
+//         res.status(500).json({ error: 'Failed to fetch leaderboard' });
+//     }
+// });
 
 // Add global stats endpoint
 app.get('/api/stats/global', async (req, res) => {
@@ -643,24 +645,24 @@ app.get('/api/admin/verify', (req, res) => {
 
 // Admin projects endpoint
 // Added
-app.get('/api/admin/projects', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
+// app.get('/api/admin/projects', async (req, res) => {
+//     if (!req.isAuthenticated()) {
+//         return res.status(401).json({ error: 'Unauthorized' });
+//     }
 
-    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
-    if (!adminIds.includes(req.user.username)) {
-        return res.status(403).json({ error: 'Not authorized' });
-    }
+//     const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+//     if (!adminIds.includes(req.user.username)) {
+//         return res.status(403).json({ error: 'Not authorized' });
+//     }
 
-    try {
-        const allProjects = await Repo.find({}).sort({ submittedAt: -1 });
-        res.json(allProjects);
-    } catch (error) {
-        console.error('Error fetching all projects:', error);
-        res.status(500).json({ error: 'Failed to fetch projects' });
-    }
-});
+//     try {
+//         const allProjects = await Repo.find({}).sort({ submittedAt: -1 });
+//         res.json(allProjects);
+//     } catch (error) {
+//         console.error('Error fetching all projects:', error);
+//         res.status(500).json({ error: 'Failed to fetch projects' });
+//     }
+// });
 
 // Add review project endpoint
 // Added
@@ -2081,54 +2083,56 @@ app.post('/api/admin/submit-pr', async (req, res) => {
 });
 
 // Add new endpoint for PendingPR to User table synchronization
-app.post('/api/admin/sync-pending-prs', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/api/admin', adminRoutes);
+// app.post('/api/admin/sync-pending-prs', async (req, res) => {
+//     if (!req.isAuthenticated()) {
+//         return res.status(401).json({ error: 'Unauthorized' });
+//     }
 
-    const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
-    if (!adminIds.includes(req.user.username)) {
-        return res.status(403).json({ error: 'Not authorized' });
-    }
+//     const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
+//     if (!adminIds.includes(req.user.username)) {
+//         return res.status(403).json({ error: 'Not authorized' });
+//     }
 
-    try {
-        console.log(`Admin ${req.user.username} initiated PendingPR to User sync`);
+//     try {
+//         console.log(`Admin ${req.user.username} initiated PendingPR to User sync`);
 
-        // Optional: Create backup before sync
-        if (req.body.createBackup) {
-            await dbSync.backupUserTable();
-        }
+//         // Optional: Create backup before sync
+//         if (req.body.createBackup) {
+//             await dbSync.backupUserTable();
+//         }
 
-        // Perform the synchronization
-        const syncResults = await dbSync.syncPendingPRsToUserTable();
+//         // Perform the synchronization
+//         const syncResults = await dbSync.syncPendingPRsToUserTable();
 
-        // Validate integrity after sync
-        const validation = await dbSync.validateSyncIntegrity();
+//         // Validate integrity after sync
+//         const validation = await dbSync.validateSyncIntegrity();
 
-        const duration = syncResults.endTime - syncResults.startTime;
+//         const duration = syncResults.endTime - syncResults.startTime;
 
-        res.json({
-            success: true,
-            message: 'PendingPR to User table synchronization completed',
-            results: {
-                ...syncResults,
-                duration: `${Math.round(duration / 1000)}s`,
-                validation
-            },
-            timestamp: new Date().toISOString(),
-            performedBy: req.user.username
-        });
+//         res.json({
+//             success: true,
+//             message: 'PendingPR to User table synchronization completed',
+//             results: {
+//                 ...syncResults,
+//                 duration: `${Math.round(duration / 1000)}s`,
+//                 validation
+//             },
+//             timestamp: new Date().toISOString(),
+//             performedBy: req.user.username
+//         });
 
-    } catch (error) {
-        console.error('PendingPR sync failed:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to sync PendingPR data to User table',
-            details: error.message,
-            timestamp: new Date().toISOString()
-        });
-    }
-});
+//     } catch (error) {
+//         console.error('PendingPR sync failed:', error);
+//         res.status(500).json({
+//             success: false,
+//             error: 'Failed to sync PendingPR data to User table',
+//             details: error.message,
+//             timestamp: new Date().toISOString()
+//         });
+//     }
+// });
 
 // Add admin email sending endpoint
 app.post('/api/admin/send-email', async (req, res) => {
