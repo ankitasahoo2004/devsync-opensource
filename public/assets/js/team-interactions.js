@@ -135,17 +135,9 @@ function initializeModal() {
             github: 'https://github.com/anshraj-21',
             instagram: 'https://www.instagram.com/ansh_pvtx21?igsh=MTVzYmNmcjhraHloYw%3D%3D'
         },
-        'member-rishikesh': {
-            name: 'Rishikesh Raj',
-            role: 'Partnership Manager',
-            description: `<p>Operations lead coordinating team activities and workflows. Facilitates communication between departments and ensures projects stay on track through effective planning and resource allocation.</p>`,
-            linkedin: 'https://www.linkedin.com/in/rishikesh-raj-b68642250/',
-            github: 'https://github.com/Rishikesh-001',
-            instagram: 'https://www.instagram.com/_raj_rishikesh'
-        },
         'member-krish': {
             name: 'Krish Maurya',
-            role: 'Creative Producer',
+            role: 'Partnership Manager',
             description: `<p>Content editor ensuring all published materials meet quality standards. Reviews technical documentation, blog posts, and marketing content for clarity, accuracy, and consistency.</p>`,
             linkedin: 'https://www.linkedin.com/in/krish-maurya-59699732b/',
             github: 'https://github.com/krishmaurya21',
@@ -158,7 +150,31 @@ function initializeModal() {
             linkedin: 'https://www.linkedin.com/in/divyanshu-soni-938468334/',
             github: 'https://github.com/DivyanshuXOR',
             instagram: 'https://www.instagram.com/divyanshu._.soni_22/'
-        }
+        },
+        'member-debasmita': {
+            name: 'Debasmita Behera',
+            role: 'Creative Producer',
+            description: `<p>Community manager overseeing Discord server operations and engagement. Facilitates discussions, enforces guidelines, and creates welcoming environments for members to connect.</p>`,
+            linkedin: 'https://www.linkedin.com/',
+            github: 'https://github.com/debsmi',
+            instagram: 'https://www.instagram.com/'
+        },
+        'member-naman': {
+            name: 'Naman Soni',
+            role: 'Full Stack Developer',
+            description: `<p>Community manager overseeing Discord server operations and engagement. Facilitates discussions, enforces guidelines, and creates welcoming environments for members to connect.</p>`,
+            linkedin: 'https://www.linkedin.com/in/namansoni18/',
+            github: 'https://github.com/NamanSoni18',
+            instagram: 'https://www.instagram.com/developer_naman.20'
+        },
+        'member-niraj': {
+            name: 'Niraj Kumar Sharma',
+            role: 'Visual Content Creator',
+            description: `<p>Community manager overseeing Discord server operations and engagement. Facilitates discussions, enforces guidelines, and creates welcoming environments for members to connect.</p>`,
+            linkedin: 'https://www.linkedin.com/in/niraj-kumar-sharma-3770b1213/',
+            github: 'https://github.com/nikush1',
+            instagram: 'https://www.instagram.com/nirajsharma_08'
+        },
     };
 
     function openModal(memberId) {
