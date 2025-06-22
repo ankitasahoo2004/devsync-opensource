@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const PendingPR = require('../models/PendingPR');
 const Repo = require('../models/Repo');
+// const calculatePoints = require('./pointCalculator').calculatePoints;
 
 /**
  * Synchronize approved PendingPR data to User table
