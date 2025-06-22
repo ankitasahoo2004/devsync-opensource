@@ -2,31 +2,31 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
-const GitHubStrategy = require('passport-github2').Strategy;
+// const GitHubStrategy = require('passport-github2').Strategy;
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
-const { Octokit } = require('@octokit/rest');
-const User = require('./models/User');
+// const { Octokit } = require('@octokit/rest');
+// const User = require('./models/User');
 const Repo = require('./models/Repo');
-const Event = require('./models/Event');
-const PendingPR = require('./models/PendingPR');
+// const Event = require('./models/Event');
+// const PendingPR = require('./models/PendingPR');
 const Ticket = require('./models/Ticket'); // Add Ticket model
 const MongoStore = require('connect-mongo');
-const emailService = require('./services/emailService');
-const dbSync = require('./utils/dbSync');
-const PORT = process.env.PORT || 5500;
+// const emailService = require('./services/emailService');
+// const dbSync = require('./utils/dbSync');
+// const PORT = process.env.PORT || 5500;
 const serverUrl = process.env.SERVER_URL;
 
 const app = express();
 
 // DevSync program start date - all contributions are tracked from this date
-const PROGRAM_START_DATE = '2025-03-14';
+// const PROGRAM_START_DATE = '2025-03-14';
 
 // Create authenticated Octokit instance
-const octokit = new Octokit({
-    auth: process.env.GITHUB_ACCESS_TOKEN
-});
+// const octokit = new Octokit({
+//     auth: process.env.GITHUB_ACCESS_TOKEN
+// });
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -52,86 +52,86 @@ mongoose.connect(process.env.MONGODB_URI)
     .catch(err => console.error('MongoDB connection error:', err));
 
 // Calculate points based on contributions from registered repos
-async function calculatePoints(mergedPRs, userId) {
-    try {
-        let totalPoints = 0;
+// async function calculatePoints(mergedPRs, userId) {
+//     try {
+//         let totalPoints = 0;
 
-        // Calculate points for merged PRs only
-        for (const pr of mergedPRs) {
-            const repo = await Repo.findOne({ repoLink: pr.repoId });
-            if (repo) {
-                // Skip points if user is the maintainer
-                if (repo.userId === userId) {
-                    continue;
-                }
-                totalPoints += repo.successPoints || 50;
-            }
-        }
+//         // Calculate points for merged PRs only
+//         for (const pr of mergedPRs) {
+//             const repo = await Repo.findOne({ repoLink: pr.repoId });
+//             if (repo) {
+//                 // Skip points if user is the maintainer
+//                 if (repo.userId === userId) {
+//                     continue;
+//                 }
+//                 totalPoints += repo.successPoints || 50;
+//             }
+//         }
 
-        return totalPoints;
-    } catch (error) {
-        console.error('Error calculating points:', error);
-        return 0;
-    }
-}
+//         return totalPoints;
+//     } catch (error) {
+//         console.error('Error calculating points:', error);
+//         return 0;
+//     }
+// }
 
 // Check and assign badges based on valid contributions
-async function checkBadges(mergedPRs, points) {
-    try {
-        const registeredRepos = await Repo.find({}, 'repoLink');
-        const registeredRepoIds = registeredRepos.map(repo => repo.repoLink);
-        const validMergedPRsCount = mergedPRs.filter(pr => registeredRepoIds.includes(pr.repoId)).length;
+// async function checkBadges(mergedPRs, points) {
+//     try {
+//         const registeredRepos = await Repo.find({}, 'repoLink');
+//         const registeredRepoIds = registeredRepos.map(repo => repo.repoLink);
+//         const validMergedPRsCount = mergedPRs.filter(pr => registeredRepoIds.includes(pr.repoId)).length;
 
-        const badges = ['Newcomer'];
-        const levelBadges = [];
+//         const badges = ['Newcomer'];
+//         const levelBadges = [];
 
-        // Contribution badges
-        if (validMergedPRsCount >= 1) badges.push('First Contribution');
-        if (validMergedPRsCount >= 5) badges.push('Active Contributor');
-        if (validMergedPRsCount >= 10) badges.push('Super Contributor');
+//         // Contribution badges
+//         if (validMergedPRsCount >= 1) badges.push('First Contribution');
+//         if (validMergedPRsCount >= 5) badges.push('Active Contributor');
+//         if (validMergedPRsCount >= 10) badges.push('Super Contributor');
 
-        // Level badges - add all badges up to current points level
-        if (points >= 0) levelBadges.push('Cursed Newbie | Just awakened.....');
-        if (points >= 100) levelBadges.push('Graveyard Shifter | Lost but curious');
-        if (points >= 250) levelBadges.push('Night Stalker | Shadows are friends');
-        if (points >= 500) levelBadges.push('Skeleton of Structure | Casts magic on code');
-        if (points >= 1000) levelBadges.push('Phantom Architect | Builds from beyond');
-        if (points >= 2000) levelBadges.push('Haunted Debugger | Haunting every broken line');
-        if (points >= 3500) levelBadges.push('Lord of Shadows | Master of the unseen');
-        if (points >= 5000) levelBadges.push('Dark Sorcerer | Controls the dark arts');
-        if (points >= 7500) levelBadges.push('Demon Crafter | Shapes the cursed world');
-        if (points >= 10000) levelBadges.push('Eternal Revenge | Undying ghost');
+//         // Level badges - add all badges up to current points level
+//         if (points >= 0) levelBadges.push('Cursed Newbie | Just awakened.....');
+//         if (points >= 100) levelBadges.push('Graveyard Shifter | Lost but curious');
+//         if (points >= 250) levelBadges.push('Night Stalker | Shadows are friends');
+//         if (points >= 500) levelBadges.push('Skeleton of Structure | Casts magic on code');
+//         if (points >= 1000) levelBadges.push('Phantom Architect | Builds from beyond');
+//         if (points >= 2000) levelBadges.push('Haunted Debugger | Haunting every broken line');
+//         if (points >= 3500) levelBadges.push('Lord of Shadows | Master of the unseen');
+//         if (points >= 5000) levelBadges.push('Dark Sorcerer | Controls the dark arts');
+//         if (points >= 7500) levelBadges.push('Demon Crafter | Shapes the cursed world');
+//         if (points >= 10000) levelBadges.push('Eternal Revenge | Undying ghost');
 
-        return [...badges, ...levelBadges];
-    } catch (error) {
-        console.error('Error checking badges:', error);
-        return ['Newcomer'];
-    }
-}
+//         return [...badges, ...levelBadges];
+//     } catch (error) {
+//         console.error('Error checking badges:', error);
+//         return ['Newcomer'];
+//     }
+// }
 
 // Update user data when PRs are merged or cancelled
-async function updateUserPRStatus(userId, repoId, prData, status) {
-    try {
-        const user = await User.findOne({ githubId: userId });
-        if (!user) return;
+// async function updateUserPRStatus(userId, repoId, prData, status) {
+//     try {
+//         const user = await User.findOne({ githubId: userId });
+//         if (!user) return;
 
-        if (status === 'merged') {
-            user.mergedPRs.push({
-                repoId,
-                prNumber: prData.number,
-                title: prData.title,
-                mergedAt: new Date()
-            });
-        }
+//         if (status === 'merged') {
+//             user.mergedPRs.push({
+//                 repoId,
+//                 prNumber: prData.number,
+//                 title: prData.title,
+//                 mergedAt: new Date()
+//             });
+//         }
 
-        user.points = await calculatePoints(user.mergedPRs, user.githubId);
-        user.badges = await checkBadges(user.mergedPRs, user.points);
+//         user.points = await calculatePoints(user.mergedPRs, user.githubId);
+//         user.badges = await checkBadges(user.mergedPRs, user.points);
 
-        await user.save();
-    } catch (error) {
-        console.error('Error updating user PR status:', error);
-    }
-}
+//         await user.save();
+//     } catch (error) {
+//         console.error('Error updating user PR status:', error);
+//     }
+// }
 
 // Middleware setup
 app.use(express.json());
@@ -162,75 +162,76 @@ app.use(session({
     name: 'devsync.sid' // Custom session cookie name
 }));
 
+require('./config/passport')(passport);
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Passport configuration
-passport.use(new GitHubStrategy({
-    clientID: process.env.GITHUB_CLIENT_ID,
-    clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: process.env.GITHUB_CALLBACK_URL,
-    scope: ['user', 'user:email']  // Add email scope
-}, async (accessToken, refreshToken, profile, done) => {
-    try {
-        // Create Octokit instance with the user's access token
-        const userOctokit = new Octokit({
-            auth: accessToken
-        });
+// passport.use(new GitHubStrategy({
+//     clientID: process.env.GITHUB_CLIENT_ID,
+//     clientSecret: process.env.GITHUB_CLIENT_SECRET,
+//     callbackURL: process.env.GITHUB_CALLBACK_URL,
+//     scope: ['user', 'user:email']  // Add email scope
+// }, async (accessToken, refreshToken, profile, done) => {
+//     try {
+//         // Create Octokit instance with the user's access token
+//         const userOctokit = new Octokit({
+//             auth: accessToken
+//         });
 
-        // Try to get authenticated user's emails with the updated endpoint
-        let primaryEmail;
-        try {
-            const { data: emails } = await userOctokit.rest.users.listEmailsForAuthenticatedUser();
-            primaryEmail = emails.find(email => email.primary)?.email;
+//         // Try to get authenticated user's emails with the updated endpoint
+//         let primaryEmail;
+//         try {
+//             const { data: emails } = await userOctokit.rest.users.listEmailsForAuthenticatedUser();
+//             primaryEmail = emails.find(email => email.primary)?.email;
 
-            if (!primaryEmail) {
-                // Fallback to public email if available
-                const { data: userData } = await userOctokit.rest.users.getAuthenticated();
-                primaryEmail = userData.email;
-            }
-        } catch (emailError) {
-            console.error('Error fetching user emails:', emailError);
-            // Fallback to profile email if available
-            primaryEmail = profile.emails?.[0]?.value;
-        }
+//             if (!primaryEmail) {
+//                 // Fallback to public email if available
+//                 const { data: userData } = await userOctokit.rest.users.getAuthenticated();
+//                 primaryEmail = userData.email;
+//             }
+//         } catch (emailError) {
+//             console.error('Error fetching user emails:', emailError);
+//             // Fallback to profile email if available
+//             primaryEmail = profile.emails?.[0]?.value;
+//         }
 
-        if (!primaryEmail) {
-            return done(new Error('No email found for user'));
-        }
+//         if (!primaryEmail) {
+//             return done(new Error('No email found for user'));
+//         }
 
-        let user = await User.findOne({ githubId: profile.id });
+//         let user = await User.findOne({ githubId: profile.id });
 
-        if (!user) {
-            // Create new user with verified email
-            user = await User.create({
-                githubId: profile.id,
-                username: profile.username,
-                displayName: profile.displayName,
-                email: primaryEmail,
-                avatarUrl: profile.photos?.[0]?.value || '',
-                mergedPRs: [],
-                cancelledPRs: [],
-                points: 0,
-                badges: ['Newcomer']
-            });
+//         if (!user) {
+//             // Create new user with verified email
+//             user = await User.create({
+//                 githubId: profile.id,
+//                 username: profile.username,
+//                 displayName: profile.displayName,
+//                 email: primaryEmail,
+//                 avatarUrl: profile.photos?.[0]?.value || '',
+//                 mergedPRs: [],
+//                 cancelledPRs: [],
+//                 points: 0,
+//                 badges: ['Newcomer']
+//             });
 
-            // Send welcome email only for new users
-            const emailSent = await emailService.sendWelcomeEmail(primaryEmail, profile.username);
-            if (emailSent) {
-                user.welcomeEmailSent = true;
-                await user.save();
-            }
-        }
+//             // Send welcome email only for new users
+//             const emailSent = await emailService.sendWelcomeEmail(primaryEmail, profile.username);
+//             if (emailSent) {
+//                 user.welcomeEmailSent = true;
+//                 await user.save();
+//             }
+//         }
 
-        return done(null, { ...profile, userData: user });
-    } catch (error) {
-        return done(error);
-    }
-}));
+//         return done(null, { ...profile, userData: user });
+//     } catch (error) {
+//         return done(error);
+//     }
+// }));
 
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((user, done) => done(null, user));
+// passport.serializeUser((user, done) => done(null, user));
+// passport.deserializeUser((user, done) => done(null, user));
 
 // Auth routes
 const authRoutes = require('./routes/authRoutes');

@@ -40,7 +40,7 @@ async function calculatePointsFromApprovedPRs(userId) {
     }
 }
 
-moduel.exports = {
+module.exports = {
     calculatePoints,
     calculatePointsFromApprovedPRs
 };
