@@ -106,15 +106,17 @@ function initializeModal() {
         'member-ankita': {
             name: 'Ankita Priyadarshini Sahoo',
             role: 'Founder & CEO',
-            description: `<p>Creative Frontend Developer passionate about building responsive, user-friendly interfaces. I specialize in translating design concepts into functional, accessible web experiences while maintaining clean code standards and performance optimization.</p>`,
+            description: `<p>Hey, this side Ankita! <br/>
+As the CEO of DevSync, I lead with creativity, strategy, and vision building a brand that’s bold, meaningful, and ready to grow beyond limits.</p>`,
             linkedin: 'https://www.linkedin.com/in/ankita-priyadarshini-sahoo-529517291/',
             github: 'https://github.com/ankitasahoo2004',
-            instagram: 'https://www.instagram.com/_.ankitasahoo._/'
+            instagram: 'https://www.instagram.com/_.ankitasahoo/n'
         },
         'member-shubham': {
             name: 'Shubham Kumar',
             role: 'Founder & COO',
-            description: `<p>Full-stack developer specializing in the MERN stack with experience in building scalable web applications. Focused on creating efficient server-side architectures and seamless frontend-backend integration.</p>`,
+            description: `<p>Hello! Shubham this side. <br/>
+I’m the structure behind the scenes. As COO, I keep our chaos in check managing operations, aligning the team, and making sure DevSync keeps moving forward smoothly.</p>`,
             linkedin: 'https://www.linkedin.com/in/shubham-yadav-07199a24b/',
             github: 'https://github.com/Shubham66020',
             instagram: 'https://www.instagram.com/shubham._.yadav._/'
@@ -122,7 +124,8 @@ function initializeModal() {
         'member-sayan': {
             name: 'Sayan Karmakar',
             role: 'Founder & CTO',
-            description: `<p>Backend specialist focused on server-side logic, database architecture, and API development. Committed to building secure, high-performance systems that power seamless user experiences.</p>`,
+            description: `<p>Hey, Sayan here! <br/>
+As CTO, I handle everything tech at DevSync. From frontend magic to backend logic, I build what powers the platform and keep things running smooth behind the scenes.</p>`,
             linkedin: 'https://www.linkedin.com/in/sayan-karmakar-01239a242/',
             github: 'https://github.com/Sayan-dev731',
             instagram: 'https://www.instagram.com/code_it884/'
@@ -130,7 +133,8 @@ function initializeModal() {
         'member-ansh': {
             name: 'Ansh Raj',
             role: 'Community Manager',
-            description: `<p>Detail-oriented developer focused on maintaining code quality through comprehensive reviews. Ensures adherence to coding standards, identifies potential issues, and suggests optimizations for better maintainability.</p>`,
+            description: `<p>Hey, this is Ansh! <br/>
+The guy who keeps the community lit! I manage the vibe on Discord, help members feel at home, and turn every ping into a party. If DevSync had a heartbeat, I’d be the rhythm.</p>`,
             linkedin: 'https://www.linkedin.com/in/ansh-raj-b66960317/',
             github: 'https://github.com/anshraj-21',
             instagram: 'https://www.instagram.com/ansh_pvtx21?igsh=MTVzYmNmcjhraHloYw%3D%3D'
@@ -138,7 +142,8 @@ function initializeModal() {
         'member-krish': {
             name: 'Krish Maurya',
             role: 'Partnership Manager',
-            description: `<p>Content editor ensuring all published materials meet quality standards. Reviews technical documentation, blog posts, and marketing content for clarity, accuracy, and consistency.</p>`,
+            description: `<p>Yo, Krish here! <br/>
+At DevSync, I’m the one locking in the deals and building bridges with brands. Whether it's sponsors, collabs, or cool opportunities. I make sure we're growing with the right people by our side.</p>`,
             linkedin: 'https://www.linkedin.com/in/krish-maurya-59699732b/',
             github: 'https://github.com/krishmaurya21',
             instagram: 'https://www.instagram.com/krrishmaurya21/'
@@ -146,7 +151,8 @@ function initializeModal() {
         'member-divyanshu': {
             name: 'Divyanshu Soni',
             role: 'Creative Designer',
-            description: `<p>Community manager overseeing Discord server operations and engagement. Facilitates discussions, enforces guidelines, and creates welcoming environments for members to connect.</p>`,
+            description: `<p>Hi, I’m Divyanshu! <br/>
+Designing is more than visuals, it’s storytelling. I shape DevSync’s look with clean, classy, and creative designs that speak louder than words.</p>`,
             linkedin: 'https://www.linkedin.com/in/divyanshu-soni-938468334/',
             github: 'https://github.com/DivyanshuXOR',
             instagram: 'https://www.instagram.com/divyanshu._.soni_22/'
@@ -154,7 +160,8 @@ function initializeModal() {
         'member-debasmita': {
             name: 'Debasmita Behera',
             role: 'Creative Producer',
-            description: `<p>Community manager overseeing Discord server operations and engagement. Facilitates discussions, enforces guidelines, and creates welcoming environments for members to connect.</p>`,
+            description: `<p>Hey hey, Debasmita this side! <br/>
+I’m the creative brain behind the scenes. From storytelling to production, I bring ideas to life through visuals that pop and vibes that stick. DevSync’s content gets its soul from my spark.</p>`,
             linkedin: 'https://www.linkedin.com/',
             github: 'https://github.com/debsmi',
             instagram: 'https://www.instagram.com/'
@@ -162,7 +169,8 @@ function initializeModal() {
         'member-naman': {
             name: 'Naman Soni',
             role: 'Full Stack Developer',
-            description: `<p>Community manager overseeing Discord server operations and engagement. Facilitates discussions, enforces guidelines, and creates welcoming environments for members to connect.</p>`,
+            description: `<p>Hi, I’m Naman! <br/>
+Tech is my playground. From front to back, I build the engine that powers DevSync. Code, deploy, repeat. I make sure everything you click, scroll, or type just works like magic.</p>`,
             linkedin: 'https://www.linkedin.com/in/namansoni18/',
             github: 'https://github.com/NamanSoni18',
             instagram: 'https://www.instagram.com/developer_naman.20'
@@ -170,7 +178,8 @@ function initializeModal() {
         'member-niraj': {
             name: 'Niraj Kumar Sharma',
             role: 'Visual Content Creator',
-            description: `<p>Community manager overseeing Discord server operations and engagement. Facilitates discussions, enforces guidelines, and creates welcoming environments for members to connect.</p>`,
+            description: `<p>Hey, Niraj here! <br/>
+I turn stories into scroll-stopping visuals. From stunning graphics to crisp video edits, I blend design and motion to create content that hits both the eye and the heart.</p>`,
             linkedin: 'https://www.linkedin.com/in/niraj-kumar-sharma-3770b1213/',
             github: 'https://github.com/nikush1',
             instagram: 'https://www.instagram.com/nirajsharma_08'
