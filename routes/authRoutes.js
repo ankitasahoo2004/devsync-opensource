@@ -4,11 +4,11 @@ const dotenv = require('dotenv');
 dotenv.config();
 const router = express.Router();
 
-router.get('/',
+router.get('/github',
     passport.authenticate('github', { scope: ['user'] })
 );
 
-router.get('/callback',
+router.get('/github/callback',
     passport.authenticate('github', { failureRedirect: '/login' }),
     (req, res) => {
         res.redirect(process.env.FRONTEND_URL);

@@ -153,6 +153,11 @@ sr.reveal(`.home-swiper, .new-swiper, .newsletter__container`);
 /*=============== GLOBAL SEARCH HINT ===============*/
 // Show search hint to users
 document.addEventListener('DOMContentLoaded', () => {
+    // Check authentication status when page loads
+    if (typeof checkAuthStatus === 'function') {
+        checkAuthStatus();
+    }
+
     // Show search hint after 3 seconds on first visit
     if (!localStorage.getItem('searchHintShown')) {
         setTimeout(() => {

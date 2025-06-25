@@ -235,7 +235,7 @@ app.use(passport.session());
 
 // Auth routes
 const authRoutes = require('./routes/authRoutes');
-app.use("/auth/github", authRoutes);
+app.use("/auth", authRoutes);
 // app.get('/auth/github',
 //     passport.authenticate('github', { scope: ['user'] })
 // );

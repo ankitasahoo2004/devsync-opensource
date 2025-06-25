@@ -1,8 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const githubLoginButton = document.getElementById('logout-button');
+    const logoutButton = document.getElementById('logout-button');
 
-    githubLoginButton.addEventListener('click', () => {
-        window.location.href = `${serverUrl}/logout`;
+    logoutButton.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        // Use the animated logout function from auth.js if available
+        if (typeof triggerLogoutWithAnimation === 'function') {
+            triggerLogoutWithAnimation();
+        } else {
+            // Fallback to direct logout if auth.js is not loaded
+            const fallbackServerUrl = window.serverUrl || 'http://localhost:3000';
+            window.location.href = `${fallbackServerUrl}/auth/logout`;
+        }
     });
 });
 
