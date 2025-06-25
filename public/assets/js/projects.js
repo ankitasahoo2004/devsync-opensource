@@ -384,7 +384,15 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
 
         const addChip = (tech) => {
-            if (selectedTechs.has(tech)) return;
+            if (selectedTechs.has(tech)) {
+                showToast(`"${tech}" is already added`, 'warning', 2000);
+                return;
+            }
+
+            if (selectedTechs.size >= 10) {
+                showToast('You can add up to 10 technologies only', 'warning', 3000);
+                return;
+            }
 
             const chip = document.createElement('div');
             chip.className = 'tech-chip';
@@ -395,13 +403,37 @@ document.addEventListener('DOMContentLoaded', () => {
             wrapper.insertBefore(chip, input);
             selectedTechs.add(tech);
             updateHiddenInput();
+
+            // Clear input and hide suggestions immediately
+            input.value = '';
+            suggestionsDiv.classList.remove('active');
+            suggestionsDiv.querySelectorAll('.selected').forEach(s => s.classList.remove('selected'));
+
+            // Clear the suggestions content to prevent stale data
+            suggestionsDiv.innerHTML = '';
+
+            // Show success feedback for first few additions
+            if (selectedTechs.size <= 3) {
+                showToast(`"${tech}" added successfully`, 'success', 1500);
+            }
+
+            // Focus back to input for continuous typing
+            setTimeout(() => {
+                input.focus();
+                // Ensure cursor is at the end and input is ready for new text
+                input.setSelectionRange(input.value.length, input.value.length);
+            }, 100);
         };
 
         const removeChip = (tech) => {
             const chip = wrapper.querySelector(`[data-tech="${tech}"]`).parentElement;
-            chip.remove();
-            selectedTechs.delete(tech);
-            updateHiddenInput();
+            chip.style.transform = 'scale(0.8)';
+            chip.style.opacity = '0';
+            setTimeout(() => {
+                chip.remove();
+                selectedTechs.delete(tech);
+                updateHiddenInput();
+            }, 200);
         };
 
         const updateHiddenInput = () => {
@@ -409,17 +441,25 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const showSuggestions = (query) => {
+            if (!query || query.trim().length === 0) {
+                suggestionsDiv.classList.remove('active');
+                suggestionsDiv.innerHTML = '';
+                return;
+            }
+
             const filtered = technologies.filter(tech =>
                 tech.toLowerCase().includes(query.toLowerCase()) &&
                 !selectedTechs.has(tech)
             );
 
-            if (filtered.length === 0 || !query) {
+            if (filtered.length === 0) {
                 suggestionsDiv.classList.remove('active');
+                suggestionsDiv.innerHTML = '';
                 return;
             }
 
             suggestionsDiv.innerHTML = filtered
+                .slice(0, 8) // Limit to 8 suggestions for better UX
                 .map(tech => `<div class="suggestion-item" data-tech="${tech}">${tech}</div>`)
                 .join('');
             suggestionsDiv.classList.add('active');
@@ -464,13 +504,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (selected) {
                         e.preventDefault();
                         addChip(selected.dataset.tech);
-                        input.value = '';
-                        suggestionsDiv.classList.remove('active');
+                    } else if (input.value) {
+                        // If no suggestion is selected but there's text, try to add it as-is
+                        e.preventDefault();
+                        const exactMatch = technologies.find(tech =>
+                            tech.toLowerCase() === input.value.toLowerCase()
+                        );
+                        if (exactMatch) {
+                            addChip(exactMatch);
+                        } else {
+                            showToast('Please select from the suggestions or type a valid technology', 'warning', 3000);
+                        }
                     }
                     break;
 
                 case 'Escape':
                     suggestionsDiv.classList.remove('active');
+                    suggestionsDiv.querySelectorAll('.selected').forEach(s => s.classList.remove('selected'));
+                    input.blur();
                     break;
             }
 
@@ -485,22 +536,73 @@ document.addEventListener('DOMContentLoaded', () => {
             const item = e.target.closest('.suggestion-item');
             if (item) {
                 addChip(item.dataset.tech);
+
+                // Ensure input is cleared and ready for next entry
                 input.value = '';
                 suggestionsDiv.classList.remove('active');
-                input.focus();
+                suggestionsDiv.innerHTML = '';
+
+                // Clear any selections
+                suggestionsDiv.querySelectorAll('.selected').forEach(s => s.classList.remove('selected'));
+
+                // Focus back to input for next entry with proper delay
+                setTimeout(() => {
+                    input.focus();
+                    input.setSelectionRange(0, 0); // Reset cursor position
+                }, 150);
             }
         });
 
         wrapper.addEventListener('click', (e) => {
             if (e.target.classList.contains('remove-chip')) {
                 removeChip(e.target.dataset.tech);
+                // Focus back to input after removing chip with proper delay
+                setTimeout(() => {
+                    input.focus();
+                    input.setSelectionRange(input.value.length, input.value.length);
+                }, 150);
+            } else if (e.target === input || wrapper.contains(e.target)) {
+                // Always focus input when clicking in wrapper area
+                setTimeout(() => {
+                    input.focus();
+                    input.setSelectionRange(input.value.length, input.value.length);
+                    // Show suggestions if there's text
+                    if (input.value.trim()) {
+                        showSuggestions(input.value);
+                    }
+                }, 50);
             }
+        });
+
+        // Enhanced focus management
+        input.addEventListener('focus', () => {
+            // Show suggestions immediately if there's text to search
+            if (input.value.trim()) {
+                showSuggestions(input.value);
+            }
+            // Ensure input is ready for typing
+            setTimeout(() => {
+                input.setSelectionRange(input.value.length, input.value.length);
+            }, 50);
+        });
+
+        input.addEventListener('blur', (e) => {
+            // Delay hiding suggestions to allow clicks
+            setTimeout(() => {
+                if (!wrapper.contains(document.activeElement) &&
+                    !suggestionsDiv.contains(document.activeElement)) {
+                    suggestionsDiv.classList.remove('active');
+                    suggestionsDiv.querySelectorAll('.selected').forEach(s => s.classList.remove('selected'));
+                }
+            }, 200);
         });
 
         // Close suggestions when clicking outside
         document.addEventListener('click', (e) => {
-            if (!wrapper.contains(e.target)) {
+            if (!wrapper.contains(e.target) && !suggestionsDiv.contains(e.target)) {
                 suggestionsDiv.classList.remove('active');
+                // Clear any selections
+                suggestionsDiv.querySelectorAll('.selected').forEach(s => s.classList.remove('selected'));
             }
         });
     };
@@ -578,6 +680,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const repoLink = form.repoLink.value.trim();
         const technologies = form.technology.value.split(',').filter(Boolean);
 
+        // Basic validation
+        if (!repoLink || !technologies.length || !form.description.value.trim()) {
+            showToast('Please fill in all required fields', 'warning');
+            return;
+        }
+
         try {
             // Show loading modal
             showModal('loading', 'Submitting Project...', 'Please wait while we process your submission.');
@@ -585,9 +693,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Validate GitHub URL format
             if (!isValidGithubUrl(repoLink)) {
                 removeExistingModals();
-                setTimeout(() => {
-                    showModal('error', 'Error!', 'Invalid GitHub repository URL. Please provide a valid GitHub repository link.');
-                }, 300);
+                showToast('Invalid GitHub repository URL. Please provide a valid GitHub repository link.', 'error');
                 return;
             }
 
@@ -613,20 +719,34 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (response.ok) {
-                showModal('success', 'Success!', 'Project submitted successfully!', async () => {
+                removeExistingModals();
+                showToast('Project submitted successfully! 🎉', 'success');
+                showModal('success', 'Success!', 'Your project has been submitted and is now under review. You will be notified once it\'s approved.', async () => {
                     form.reset();
+                    // Reset technology chips
+                    const techWrapper = document.getElementById('techChipsWrapper');
+                    if (techWrapper) {
+                        const chips = techWrapper.querySelectorAll('.tech-chip');
+                        chips.forEach(chip => chip.remove());
+                    }
+                    const hiddenInput = document.getElementById('technology');
+                    if (hiddenInput) {
+                        hiddenInput.value = '';
+                    }
                     // Switch to view tab and refresh projects
                     const viewTabButton = document.querySelector('[data-tab="view"]');
-                    viewTabButton.click();
+                    if (viewTabButton) {
+                        viewTabButton.click();
+                    }
                 });
             } else {
                 throw new Error(data.error || 'Failed to submit project');
             }
         } catch (error) {
             removeExistingModals();
-            setTimeout(() => {
-                showModal('error', 'Error!', error.message || 'Failed to submit project. Please try again.');
-            }, 300);
+            console.error('Submission error:', error);
+            showToast(error.message || 'Failed to submit project. Please try again.', 'error');
+            showModal('error', 'Submission Failed', error.message || 'An error occurred while submitting your project. Please check your connection and try again.');
         }
     };
 
@@ -916,82 +1036,477 @@ document.addEventListener('DOMContentLoaded', () => {
         return modal;
     }
 
-    // Add these utility functions for the modal
+    // Enhanced Toast Notification System with improved positioning
+    function showToast(message, type = 'info', duration = 5000) {
+        // Ensure toast container exists with proper styling
+        let toastContainer = document.querySelector('.toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.className = 'toast-container';
+            toastContainer.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 100000;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                pointer-events: none;
+                max-width: 400px;
+            `;
+            document.body.appendChild(toastContainer);
+        }
+
+        const iconMap = {
+            success: 'bx-check-circle',
+            error: 'bx-error-circle',
+            warning: 'bx-error',
+            info: 'bx-info-circle'
+        };
+
+        const colorMap = {
+            success: {
+                bg: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05))',
+                color: '#047857',
+                border: 'rgba(16, 185, 129, 0.2)',
+                icon: '#10b981'
+            },
+            error: {
+                bg: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05))',
+                color: '#dc2626',
+                border: 'rgba(239, 68, 68, 0.2)',
+                icon: '#ef4444'
+            },
+            warning: {
+                bg: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05))',
+                color: '#d97706',
+                border: 'rgba(245, 158, 11, 0.2)',
+                icon: '#f59e0b'
+            },
+            info: {
+                bg: 'linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(6, 182, 212, 0.05))',
+                color: '#0891b2',
+                border: 'rgba(6, 182, 212, 0.2)',
+                icon: '#06b6d4'
+            }
+        };
+
+        const colors = colorMap[type] || colorMap.info;
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast--${type}`;
+        toast.style.cssText = `
+            background: ${colors.bg};
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid ${colors.border};
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: auto;
+            min-width: 320px;
+            max-width: 400px;
+            color: ${colors.color};
+            cursor: pointer;
+        `;
+
+        toast.innerHTML = `
+            <div class="toast__content" style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            ">
+                <i class="bx ${iconMap[type] || iconMap.info} toast__icon" style="
+                    font-size: 20px;
+                    flex-shrink: 0;
+                    color: ${colors.icon};
+                "></i>
+                <span class="toast__message" style="
+                    flex: 1;
+                    font-size: 14px;
+                    font-weight: 500;
+                    line-height: 1.4;
+                ">${message}</span>
+                <button class="toast__close" style="
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    padding: 4px;
+                    border-radius: 4px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: background-color 0.2s ease;
+                    color: inherit;
+                ">
+                    <i class="bx bx-x" style="font-size: 16px;"></i>
+                </button>
+            </div>
+        `;
+
+        toastContainer.appendChild(toast);
+
+        // Show toast with animation
+        setTimeout(() => {
+            toast.style.transform = 'translateX(0)';
+            toast.style.opacity = '1';
+        }, 100);
+
+        // Auto remove
+        const autoRemove = setTimeout(() => {
+            removeToast(toast);
+        }, duration);
+
+        // Add hover effects
+        const closeBtn = toast.querySelector('.toast__close');
+        closeBtn.addEventListener('mouseenter', () => {
+            closeBtn.style.background = 'rgba(0, 0, 0, 0.1)';
+        });
+        closeBtn.addEventListener('mouseleave', () => {
+            closeBtn.style.background = 'none';
+        });
+
+        // Toast hover effect
+        toast.addEventListener('mouseenter', () => {
+            toast.style.transform = 'translateX(-5px) scale(1.02)';
+        });
+        toast.addEventListener('mouseleave', () => {
+            toast.style.transform = 'translateX(0) scale(1)';
+        });
+
+        // Manual close
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            clearTimeout(autoRemove);
+            removeToast(toast);
+        });
+
+        // Click toast to close
+        toast.addEventListener('click', () => {
+            clearTimeout(autoRemove);
+            removeToast(toast);
+        });
+
+        return toast;
+    }
+
+    function removeToast(toast) {
+        toast.style.transform = 'translateX(100%)';
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 400);
+    }
+
+    // Enhanced Modal System with proper positioning and z-index
     function showModal(type, title, message, callback) {
         removeExistingModals();
 
         const modal = document.createElement('div');
-        modal.className = 'modal';
-
-        const overlay = document.createElement('div');
-        overlay.className = 'modal__overlay';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        `;
 
         const iconMap = {
-            loading: 'bx bx-loader-alt',
-            success: 'bx bx-check-circle',
-            error: 'bx bx-x-circle',
-            confirm: 'bx bx-help-circle'
+            loading: 'bx-loader-alt bx-spin',
+            success: 'bx-check-circle',
+            error: 'bx-x-circle',
+            confirm: 'bx-help-circle',
+            info: 'bx-info-circle'
+        };
+
+        const colorMap = {
+            loading: '#3b82f6',
+            success: '#10b981',
+            error: '#ef4444',
+            confirm: '#f59e0b',
+            info: '#06b6d4'
         };
 
         modal.innerHTML = `
-            <div class="modal__content">
-                <i class="modal__icon ${type} ${iconMap[type]}"></i>
-                <h3 class="modal__title">${title}</h3>
-                <p class="modal__message">${message}</p>
-                ${type === 'confirm' ? `
-                    <div class="modal__actions">
-                        <button class="modal__button modal__button--confirm">Yes</button>
-                        <button class="modal__button modal__button--cancel">No</button>
+            <div class="modal-container" style="
+                width: 90%;
+                max-width: 500px;
+                margin: 20px;
+            ">
+                <div class="modal-content" style="
+                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+                    backdrop-filter: blur(20px);
+                    border-radius: 20px;
+                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    transform: scale(0.9) translateY(20px);
+                    opacity: 0;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    overflow: hidden;
+                    position: relative;
+                ">
+                    <div class="modal-header" style="
+                        padding: 30px 30px 20px;
+                        text-align: center;
+                        position: relative;
+                    ">
+                        <div class="modal-icon-wrapper" style="
+                            width: 64px;
+                            height: 64px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin: 0 auto 16px;
+                            background: ${colorMap[type]}20;
+                            border: 1px solid ${colorMap[type]}40;
+                        ">
+                            <i class="bx ${iconMap[type]} modal-icon" style="
+                                font-size: 28px;
+                                color: ${colorMap[type]};
+                            "></i>
+                        </div>
+                        <h3 class="modal-title" style="
+                            font-size: 24px;
+                            font-weight: 700;
+                            margin: 0;
+                            color: #1e293b;
+                        ">${title}</h3>
+                        ${type !== 'loading' ? `
+                            <button class="modal-close" style="
+                                position: absolute;
+                                top: 20px;
+                                right: 20px;
+                                background: none;
+                                border: none;
+                                cursor: pointer;
+                                width: 32px;
+                                height: 32px;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                transition: all 0.2s ease;
+                                color: #64748b;
+                            ">
+                                <i class="bx bx-x"></i>
+                            </button>
+                        ` : ''}
                     </div>
-                ` : type !== 'loading' ? `
-                    <button class="modal__button">OK</button>
-                ` : ''}
+                    <div class="modal-body" style="
+                        padding: 0 30px 20px;
+                        text-align: center;
+                    ">
+                        <p class="modal-message" style="
+                            font-size: 16px;
+                            line-height: 1.5;
+                            margin: 0;
+                            color: #64748b;
+                        ">${message}</p>
+                    </div>
+                    ${type === 'confirm' ? `
+                        <div class="modal-actions" style="
+                            padding: 20px 30px 30px;
+                            display: flex;
+                            gap: 12px;
+                            justify-content: center;
+                        ">
+                            <button class="modal-button modal-button--secondary" style="
+                                padding: 12px 24px;
+                                border-radius: 10px;
+                                border: none;
+                                font-size: 14px;
+                                font-weight: 600;
+                                cursor: pointer;
+                                transition: all 0.2s ease;
+                                min-width: 100px;
+                                background: rgba(100, 116, 139, 0.1);
+                                color: #64748b;
+                            ">Cancel</button>
+                            <button class="modal-button modal-button--primary" style="
+                                padding: 12px 24px;
+                                border-radius: 10px;
+                                border: none;
+                                font-size: 14px;
+                                font-weight: 600;
+                                cursor: pointer;
+                                transition: all 0.2s ease;
+                                min-width: 100px;
+                                background: linear-gradient(135deg, #e51837, #ff4d5a);
+                                color: white;
+                                box-shadow: 0 4px 12px rgba(229, 24, 55, 0.3);
+                            ">Confirm</button>
+                        </div>
+                    ` : type !== 'loading' ? `
+                        <div class="modal-actions" style="
+                            padding: 20px 30px 30px;
+                            display: flex;
+                            gap: 12px;
+                            justify-content: center;
+                        ">
+                            <button class="modal-button modal-button--primary" style="
+                                padding: 12px 24px;
+                                border-radius: 10px;
+                                border: none;
+                                font-size: 14px;
+                                font-weight: 600;
+                                cursor: pointer;
+                                transition: all 0.2s ease;
+                                min-width: 100px;
+                                background: linear-gradient(135deg, #e51837, #ff4d5a);
+                                color: white;
+                                box-shadow: 0 4px 12px rgba(229, 24, 55, 0.3);
+                            ">OK</button>
+                        </div>
+                    ` : ''}
+                </div>
             </div>
         `;
 
-        document.body.appendChild(overlay);
         document.body.appendChild(modal);
 
+        // Force a reflow to ensure the modal is in the DOM
+        modal.offsetHeight;
+
+        // Trigger animation
         setTimeout(() => {
-            modal.classList.add('show');
-            overlay.classList.add('show');
+            modal.style.opacity = '1';
+            modal.style.visibility = 'visible';
+            const content = modal.querySelector('.modal-content');
+            if (content) {
+                content.style.transform = 'scale(1) translateY(0)';
+                content.style.opacity = '1';
+            }
         }, 10);
 
+        // Event handlers
         if (type === 'confirm') {
-            const confirmBtn = modal.querySelector('.modal__button--confirm');
-            const cancelBtn = modal.querySelector('.modal__button--cancel');
+            const confirmBtn = modal.querySelector('.modal-button--primary');
+            const cancelBtn = modal.querySelector('.modal-button--secondary');
 
-            confirmBtn.addEventListener('click', () => {
-                closeModal(modal, overlay, () => callback(true));
-            });
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    closeModal(modal, () => callback && callback(true));
+                });
+            }
 
-            cancelBtn.addEventListener('click', () => {
-                closeModal(modal, overlay, () => callback(false));
-            });
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    closeModal(modal, () => callback && callback(false));
+                });
+            }
         } else if (type !== 'loading') {
-            const button = modal.querySelector('.modal__button');
-            button.addEventListener('click', () => {
-                closeModal(modal, overlay, callback);
+            const okBtn = modal.querySelector('.modal-button--primary');
+            const closeBtn = modal.querySelector('.modal-close');
+
+            if (okBtn) {
+                okBtn.addEventListener('click', () => {
+                    closeModal(modal, callback);
+                });
+            }
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    closeModal(modal, callback);
+                });
+            }
+        }
+
+        // Close on overlay click (but not on content click)
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal && type !== 'loading') {
+                closeModal(modal, callback);
+            }
+        });
+
+        // Add hover effects to buttons
+        const buttons = modal.querySelectorAll('.modal-button');
+        buttons.forEach(button => {
+            if (button.classList.contains('modal-button--primary')) {
+                button.addEventListener('mouseenter', () => {
+                    button.style.transform = 'translateY(-1px)';
+                    button.style.boxShadow = '0 6px 16px rgba(229, 24, 55, 0.4)';
+                });
+                button.addEventListener('mouseleave', () => {
+                    button.style.transform = 'translateY(0)';
+                    button.style.boxShadow = '0 4px 12px rgba(229, 24, 55, 0.3)';
+                });
+            } else {
+                button.addEventListener('mouseenter', () => {
+                    button.style.background = 'rgba(100, 116, 139, 0.2)';
+                });
+                button.addEventListener('mouseleave', () => {
+                    button.style.background = 'rgba(100, 116, 139, 0.1)';
+                });
+            }
+        });
+
+        // Add close button hover effect
+        const closeBtn = modal.querySelector('.modal-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('mouseenter', () => {
+                closeBtn.style.background = 'rgba(0, 0, 0, 0.1)';
+                closeBtn.style.color = '#1e293b';
+            });
+            closeBtn.addEventListener('mouseleave', () => {
+                closeBtn.style.background = 'none';
+                closeBtn.style.color = '#64748b';
             });
         }
+
+        return modal;
     }
 
-    function closeModal(modal, overlay, callback) {
-        modal.classList.remove('show');
-        overlay.classList.remove('show');
+    function closeModal(modal, callback) {
+        const content = modal.querySelector('.modal-content');
+        if (content) {
+            content.style.transform = 'scale(0.9) translateY(20px)';
+            content.style.opacity = '0';
+        }
+        modal.style.opacity = '0';
+        modal.style.visibility = 'hidden';
+
         setTimeout(() => {
-            modal.remove();
-            overlay.remove();
-            if (callback) callback();
+            if (modal.parentNode) {
+                modal.parentNode.removeChild(modal);
+            }
+            if (callback && typeof callback === 'function') {
+                callback();
+            }
         }, 300);
     }
 
-    // Add this new function to remove existing modals
+    // Remove existing modals with improved cleanup
     function removeExistingModals() {
-        const existingModals = document.querySelectorAll('.modal, .modal__overlay');
+        const existingModals = document.querySelectorAll('.modal-overlay');
         existingModals.forEach(modal => {
-            modal.classList.remove('show');
-            setTimeout(() => modal.remove(), 300);
+            const content = modal.querySelector('.modal-content');
+            if (content) {
+                content.style.transform = 'scale(0.9) translateY(20px)';
+                content.style.opacity = '0';
+            }
+            modal.style.opacity = '0';
+            modal.style.visibility = 'hidden';
+
+            setTimeout(() => {
+                if (modal.parentNode) {
+                    modal.parentNode.removeChild(modal);
+                }
+            }, 100);
         });
     }
 
