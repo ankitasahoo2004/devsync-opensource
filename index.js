@@ -396,7 +396,7 @@ app.use('/api/stats', statsRoutes);
 //     }
 // });
 
-app.get('/logout', (req, res) => {
+app.get('/auth/logout', (req, res) => {
     req.logout();
     res.redirect(`${serverUrl}/index.html`);
 });
