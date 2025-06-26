@@ -1538,12 +1538,12 @@ document.addEventListener('DOMContentLoaded', () => {
             acceptedContainer.addEventListener('click', (e) => {
                 const viewBtn = e.target.closest('.view-repo');
                 if (viewBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     const repoUrl = viewBtn.dataset.url;
-                    showModal('confirm', 'View Repository', 'Would you like to visit this repository on GitHub?', (confirmed) => {
-                        if (confirmed) {
-                            window.open(repoUrl, '_blank');
-                        }
-                    });
+                    if (repoUrl) {
+                        window.open(repoUrl, '_blank');
+                    }
                 }
             });
 
@@ -1579,7 +1579,9 @@ document.addEventListener('DOMContentLoaded', () => {
             projects.map((project, index) => `
                 <div class="project-card" 
                      data-project-id="${project._id}"
-                     style="animation-delay: ${index * 0.1}s">
+                     data-project-data='${JSON.stringify(project).replace(/'/g, "&apos;")}'
+                     style="animation-delay: ${index * 0.1}s; cursor: pointer;"
+                     onclick="showProjectDetails('${project._id}')">
                     <div class="project-owner">
                         <strong>Owner:</strong> ${project.ownerName}
                     </div>
@@ -1587,7 +1589,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i class='bx bx-code-alt'></i>
                         ${project.repoLink.split('/').pop()}
                     </h4>
-                    <p>${project.description}</p>
+                    <div class="project-preview">
+                        <span class="description-preview">Click to view details</span>
+                    </div>
                     <div class="tech-stack">
                         ${project.technology.map(tech =>
                 `<span class="tech-tag">
@@ -1596,7 +1600,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </span>`
             ).join('')}
                     </div>
-                    <div class="project-actions accepted-projects-button">
+                    <div class="project-actions accepted-projects-button" onclick="event.stopPropagation()">
                         <button class="repo-link view-repo" data-url="${project.repoLink}">
                             <i class='bx bxl-github'></i>
                             View Repository
@@ -1891,12 +1895,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (viewBtn) {
+                e.preventDefault();
+                e.stopPropagation();
                 const repoUrl = viewBtn.dataset.url;
-                showModal('confirm', 'View Repository', `Would you like to view this repository on GitHub?`, (confirmed) => {
-                    if (confirmed) {
-                        window.open(repoUrl, '_blank');
-                    }
-                });
+                if (repoUrl) {
+                    window.open(repoUrl, '_blank');
+                }
             }
         });
     };
@@ -1907,7 +1911,9 @@ document.addEventListener('DOMContentLoaded', () => {
             projects.map((project, index) => `
                 <div class="project-card" 
                      data-project-id="${project._id}"
-                     style="animation-delay: ${index * 0.1}s">
+                     data-project-data='${JSON.stringify(project).replace(/'/g, "&apos;")}'
+                     style="animation-delay: ${index * 0.1}s; cursor: pointer;"
+                     onclick="showProjectDetails('${project._id}')">
                     <div class="review-status ${project.reviewStatus}">
                         ${getReviewStatusIcon(project.reviewStatus)}
                         ${getReviewStatusText(project.reviewStatus)}
@@ -1916,7 +1922,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i class='bx bx-code-alt'></i>
                         ${project.repoLink.split('/').pop()}
                     </h4>
-                    <p>${project.description}</p>
+                    <div class="project-preview">
+                        <span class="description-preview">Click to view details</span>
+                    </div>
                     <div class="tech-stack">
                         ${project.technology.map(tech =>
                 `<span class="tech-tag">
@@ -1926,7 +1934,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ).join('')}
                     </div>
                     <div class="project-new">
-                    <div class="project-actions project-buttons">
+                    <div class="project-actions project-buttons" onclick="event.stopPropagation()">
                         <button class="repo-link view-repo" data-url="${project.repoLink}">
                             <i class='bx bxl-github'></i>
                             View Repository
@@ -1945,7 +1953,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderAdminProjects = (projects) => {
         return projects.length ? projects.map(project => `
-            <div class="project-card ${project.reviewStatus}" data-project-id="${project._id}">
+            <div class="project-card ${project.reviewStatus}" 
+                 data-project-id="${project._id}"
+                 data-project-data='${JSON.stringify(project).replace(/'/g, "&apos;")}'
+                 style="cursor: pointer;"
+                 onclick="showProjectDetails('${project._id}')">
                 <div class="review-status ${project.reviewStatus}">
                     ${getReviewStatusIcon(project.reviewStatus)}
                     ${getReviewStatusText(project.reviewStatus)}
@@ -1957,7 +1969,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <i class='bx bx-code-alt'></i>
                     ${project.repoLink.split('/').pop()}
                 </h4>
-                <p>${project.description}</p>
+                <div class="project-preview">
+                    <span class="description-preview">Click to view details</span>
+                </div>
                 <div class="tech-stack">
                     ${project.technology.map(tech =>
             `<span class="tech-tag">
@@ -1966,6 +1980,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </span>`
         ).join('')}
                 </div>
+                <div onclick="event.stopPropagation()">
                 ${project.reviewStatus === 'pending' ? `
                     <div class="review-buttons">
                         <button class="accept-project" data-id="${project._id}">
@@ -2008,6 +2023,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             Delete
                         </button>
                     </div>
+                </div>
                 </div>
                 </div>
             </div>
@@ -2071,6 +2087,264 @@ document.addEventListener('DOMContentLoaded', () => {
             const filteredUsers = searchUsers(allUsers, e.target.value);
             renderUsers(filteredUsers);
         });
+    };
+
+    // Function to show project details in a popup
+    window.showProjectDetails = function (projectId) {
+        console.log('🔍 Showing project details for ID:', projectId);
+
+        // Find the project data from the card
+        const projectCard = document.querySelector(`[data-project-id="${projectId}"]`);
+        if (!projectCard) {
+            console.error('❌ Project card not found for ID:', projectId);
+            return;
+        }
+
+        const projectDataStr = projectCard.getAttribute('data-project-data');
+        if (!projectDataStr) {
+            console.error('❌ Project data not found in card');
+            return;
+        }
+
+        let project;
+        try {
+            project = JSON.parse(projectDataStr);
+            console.log('✅ Project data parsed:', project);
+        } catch (error) {
+            console.error('❌ Error parsing project data:', error);
+            return;
+        }
+
+        const repoName = project.repoLink.split('/').pop();
+        const submissionDate = project.submittedAt ? new Date(project.submittedAt).toLocaleDateString() : 'Unknown';
+        const reviewDate = project.reviewedAt ? new Date(project.reviewedAt).toLocaleDateString() : 'Not reviewed';
+
+        const modalContent = `
+            <div class="project-details-modal">
+                <div class="project-header">
+                    <div class="project-title">
+                        <i class='bx bx-code-alt'></i>
+                        <h2>${repoName}</h2>
+                    </div>
+                    <div class="project-status ${project.reviewStatus}">
+                        ${getReviewStatusIcon(project.reviewStatus)}
+                        ${getReviewStatusText(project.reviewStatus)}
+                    </div>
+                </div>
+                
+                <div class="project-info-grid">
+                    <div class="info-section">
+                        <h3><i class='bx bx-user'></i> Project Owner</h3>
+                        <p>${project.ownerName}</p>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3><i class='bx bx-link-external'></i> Repository</h3>
+                        <a href="${project.repoLink}" target="_blank" class="repo-link-detail">
+                            ${project.repoLink}
+                            <i class='bx bx-external-link'></i>
+                        </a>
+                    </div>
+                    
+                    <div class="info-section full-width">
+                        <h3><i class='bx bx-detail'></i> Description</h3>
+                        <div class="description-content">
+                            ${project.description}
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3><i class='bx bx-code-curly'></i> Technologies</h3>
+                        <div class="tech-stack-modal">
+                            ${project.technology.map(tech =>
+            `<span class="tech-tag-modal">
+                                    <i class='bx bx-code-curly'></i>
+                                    ${tech}
+                                </span>`
+        ).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3><i class='bx bx-calendar'></i> Submission Date</h3>
+                        <p>${submissionDate}</p>
+                    </div>
+                    
+                    ${project.reviewStatus !== 'pending' ? `
+                        <div class="info-section">
+                            <h3><i class='bx bx-calendar-check'></i> Review Date</h3>
+                            <p>${reviewDate}</p>
+                        </div>
+                    ` : ''}
+                    
+                    ${project.successPoints ? `
+                        <div class="info-section">
+                            <h3><i class='bx bx-trophy'></i> Success Points</h3>
+                            <p class="points-display">${project.successPoints} points</p>
+                        </div>
+                    ` : ''}
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn-primary" onclick="window.open('${project.repoLink}', '_blank')">
+                        <i class='bx bxl-github'></i>
+                        View on GitHub
+                    </button>
+                </div>
+            </div>
+        `;
+
+        console.log('📝 Generated modal content:', modalContent.substring(0, 100) + '...');
+
+        // Remove any existing project modals
+        const existingModals = document.querySelectorAll('.project-modal-overlay');
+        existingModals.forEach(modal => modal.remove());
+
+        // Create the modal with proper z-index and positioning
+        const modal = document.createElement('div');
+        modal.className = 'project-modal-overlay';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        `;
+
+        modal.innerHTML = `
+            <div class="project-modal-content" style="
+                background: linear-gradient(135deg, rgba(30, 30, 30, 0.95), rgba(20, 20, 20, 0.95));
+                border-radius: 16px;
+                max-width: 800px;
+                width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                transform: scale(0.9) translateY(20px);
+                opacity: 0;
+                transition: all 0.3s ease;
+                position: relative;
+            ">
+                <div class="modal-header" style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 1.5rem;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                ">
+                    <h2 style="margin: 0; color: #fff;">Project Details</h2>
+                    <button class="modal-close" style="
+                        background: none;
+                        border: none;
+                        color: rgba(255, 255, 255, 0.7);
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        padding: 0.5rem;
+                        border-radius: 50%;
+                        transition: all 0.3s ease;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 40px;
+                        height: 40px;
+                    ">
+                        <i class='bx bx-x'></i>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 1.5rem; color: #fff;">
+                    ${modalContent}
+                </div>
+            </div>
+        `;
+
+        // Add event listeners
+        const closeBtn = modal.querySelector('.modal-close');
+        const githubBtn = modal.querySelector('.btn-primary');
+
+        closeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closeProjectModal();
+        });
+
+        // Handle GitHub button click
+        if (githubBtn) {
+            githubBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.open(project.repoLink, '_blank');
+            });
+        }
+
+        closeBtn.addEventListener('mouseenter', () => {
+            closeBtn.style.background = 'rgba(255, 255, 255, 0.1)';
+            closeBtn.style.color = '#fff';
+        });
+
+        closeBtn.addEventListener('mouseleave', () => {
+            closeBtn.style.background = 'none';
+            closeBtn.style.color = 'rgba(255, 255, 255, 0.7)';
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeProjectModal();
+            }
+        });
+
+        // Prevent body scroll when modal is open
+        document.body.style.overflow = 'hidden';
+
+        // Add to DOM and show with animation
+        document.body.appendChild(modal);
+        console.log('✅ Modal added to DOM');
+
+        // Force reflow
+        modal.offsetHeight;
+
+        // Show modal with animation
+        setTimeout(() => {
+            console.log('🎬 Starting modal animation');
+            modal.style.opacity = '1';
+            modal.style.visibility = 'visible';
+            const content = modal.querySelector('.project-modal-content');
+            if (content) {
+                content.style.transform = 'scale(1) translateY(0)';
+                content.style.opacity = '1';
+                console.log('✅ Modal content animated');
+            }
+        }, 10);
+
+        // Function to close modal
+        function closeProjectModal() {
+            const content = modal.querySelector('.project-modal-content');
+            if (content) {
+                content.style.transform = 'scale(0.9) translateY(20px)';
+                content.style.opacity = '0';
+            }
+            modal.style.opacity = '0';
+            modal.style.visibility = 'hidden';
+
+            setTimeout(() => {
+                if (modal.parentNode) {
+                    document.body.removeChild(modal);
+                }
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        // Store close function globally for external access
+        window.closeProjectModal = closeProjectModal;
     };
 
     // Start the authentication check process

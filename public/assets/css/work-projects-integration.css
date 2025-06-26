@@ -1766,3 +1766,42 @@ html[data-theme="light"] {
     border: none !important;
     box-shadow: none !important;
 }
+
+/* Project Details Modal Integration */
+.devsync-projects-section .project-preview {
+    margin: 0.75rem 0;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.devsync-projects-section .description-preview {
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.devsync-projects-section .project-card:hover .project-preview {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--devsync-primary);
+}
+
+.devsync-projects-section .project-card:hover .description-preview {
+    color: var(--devsync-primary);
+}
+
+/* Make project cards clickable */
+.devsync-projects-section .project-card[onclick],
+.devsync-projects-section .admin-project-card[onclick] {
+    cursor: pointer !important;
+    transition: all 0.3s ease;
+}
+
+.devsync-projects-section .project-card[onclick]:hover,
+.devsync-projects-section .admin-project-card[onclick]:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
