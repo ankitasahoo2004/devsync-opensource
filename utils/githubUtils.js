@@ -25,6 +25,59 @@ function calculateProfileCompleteness(user) {
     return Math.min(completeness, 100);
 }
 
+async function normalizeAndValidateGitHubUrl(url) {
+    try {
+        // Handle URLs without protocol
+        if (!url.startsWith('http')) {
+            url = 'https://' + url;
+        }
+
+        const urlObj = new URL(url);
+        if (!urlObj.hostname.toLowerCase().endsWith('github.com')) {
+            throw new Error('Not a GitHub repository URL');
+        }
+
+        // Clean and split path
+        const cleanPath = urlObj.pathname
+            .toLowerCase()                    // Convert to lowercase
+            .replace(/\.git$/, '')           // Remove .git suffix
+            .replace(/\/$/, '')              // Remove trailing slash
+            .split('/')
+            .filter(Boolean);                // Remove empty parts
+
+        if (cleanPath.length < 2) {
+            throw new Error('Invalid repository URL format');
+        }
+
+        const [owner, repo] = cleanPath;
+
+        // Verify repo exists and is public using Octokit
+        try {
+            const { data: repoData } = await octokit.repos.get({
+                owner,
+                repo
+            });
+
+            if (repoData.private) {
+                throw new Error('Private repositories are not allowed');
+            }
+
+            // Return canonical URL format using actual case from GitHub API
+            return `https://github.com/${repoData.owner.login}/${repoData.name}`;
+        } catch (error) {
+            if (error.status === 404) {
+                throw new Error('Repository not found');
+            }
+            throw error;
+        }
+    } catch (error) {
+        if (error instanceof TypeError) {
+            throw new Error('Invalid URL format');
+        }
+        throw error;
+    }
+}
+
 async function retryWithBackoff(fn, maxRetries = 3, initialDelay = 1000) {
     let retries = 0;
     while (true) {
@@ -198,5 +251,6 @@ module.exports = {
     getApprovedMergedPRs,
     calculatePointsFromApprovedPRs,
     isValidEmail,
-    calculateProfileCompleteness
+    calculateProfileCompleteness,
+    normalizeAndValidateGitHubUrl
 };
