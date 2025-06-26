@@ -939,30 +939,247 @@ html[data-theme="light"] {
     color: var(--devsync-text-muted);
 }
 
-/* Mobile responsiveness improvements */
+/* Enhanced responsive design - Mobile first approach */
+
+/* Extra large screens (Ultra-wide) */
+@media (min-width: 1920px) {
+    .devsync-projects-container {
+        max-width: 1600px;
+    }
+
+    .devsync-intro-compact .h-eyebrow {
+        font-size: clamp(3rem, 4vw, 4rem);
+    }
+
+    .projects-summary {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+    }
+
+    .community-preview,
+    .community-expanded.show {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+/* Large desktop screens */
+@media (min-width: 1200px) and (max-width: 1919px) {
+    .devsync-intro-compact .h-eyebrow {
+        font-size: clamp(2.5rem, 3.5vw, 3.5rem);
+    }
+
+    .projects-summary {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+
+    .community-preview,
+    .community-expanded.show {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+}
+
+/* Standard desktop */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .devsync-intro-compact .h-eyebrow {
+        font-size: clamp(2rem, 3vw, 3rem);
+    }
+
+    .projects-summary {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    .section-tabs {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .community-preview,
+    .community-expanded.show {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+}
+
+/* Tablet landscape */
+@media (min-width: 769px) and (max-width: 991px) {
+    .devsync-projects-section {
+        padding: 1.5rem;
+    }
+
+    .devsync-intro-compact {
+        padding: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .devsync-intro-compact .h-eyebrow {
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+    }
+
+    .projects-summary {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+
+    .section-tabs {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+    }
+
+    .tab-button {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.9rem;
+    }
+
+    .projects-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .community-preview,
+    .community-expanded.show {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .users-header {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .users-search {
+        max-width: 280px;
+    }
+}
+
+/* Mobile landscape and tablet portrait */
 @media (max-width: 768px) {
     .devsync-projects-section {
         padding: 1rem;
     }
 
+    .devsync-projects-container {
+        padding: 0 1rem;
+    }
+
     .devsync-intro-compact {
         text-align: center;
         margin-bottom: 2rem;
+        padding: 1rem;
+    }
+
+    .devsync-intro-compact .h-eyebrow {
+        font-size: clamp(1.5rem, 5vw, 2.2rem);
+        margin-bottom: 0.75rem;
+    }
+
+    .devsync-intro-compact .intro-description {
+        font-size: 0.9rem;
+        max-width: 500px;
     }
 
     .projects-summary {
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .summary-card {
+        padding: 1.25rem;
+        text-align: center;
+    }
+
+    .summary-card .card-number {
+        font-size: 1.5rem;
+    }
+
+    .summary-card .card-label {
+        font-size: 0.8rem;
+    }
+
+    .section-tabs {
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        max-width: 100%;
+    }
+
+    .tab-button {
+        width: 100%;
+        padding: 0.75rem;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    .projects-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .project-card,
+    .admin-project-card {
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .project-form {
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+
+    .tech-chips-wrapper {
+        min-height: 50px;
+        padding: 0.75rem;
     }
 
     .users-header {
         flex-direction: column;
         text-align: center;
+        gap: 1rem;
+    }
+
+    .users-header .section__title {
+        font-size: clamp(1.3rem, 4vw, 2rem);
+        margin-bottom: 0;
     }
 
     .users-search {
         width: 100%;
+        max-width: none;
         margin-bottom: 1rem;
+    }
+
+    .community-stats {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .stats-item {
+        min-width: 100px;
+        text-align: center;
+    }
+
+    .stats-number {
+        font-size: 1.3rem;
+    }
+
+    .stats-label {
+        font-size: 0.75rem;
     }
 
     .community-preview,
@@ -993,6 +1210,11 @@ html[data-theme="light"] {
         font-size: 0.7rem;
     }
 
+    .user-card-compact .user-role {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+
     .community-pagination {
         flex-direction: column;
         gap: 0.75rem;
@@ -1003,19 +1225,363 @@ html[data-theme="light"] {
         order: -1;
     }
 
-    .community-stats {
-        flex-direction: column;
-        gap: 0.75rem;
-        padding: 1rem;
-    }
-
-    .community-stats .stats-item {
-        min-width: 100px;
-    }
-
     .pagination-btn {
         padding: 0.75rem 1rem;
         font-size: 0.85rem;
+    }
+
+    .pagination-info {
+        font-size: 0.8rem;
+        text-align: center;
+    }
+}
+
+/* Mobile portrait - small screens */
+@media (max-width: 480px) {
+    .devsync-projects-section {
+        padding: 0.75rem;
+    }
+
+    .devsync-projects-container {
+        padding: 0 0.5rem;
+    }
+
+    .devsync-intro-compact {
+        padding: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .devsync-intro-compact .h-eyebrow {
+        font-size: clamp(1.3rem, 6vw, 1.8rem);
+        margin-bottom: 0.5rem;
+    }
+
+    .devsync-intro-compact .intro-description {
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
+    .projects-summary {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .summary-card {
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .summary-card .card-icon {
+        font-size: 1.5rem;
+    }
+
+    .summary-card .card-number {
+        font-size: 1.3rem;
+    }
+
+    .summary-card .card-label {
+        font-size: 0.75rem;
+    }
+
+    .section-tabs {
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .tab-button {
+        padding: 0.6rem;
+        font-size: 0.85rem;
+    }
+
+    .project-card,
+    .admin-project-card {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    .project-card h4,
+    .admin-project-card h4 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .project-card p,
+    .admin-project-card p {
+        font-size: 0.85rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .project-form {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        border-radius: 8px;
+    }
+
+    .tech-chips-wrapper {
+        min-height: 45px;
+        padding: 0.5rem;
+    }
+
+    .tech-chip {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.75rem;
+    }
+
+    .submit-button,
+    .expand-toggle {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        border-radius: 8px;
+    }
+
+    .users-section {
+        margin-top: 2rem;
+        padding: 1rem;
+    }
+
+    .users-header .section__title {
+        font-size: clamp(1.2rem, 5vw, 1.5rem);
+    }
+
+    .community-stats {
+        gap: 0.5rem;
+        padding: 0.75rem;
+    }
+
+    .stats-number {
+        font-size: 1.2rem;
+    }
+
+    .stats-label {
+        font-size: 0.7rem;
+    }
+
+    .community-preview,
+    .community-expanded.show {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .user-card-compact {
+        padding: 0.5rem;
+        min-height: 160px;
+    }
+
+    .user-card-compact .user-avatar {
+        width: 35px;
+        height: 35px;
+    }
+
+    .user-card-compact .user-name {
+        font-size: 0.8rem;
+    }
+
+    .user-card-compact .user-username {
+        font-size: 0.7rem;
+    }
+
+    .user-card-compact .user-email {
+        font-size: 0.65rem;
+    }
+
+    .user-card-compact .user-role {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.3rem;
+    }
+
+    .community-pagination {
+        gap: 0.5rem;
+        padding: 0.75rem 0.25rem;
+    }
+
+    .pagination-btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .pagination-info {
+        font-size: 0.75rem;
+    }
+
+    .page-size-selector select {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.8rem;
+    }
+
+    .page-size-selector label {
+        font-size: 0.8rem;
+    }
+}
+
+/* Extra small mobile - very small screens */
+@media (max-width: 360px) {
+    .devsync-projects-section {
+        padding: 0.5rem;
+    }
+
+    .devsync-intro-compact {
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .devsync-intro-compact .h-eyebrow {
+        font-size: clamp(1.1rem, 7vw, 1.5rem);
+    }
+
+    .devsync-intro-compact .intro-description {
+        font-size: 0.8rem;
+    }
+
+    .summary-card {
+        padding: 0.75rem;
+    }
+
+    .summary-card .card-number {
+        font-size: 1.1rem;
+    }
+
+    .summary-card .card-label {
+        font-size: 0.7rem;
+    }
+
+    .tab-button {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .project-card,
+    .admin-project-card {
+        padding: 0.75rem;
+    }
+
+    .user-card-compact {
+        padding: 0.4rem;
+        min-height: 140px;
+    }
+
+    .user-card-compact .user-avatar {
+        width: 30px;
+        height: 30px;
+    }
+
+    .user-card-compact .user-name {
+        font-size: 0.75rem;
+    }
+
+    .user-card-compact .user-username,
+    .user-card-compact .user-email {
+        font-size: 0.6rem;
+    }
+
+    .user-card-compact .user-role {
+        font-size: 0.6rem;
+        padding: 0.1rem 0.25rem;
+    }
+}
+
+/* Landscape orientation specific adjustments */
+@media (max-width: 767px) and (orientation: landscape) {
+    .devsync-intro-compact {
+        margin-bottom: 1rem;
+    }
+
+    .devsync-intro-compact .h-eyebrow {
+        font-size: clamp(1.2rem, 4vw, 1.8rem);
+    }
+
+    .projects-summary {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+    }
+
+    .summary-card {
+        padding: 0.75rem;
+    }
+
+    .summary-card .card-number {
+        font-size: 1.2rem;
+    }
+
+    .summary-card .card-label {
+        font-size: 0.7rem;
+    }
+
+    .section-tabs {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .tab-button {
+        width: auto;
+        min-width: 120px;
+    }
+
+    .community-preview,
+    .community-expanded.show {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .user-card-compact {
+        min-height: 140px;
+    }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .tech-chip,
+    .summary-card,
+    .user-card-compact {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/* Print styles */
+@media print {
+    .devsync-projects-section {
+        background: white !important;
+        color: black !important;
+    }
+
+    .section-tabs,
+    .pagination-btn,
+    .users-search {
+        display: none !important;
+    }
+
+    .projects-summary {
+        grid-template-columns: repeat(2, 1fr);
+        page-break-inside: avoid;
+    }
+
+    .project-card,
+    .user-card-compact {
+        page-break-inside: avoid;
+        border: 1px solid #ccc !important;
+        background: white !important;
+        color: black !important;
+    }
+
+    .community-expanded {
+        display: grid !important;
     }
 }
 

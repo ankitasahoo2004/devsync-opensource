@@ -14,7 +14,8 @@
   font-size: 3.5rem;
   margin-bottom: 3rem;
   text-align: center;
-  background: linear-gradient(135deg, #FF3366, #FF6B6B, #E95060,#e51837);
+  background: linear-gradient(135deg, #FF3366, #FF6B6B, #E95060, #e51837);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
@@ -49,6 +50,7 @@
   font-size: 3rem;
   margin-bottom: 1rem;
   background: linear-gradient(135deg, #ff6b6b, #feca57);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 700;
@@ -382,7 +384,7 @@
 
 .runner-up-card:hover {
   transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.1);  
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .runner-up-card .user-img {
@@ -456,12 +458,81 @@
   z-index: -1;
 }
 
+/* Theme Integration for Services.html */
+/* Base variables that adapt to services.html theme */
+:root {
+  --gradient-gold: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+  --gradient-silver: linear-gradient(135deg, #c0c0c0 0%, #a9a9a9 100%);
+  --gradient-bronze: linear-gradient(135deg, #cd7f32 0%, #a0522d 100%);
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --hover-bg: rgba(255, 255, 255, 0.1);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+}
+
+/* Light theme adaptation */
+html.light .leaderboard-section {
+  --card-bg: rgba(0, 0, 0, 0.05);
+  --card-border: rgba(0, 0, 0, 0.1);
+  --hover-bg: rgba(0, 0, 0, 0.1);
+  --text-primary: #000000;
+  --text-secondary: rgba(0, 0, 0, 0.7);
+}
+
+html.light .leaderboard-section .section__title {
+  background: linear-gradient(135deg, #FF3366, #FF6B6B, #E95060, #e51837);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html.light .leaderboard-section .stat h3 {
+  background: linear-gradient(135deg, #ff6b6b, #feca57);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html.light .leaderboard-section .stat p {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+html.light .leaderboard-section .search-input {
+  color: var(--text-primary);
+}
+
+/* Dark theme adaptation */
+html.dark .leaderboard-section {
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --hover-bg: rgba(255, 255, 255, 0.1);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+}
+
+/* Ensure leaderboard section blends with services theme */
+.leaderboard-section {
+  background: transparent;
+  padding: 6rem 0;
+  position: relative;
+  z-index: 1;
+}
+
+.leaderboard-section .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
 /* Responsive Design */
 @media screen and (max-width: 1200px) {
+  .leaderboard-section {
+    padding: 4rem 0;
+  }
 
-  .leaderboard-item,
-  .runner-up-card {
-    flex: 0 0 calc(25% - 1.5rem);
+  .leaderboard-section .container {
+    padding: 0 1.5rem;
   }
 }
 
@@ -599,8 +670,8 @@
   }
 
   .search-icon {
-  top: 25%;
-}
+    top: 25%;
+  }
 
   .leaderboard-item .badges-container {
     justify-content: center;
@@ -646,6 +717,44 @@
     display: flex;
     flex-direction: column;
   }
+}
+
+/* Additional responsive design for services.html integration */
+@media screen and (max-width: 1200px) {
+  .leaderboard-section {
+    padding: 4rem 0;
+  }
+
+  .leaderboard-section .container {
+    padding: 0 1.5rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .leaderboard-section {
+    padding: 3rem 0;
+  }
+
+  .leaderboard-section .section__title {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .leaderboard-section .container {
+    padding: 0 1rem;
+  }
+}
+
+/* Ensure smooth scrolling integration */
+.leaderboard-section * {
+  box-sizing: border-box;
+}
+
+/* Override any conflicting styles from services.css */
+.leaderboard-section .section-subtitle {
+  margin-bottom: 2rem;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
 }
 
 /* Badge Popup Styles */

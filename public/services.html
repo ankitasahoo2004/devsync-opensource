@@ -60,6 +60,9 @@
 </script>
 
     <link rel="stylesheet" href="assets/css/services.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="assets/css/leaderboard.css">
+    <link rel="stylesheet" href="assets/css/global-search.css">
 
 
 
@@ -784,6 +787,73 @@
                         </div>
                         <div class="spacer-10"></div>
                     </div>
+
+                    <!-- DevSync Leaderboard Section -->
+                    <section class="section leaderboard-section">
+                        <div class="container">
+                            <header class="section-header">
+                                <h2 class="section__title">DevSync Leaderboard</h2>
+                                <p class="section__subtitle">Discover top contributors and their achievements</p>
+                            </header>
+
+                            <!-- Global Stats Dashboard -->
+                            <section class="stats-dashboard" aria-label="Global Statistics">
+                                <div class="leaderboard-stats" id="globalStats">
+                                    <div class="stat shine-effect">
+                                        <i class='bx bx-merge stat-icon'></i>
+                                        <h3>0</h3>
+                                        <p>Total Merged PRs</p>
+                                    </div>
+                                    <div class="stat shine-effect">
+                                        <i class='bx bx-user-check stat-icon'></i>
+                                        <h3>0</h3>
+                                        <p>Active Users</p>
+                                    </div>
+                                    <div class="stat shine-effect">
+                                        <i class='bx bx-git-repo-forked stat-icon'></i>
+                                        <h3>0</h3>
+                                        <p>Registered Repos</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Winners Podium -->
+                            <section class="winners-section" aria-label="Top Contributors">
+                                <h3 class="section-subtitle" style="text-align: center;">Top Contributors</h3>
+                                <div class="leaderboard-winners" id="topWinners"></div>
+                            </section>
+
+                            <!-- Rankings & Filters -->
+                            <section class="rankings-section" aria-label="Global Rankings">
+                                <div class="rankings-header">
+                                    <h3 class="section-subtitle" style="text-align: center;">Global Rankings</h3>
+                                    <div class="leaderboard-search">
+                                        <div class="search-wrapper">
+                                            <input type="text" id="leaderboardSearch"
+                                                placeholder="Search by username, or points..." class="search-input">
+                                            <i class='bx bx-search search-icon'></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Leaderboard List -->
+                                <div class="leaderboard-list-wrapper">
+                                    <div class="leaderboard-list" id="leaderboardList">
+                                        <div class="loading-state">
+                                            <i class='bx bx-loader-alt bx-spin'></i>
+                                            <p>Loading leaderboard...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </section>
+
+                    <!-- Scroll indicator for leaderboard -->
+                    <a href="#" class="scrollup" id="scroll-up">
+                        <i class='bx bx-up-arrow-alt scrollup__icon'></i>
+                    </a>
+
                     <section class="s is-footer">
                         <div class="c is-footer">
                             <div class="ft-content-w">
@@ -1213,6 +1283,8 @@ new Orb(document.querySelector('[data-orb]') , 'https://cdn.jsdelivr.net/gh/itso
 -->
     <script src="assets/js/main.js"></script>
     <script src="assets/js/auth.js"></script>
+    <script src="assets/js/global-search.js"></script>
+    <script src="assets/js/leaderboard.js"></script>
 </body>
 
 </html>

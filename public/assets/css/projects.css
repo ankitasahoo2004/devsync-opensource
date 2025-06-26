@@ -1389,8 +1389,219 @@
     }
 }
 
-/* Mobile responsiveness */
+/* Enhanced Mobile and Tablet Responsiveness */
+
+/* Tablet styles */
+@media (max-width: 1024px) {
+    .section__title {
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+        padding: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .project-form {
+        padding: 2.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .projects-grid {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .admin-project-card {
+        max-width: 900px;
+        padding: 2rem;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 1rem;
+    }
+}
+
+/* Mobile landscape */
+@media (max-width: 768px) {
+    .section__title {
+        font-size: clamp(2rem, 6vw, 3rem);
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .project-form {
+        padding: 2rem;
+        border-radius: 20px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 1rem;
+        font-size: 1rem;
+        border-radius: 12px;
+    }
+
+    .form-group textarea {
+        height: 120px;
+    }
+
+    .submit-button {
+        padding: 1.25rem;
+        font-size: 1rem;
+        border-radius: 12px;
+    }
+
+    .projects-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .project-card {
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .tech-stack {
+        gap: 0.4rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .tech-tag {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        border-radius: 16px;
+    }
+
+    .section-tabs {
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .tab-button {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        border-radius: 10px;
+    }
+
+    .admin-project-card {
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-content {
+        border-radius: 16px;
+    }
+
+    .modal-header {
+        padding: 20px 20px 15px;
+    }
+
+    .modal-body {
+        padding: 0 20px 15px;
+    }
+
+    .modal-actions {
+        padding: 15px 20px 20px;
+    }
+}
+
+/* Mobile portrait */
 @media (max-width: 640px) {
+    .section__title {
+        font-size: clamp(1.8rem, 7vw, 2.5rem);
+        padding: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .project-form {
+        padding: 1.5rem;
+        margin-top: 1rem;
+        border-radius: 16px;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .submit-button {
+        padding: 1rem;
+        font-size: 0.95rem;
+    }
+
+    .section-tabs {
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .tab-button {
+        width: 100%;
+        padding: 0.75rem;
+        text-align: center;
+    }
+
+    .project-card {
+        padding: 1.25rem;
+    }
+
+    .project-card h4 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .project-card p {
+        font-size: 0.85rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .tech-stack {
+        gap: 0.3rem;
+        margin-bottom: 1rem;
+    }
+
+    .tech-tag {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .project-actions {
+        gap: 1rem;
+        margin-top: 0.75rem;
+    }
+
+    .delete-project,
+    .repo-link {
+        width: 100%;
+        text-align: center;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .admin-project-card {
+        padding: 1.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .admin-project-card h4 {
+        font-size: 1.3rem;
+    }
+
+    .admin-project-card .project-actions {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .admin-project-card .review-buttons {
+        grid-column: 1;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
     .toast-container {
         top: 10px;
         right: 10px;
@@ -1400,6 +1611,7 @@
     .toast {
         min-width: auto;
         max-width: none;
+        padding: 14px 16px;
     }
 
     .modal-container {
@@ -1410,15 +1622,104 @@
     .modal-header,
     .modal-body,
     .modal-actions {
-        padding: 20px;
+        padding: 16px;
     }
 
     .modal-actions {
         flex-direction: column;
+        gap: 8px;
     }
 
     .modal-button {
         width: 100%;
+        padding: 12px;
+    }
+
+    .modal-title {
+        font-size: 20px;
+    }
+
+    .modal-message {
+        font-size: 14px;
+    }
+}
+
+/* Extra small mobile */
+@media (max-width: 480px) {
+    .section__title {
+        font-size: clamp(1.5rem, 8vw, 2rem);
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .project-form {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .submit-button {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .project-card {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    .project-card h4 {
+        font-size: 1rem;
+    }
+
+    .project-card p {
+        font-size: 0.8rem;
+    }
+
+    .tech-tag {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+    }
+
+    .tab-button {
+        padding: 0.6rem;
+        font-size: 0.85rem;
+    }
+
+    .admin-project-card {
+        padding: 1rem;
+    }
+
+    .toast {
+        padding: 12px 14px;
+        border-radius: 10px;
+    }
+
+    .toast-title {
+        font-size: 14px;
+    }
+
+    .toast-message {
+        font-size: 12px;
+    }
+
+    .modal-title {
+        font-size: 18px;
+    }
+
+    .modal-message {
+        font-size: 13px;
+    }
+
+    .modal-button {
+        padding: 10px;
+        font-size: 13px;
     }
 }
 

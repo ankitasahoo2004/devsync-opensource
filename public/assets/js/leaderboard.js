@@ -1,7 +1,13 @@
+// DevSync Leaderboard Configuration
+// Set server URL based on environment
+if (typeof window.serverUrl === 'undefined') {
+    window.serverUrl = window.location.origin;
+}
+
 // Global stats update
 async function updateGlobalStats() {
     try {
-        const response = await fetch(`${serverUrl}/api/stats/global`);
+        const response = await fetch(`${window.serverUrl}/api/stats/global`);
         const stats = await response.json();
 
         document.querySelector('#globalStats').innerHTML = `
