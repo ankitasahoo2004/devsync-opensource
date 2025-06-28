@@ -1586,3 +1586,13 @@ html.dark [faq-svg] path {
         height: 16px;
     }
 }
+
+/* Footer */
+#w-node-b2deac9f-48fc-2cd0-3331-af319f49ee25-9f49edfa {
+    grid-area: span 1 / span 5 / span 1 / span 5;
+}
+
+.grid-main.ft-nav-w {
+    grid-template-columns: 1fr 1fr;
+    padding-left: 3em;
+}
