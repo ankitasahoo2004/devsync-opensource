@@ -4,7 +4,15 @@ const { Octokit } = require("@octokit/rest");
 const User = require("../models/User");
 const dotenv = require("dotenv");
 dotenv.config();
-const emailService = require("../services/emailService");
+
+// Try to require email service, but don't fail if it's not available
+let emailService;
+try {
+  emailService = require("../services/emailService");
+} catch (error) {
+  console.log("Email service not available, skipping email functionality");
+  emailService = null;
+}
 
 module.exports = function (passport) {
   passport.use(
@@ -61,14 +69,21 @@ module.exports = function (passport) {
               badges: ["Newcomer"],
             });
 
-            // Send welcome email only for new users
-            const emailSent = await emailService.sendWelcomeEmail(
-              primaryEmail,
-              profile.username
-            );
-            if (emailSent) {
-              user.welcomeEmailSent = true;
-              await user.save();
+            // Send welcome email only for new users (if email service is available)
+            if (emailService) {
+              try {
+                const emailSent = await emailService.sendWelcomeEmail(
+                  primaryEmail,
+                  profile.username
+                );
+                if (emailSent) {
+                  user.welcomeEmailSent = true;
+                  await user.save();
+                }
+              } catch (emailError) {
+                console.error("Error sending welcome email:", emailError);
+                // Continue without failing the auth process
+              }
             }
           }
 

@@ -1,18 +1,21 @@
-require('dotenv').config();
-const express = require('express');
-const session = require('express-session');
-const passport = require('passport');
-// const GitHubStrategy = require('passport-github2').Strategy;
-const cors = require('cors');
-const mongoose = require('mongoose');
-const path = require('path');
-// const { Octokit } = require('@octokit/rest');
-// const User = require('./models/User');
-const Repo = require('./models/Repo');
+require("dotenv").config();
+const express = require("express");
+const session = require("express-session");
+const passport = require("passport");
+const GitHubStrategy = require("passport-github2").Strategy;
+const cors = require("cors");
+const mongoose = require("mongoose");
+const path = require("path");
+const { Octokit } = require("@octokit/rest");
+const User = require("./models/User");
+const Repo = require("./models/Repo");
 // const Event = require('./models/Event');
 // const PendingPR = require('./models/PendingPR');
-const Ticket = require('./models/Ticket'); // Add Ticket model
-const MongoStore = require('connect-mongo');
+const Ticket = require("./models/Ticket"); // Add Ticket model
+const MongoStore = require("connect-mongo");
+const { verifyApiKey, verifyVpnKey } = require("./middleware/apiAuth");
+const { applySecurityMiddleware } = require("./security-config");
+const { HealthMonitor, createHealthRoute } = require("./health");
 // const emailService = require('./services/emailService');
 // const dbSync = require('./utils/dbSync');
 // const PORT = process.env.PORT || 5500;
@@ -24,32 +27,37 @@ const app = express();
 // const PROGRAM_START_DATE = '2025-03-14';
 
 // Create authenticated Octokit instance
-// const octokit = new Octokit({
-//     auth: process.env.GITHUB_ACCESS_TOKEN
-// });
+const octokit = new Octokit({
+  auth: process.env.GITHUB_ACCESS_TOKEN,
+});
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-    .then(async () => {
-        console.log('Connected to MongoDB');
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(async () => {
+    console.log("Connected to MongoDB");
 
-        // Clean up old indexes that might cause issues
-        try {
-            const Ticket = require('./models/Ticket');
-            await Ticket.cleanupOldIndexes();
+    // Clean up old indexes that might cause issues
+    try {
+      const Ticket = require("./models/Ticket");
+      await Ticket.cleanupOldIndexes();
 
-            // Also try to drop the specific problematic index
-            try {
-                await mongoose.connection.db.collection('tickets').dropIndex('ticketId_1');
-                console.log('Dropped problematic ticketId_1 index');
-            } catch (dropError) {
-                console.log('Note: ticketId_1 index may not exist or was already dropped');
-            }
-        } catch (error) {
-            console.log('Note: Could not clean up old indexes:', error.message);
-        }
-    })
-    .catch(err => console.error('MongoDB connection error:', err));
+      // Also try to drop the specific problematic index
+      try {
+        await mongoose.connection.db
+          .collection("tickets")
+          .dropIndex("ticketId_1");
+        console.log("Dropped problematic ticketId_1 index");
+      } catch (dropError) {
+        console.log(
+          "Note: ticketId_1 index may not exist or was already dropped"
+        );
+      }
+    } catch (error) {
+      console.log("Note: Could not clean up old indexes:", error.message);
+    }
+  })
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 // Calculate points based on contributions from registered repos
 // async function calculatePoints(mergedPRs, userId) {
@@ -135,34 +143,38 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // Middleware setup
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '..')));
-app.use(cors({
+app.use(express.static(path.join(__dirname, "..")));
+app.use(
+  cors({
     origin: [serverUrl],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
-}));
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  })
+);
 
 // Added
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'your_session_secret',
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "your_session_secret",
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-        mongoUrl: process.env.MONGODB_URI,
-        collectionName: 'sessions',
-        ttl: 24 * 60 * 60, // Session TTL in seconds (1 day)
-        autoRemove: 'native' // Enable automatic removal of expired sessions
+      mongoUrl: process.env.MONGODB_URI,
+      collectionName: "sessions",
+      ttl: 24 * 60 * 60, // Session TTL in seconds (1 day)
+      autoRemove: "native", // Enable automatic removal of expired sessions
     }),
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
-        sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
     },
-    name: 'devsync.sid' // Custom session cookie name
-}));
+    name: "devsync.sid", // Custom session cookie name
+  })
+);
 
-require('./config/passport')(passport);
+require("./config/passport")(passport);
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -233,8 +245,11 @@ app.use(passport.session());
 // passport.serializeUser((user, done) => done(null, user));
 // passport.deserializeUser((user, done) => done(null, user));
 
-// Auth routes
-const authRoutes = require('./routes/authRoutes');
+// Apply security middleware before defining routes
+applySecurityMiddleware(app);
+
+// Auth routes - mount at /auth, not /auth/github
+const authRoutes = require("./routes/authRoutes");
 app.use("/auth", authRoutes);
 // app.get('/auth/github',
 //     passport.authenticate('github', { scope: ['user'] })
@@ -247,8 +262,8 @@ app.use("/auth", authRoutes);
 //     }
 // );
 
-const userRoutes = require('./routes/userRoutes');
-app.use('/api/user', userRoutes);
+const userRoutes = require("./routes/userRoutes");
+app.use("/api/user", userRoutes);
 // app.get('/api/user', (req, res) => {
 //     if (req.isAuthenticated()) {
 //         res.json({
@@ -321,8 +336,8 @@ app.use('/api/user', userRoutes);
 // }
 
 // Update leaderboard endpoint
-const leaderboard = require('./routes/leaderboardRoutes');
-app.use('/api/leaderboard', leaderboard);
+const leaderboard = require("./routes/leaderboardRoutes");
+app.use("/api/leaderboard", leaderboard);
 // app.get('/api/leaderboard', async (req, res) => {
 //     try {
 //         // Add cache control headers
@@ -366,8 +381,8 @@ app.use('/api/leaderboard', leaderboard);
 // });
 
 // Add global stats endpoint
-const statsRoutes = require('./routes/statsRoutes');
-app.use('/api/stats', statsRoutes);
+const statsRoutes = require("./routes/statsRoutes");
+app.use("/api/stats", statsRoutes);
 // app.get('/api/stats/global', async (req, res) => {
 //     try {
 //         // Get all users and accepted repos
@@ -396,14 +411,19 @@ app.use('/api/stats', statsRoutes);
 //     }
 // });
 
-app.get('/auth/logout', (req, res) => {
-    req.logout();
+// Logout route (keep for backward compatibility)
+app.get("/logout", (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
     res.redirect(`${serverUrl}/index.html`);
+  });
 });
 
 // Update GitHub API routes with Octokit
-const githubRoutes = require('./routes/githubRoutes');
-app.use('/api/github', githubRoutes);
+const githubRoutes = require("./routes/githubRoutes");
+app.use("/api/github", githubRoutes);
 // app.get('/api/github/user/:username', async (req, res) => {
 //     try {
 //         const { data: userData } = await octokit.users.getByUsername({
@@ -498,8 +518,8 @@ app.use('/api/github', githubRoutes);
 
 // Update the project submission route
 // Added
-const projectRoutes = require('./routes/projectRoutes');
-app.use('/api/projects', projectRoutes);
+const projectRoutes = require("./routes/projectRoutes");
+app.use("/api/projects", projectRoutes);
 // app.post('/api/projects', async (req, res) => {
 //     if (!req.isAuthenticated()) {
 //         return res.status(401).json({ error: 'Unauthorized' });
@@ -606,8 +626,8 @@ app.use('/api/projects', projectRoutes);
 // });
 
 // Get all accepted projects
-const acceptedProjectsRoutes = require('./routes/acceptedprojects');
-app.use('/api/accepted-projects', acceptedProjectsRoutes);
+const acceptedProjectsRoutes = require("./routes/acceptedprojects");
+app.use("/api/accepted-projects", acceptedProjectsRoutes);
 // app.get('/api/accepted-projects', async (req, res) => {
 //     try {
 //         const projects = await Repo.find({ reviewStatus: 'accepted' })
@@ -645,8 +665,8 @@ app.use('/api/accepted-projects', acceptedProjectsRoutes);
 
 // Admin verification endpoint
 // Added
-const adminRoutes = require('./routes/adminRoutes');
-app.use('/api/admin', adminRoutes);
+const adminRoutes = require("./routes/adminRoutes");
+app.use("/api/admin", adminRoutes);
 // app.get('/api/admin/verify', (req, res) => {
 //     if (!req.isAuthenticated()) {
 //         return res.status(401).json({ isAdmin: false });
@@ -774,12 +794,12 @@ app.use('/api/admin', adminRoutes);
 
 // Helper function to check if repo is registered and accepted
 async function isRegisteredRepo(repoFullName) {
-    const repoUrl = `https://github.com/${repoFullName}`;
-    const repo = await Repo.find({
-        repoLink: repoUrl,
-        reviewStatus: 'accepted'
-    });
-    return repo ? repo : null;
+  const repoUrl = `https://github.com/${repoFullName}`;
+  const repo = await Repo.find({
+    repoLink: repoUrl,
+    reviewStatus: "accepted",
+  });
+  return repo ? repo : null;
 }
 
 // Add new helper functions for caching and rate limiting
@@ -956,8 +976,8 @@ const PR_CACHE_TTL = 1000 * 60 * 60; // 1 hour cache TTL
 
 // Middleware to log request details (for debugging)
 app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url} - ${new Date().toISOString()}`);
-    next();
+  console.log(`${req.method} ${req.url} - ${new Date().toISOString()}`);
+  next();
 });
 
 // Admin endpoint to get pending PRs with enhanced formatting
@@ -1608,8 +1628,8 @@ app.use((req, res, next) => {
 // });
 
 // Get all registered users endpoint
-const usersRoutes = require('./routes/usersRoutes');
-app.use('/api/users', usersRoutes);
+const usersRoutes = require("./routes/usersRoutes");
+app.use("/api/users", usersRoutes);
 // app.get('/api/users', async (req, res) => {
 //     try {
 //         const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
@@ -1821,8 +1841,8 @@ app.use('/api/users', usersRoutes);
 // }
 
 // Create event
-const eventRoutes = require('./routes/eventsRoutes');
-app.use('/api/events', eventRoutes);
+const eventRoutes = require("./routes/eventsRoutes");
+app.use("/api/events", eventRoutes);
 // app.post('/api/events', async (req, res) => {
 //     if (!req.isAuthenticated()) {
 //         return res.status(401).json({ error: 'Unauthorized' });
@@ -1913,8 +1933,8 @@ app.use('/api/events', eventRoutes);
 // });
 
 // Add sponsorship inquiry endpoint
-const sponsorshipRoutes = require('./routes/sponsorshipRoutes');
-app.use('/api/sponsorship', sponsorshipRoutes);
+const sponsorshipRoutes = require("./routes/sponsorshipRoutes");
+app.use("/api/sponsorship", sponsorshipRoutes);
 // app.post('/api/sponsorship/inquiry', async (req, res) => {
 //     try {
 //         if (!req.body.email || !req.body.organization || !req.body.sponsorshipType) {
@@ -1943,30 +1963,43 @@ app.use('/api/sponsorship', sponsorshipRoutes);
 //     }
 // });
 
-// Add ticket routes BEFORE the catch-all route and AFTER other API routes
-const ticketRoutes = require('./routes/ticketRoutes');
-app.use('/api/tickets', ticketRoutes);
+// Ticket routes
+const ticketRoutes = require("./routes/ticketRoutes");
+app.use("/api/tickets", ticketRoutes);
+
+// Health monitoring routes
+const healthMonitor = new HealthMonitor({
+  baseUrl: process.env.SERVER_URL || "http://localhost:3000",
+  interval: 30000, // 30 seconds
+});
+
+// Initialize health monitoring
+healthMonitor.start();
+
+// Health API routes
+const healthRoute = createHealthRoute(healthMonitor);
+app.use("/api/health", healthRoute);
 
 // Add ticket cleanup job
 const cleanupExpiredTickets = async () => {
-    try {
-        const now = new Date();
-        const expiredTickets = await Ticket.find({
-            scheduledForDeletion: { $lte: now },
-            status: 'closed'
-        });
+  try {
+    const now = new Date();
+    const expiredTickets = await Ticket.find({
+      scheduledForDeletion: { $lte: now },
+      status: "closed",
+    });
 
-        if (expiredTickets.length > 0) {
-            await Ticket.deleteMany({
-                scheduledForDeletion: { $lte: now },
-                status: 'closed'
-            });
+    if (expiredTickets.length > 0) {
+      await Ticket.deleteMany({
+        scheduledForDeletion: { $lte: now },
+        status: "closed",
+      });
 
-            console.log(`Cleaned up ${expiredTickets.length} expired tickets`);
-        }
-    } catch (error) {
-        console.error('Error cleaning up expired tickets:', error);
+      console.log(`Cleaned up ${expiredTickets.length} expired tickets`);
     }
+  } catch (error) {
+    console.error("Error cleaning up expired tickets:", error);
+  }
 };
 
 // Run cleanup every hour
@@ -1976,48 +2009,43 @@ setInterval(cleanupExpiredTickets, 60 * 60 * 1000);
 cleanupExpiredTickets();
 
 // Update static file serving
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 // Update cors configuration to handle frontend requests
-app.use(cors({
+app.use(
+  cors({
     origin: [serverUrl],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
-}));
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  })
+);
 
 // Initialize and start server
 async function startServer() {
-    try {
-        const PORT = process.env.PORT || 3000;
+  try {
+    const PORT = process.env.PORT || 3000;
 
-        // Ensure all routes are registered before the catch-all
+    // Ensure all routes are registered before the catch-all
 
-        // Catch-all route for SPA - must be LAST after ALL API routes
-        // Added
-        app.get('*', (req, res) => {
-            // Only serve index.html for non-API routes
-            if (!req.path.startsWith('/api/')) {
-                res.sendFile(path.join(__dirname, 'public', 'index.html'));
-            } else {
-                res.status(404).json({ error: 'API endpoint not found' });
-            }
-        });
+    // Routes will be defined before the catch-all route at the end
 
-        app.listen(PORT, () => {
-            console.log(`Server running on http://localhost:${PORT}`);
-            console.log('Serving frontend from', path.join(__dirname, 'public'));
-        }).on('error', (err) => {
-            if (err.code === 'EADDRINUSE') {
-                console.error(`Port ${PORT} is already in use`);
-                process.exit(1);
-            } else {
-                throw err;
-            }
-        });
-    } catch (error) {
-        console.error('Failed to start server:', error);
-        process.exit(1);
-    }
+    app
+      .listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+        console.log("Serving frontend from", path.join(__dirname, "public"));
+      })
+      .on("error", (err) => {
+        if (err.code === "EADDRINUSE") {
+          console.error(`Port ${PORT} is already in use`);
+          process.exit(1);
+        } else {
+          throw err;
+        }
+      });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
 }
 
 // Start the server
@@ -2155,7 +2183,7 @@ startServer();
 //     }
 // });
 
-// Add admin email sending endpoint
+// // Add admin email sending endpoint
 // app.post('/api/admin/send-email', async (req, res) => {
 //     if (!req.isAuthenticated()) {
 //         return res.status(401).json({ error: 'Unauthorized' });
@@ -2539,6 +2567,122 @@ startServer();
 
 // Helper function to validate email
 function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }
+
+// Rate limiting middleware
+const rateLimit = (req, res, next) => {
+  const ip = req.ip;
+  const now = Date.now();
+  const windowMs = 15 * 60 * 1000; // 15 minutes
+  const maxRequests = 100; // Limit each IP to 100 requests per windowMs
+
+  if (!global.rateLimitData) {
+    global.rateLimitData = {};
+  }
+
+  if (!global.rateLimitData[ip]) {
+    global.rateLimitData[ip] = { count: 0, firstRequestTime: now };
+  }
+
+  global.rateLimitData[ip].count++;
+
+  // Reset count after the time window
+  if (now - global.rateLimitData[ip].firstRequestTime > windowMs) {
+    global.rateLimitData[ip].count = 1;
+    global.rateLimitData[ip].firstRequestTime = now;
+  }
+
+  if (global.rateLimitData[ip].count > maxRequests) {
+    return res
+      .status(429)
+      .json({ error: "Too many requests - please try again later" });
+  }
+
+  next();
+};
+
+// Apply rate limiting to all API routes
+app.use("/api", rateLimit);
+
+// Protected API routes - require API key
+app.use("/api/protected", verifyApiKey);
+
+// Super secure routes - require VPN key
+app.use("/api/vpn", verifyVpnKey);
+
+// Example protected routes
+app.get("/api/protected/users", verifyApiKey, async (req, res) => {
+  try {
+    // Your protected logic here
+    const users = await User.find({}).select("-password");
+    res.json({
+      success: true,
+      data: users,
+      message: "Data retrieved successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+});
+
+// VPN-level protected route
+app.get("/api/vpn/admin-data", verifyVpnKey, async (req, res) => {
+  try {
+    // Super sensitive admin data
+    const adminData = {
+      totalUsers: await User.countDocuments(),
+      systemStats: {
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+      },
+    };
+
+    res.json({
+      success: true,
+      data: adminData,
+      message: "Admin data retrieved successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+});
+
+// Catch-all route for SPA - must be LAST after ALL API routes
+app.get("*", (req, res) => {
+  // Only serve index.html for non-API routes
+  if (!req.path.startsWith("/api/")) {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+  } else {
+    res.status(404).json({ error: "API endpoint not found" });
+  }
+});
+
+// Add this temporarily to your index.js for testing
+app.get("/test-admin", (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.json({
+      isAuthenticated: false,
+      message: "Not logged in",
+    });
+  }
+
+  const adminIds = process.env.ADMIN_GITHUB_IDS.split(",");
+  const isAdmin = adminIds.includes(req.user.username);
+
+  res.json({
+    isAuthenticated: true,
+    username: req.user.username,
+    isAdmin: isAdmin,
+    adminIds: adminIds, // Remove this in production
+  });
+});
