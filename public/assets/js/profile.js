@@ -44,16 +44,27 @@ async function fetchUserProfile() {
         const combinedData = {
             ...profileData,
             points: statsData.points,
-            badges: statsData.badges
+            badges: statsData.badges,
+            mergedPRs: statsData.mergedPRs || []
         };
 
         // Update profile information with combined data
         updateProfileInfo(combinedData);
         updateProfileStats(combinedData);
-        displayPullRequests(combinedData.pullRequests);
+        displayPullRequests(combinedData.pullRequests || []);
+
+        // Display activities if available (fallback to pull requests)
+        const activities = {
+            pushEvents: [], // This would come from a different endpoint
+            pullRequests: combinedData.pullRequests || []
+        };
+        displayActivities(activities);
 
     } catch (error) {
         console.error('Failed to load profile:', error);
+        // Show error message to user
+        document.getElementById('profile-name').textContent = 'Error loading profile';
+        document.getElementById('profile-bio').textContent = 'Please try refreshing the page';
     }
 }
 
@@ -93,24 +104,42 @@ function updateProfileInfo(data) {
     bannerElement.addEventListener('click', openBannerSidebar);
     document.getElementById('profile-location').textContent = data.location || 'Not specified';
     document.getElementById('profile-company').textContent = data.company || 'Not specified';
-    document.getElementById('profile-blog').href = data.blog;
+    document.getElementById('profile-blog').href = data.blog || '#';
     document.getElementById('profile-blog').textContent = data.blog || 'Not specified';
     document.getElementById('profile-twitter').textContent = data.twitter_username || 'Not specified';
 
-    // Add points display
-    const pointsDisplay = document.createElement('div');
-    pointsDisplay.className = 'profile__points';
-    pointsDisplay.innerHTML = `
-        <div class="points-value">${data.points || 0}</div>
-        <div class="points-label">Total Points</div>
-    `;
+    // Check if points display already exists
+    let pointsDisplay = document.querySelector('.profile__points');
+    if (!pointsDisplay) {
+        // Add points display
+        pointsDisplay = document.createElement('div');
+        pointsDisplay.className = 'profile__points';
+        pointsDisplay.innerHTML = `
+            <div class="points-value">${data.points || 0}</div>
+            <div class="points-label">Total Points</div>
+        `;
+
+        const profileContent = document.querySelector('.profile__content');
+        if (profileContent) {
+            profileContent.appendChild(pointsDisplay);
+        }
+    }
 
     // Add only level badges display
     if (data.badges) {
         const levelBadges = getLevelBadges(data.badges);
         if (levelBadges.length > 0) {
-            const badgesContainer = document.createElement('div');
-            badgesContainer.className = 'profile__badges';
+            let badgesContainer = document.querySelector('.profile__badges');
+            if (!badgesContainer) {
+                badgesContainer = document.createElement('div');
+                badgesContainer.className = 'profile__badges';
+
+                const profileContent = document.querySelector('.profile__content');
+                if (profileContent) {
+                    profileContent.appendChild(badgesContainer);
+                }
+            }
+
             badgesContainer.innerHTML = levelBadges.map(badge => {
                 const [name, description] = badge.split('|').map(s => s.trim());
                 return `
@@ -122,10 +151,6 @@ function updateProfileInfo(data) {
                     </div>
                 `;
             }).join('');
-
-            const bio = document.getElementById('profile-bio');
-            bio.parentNode.insertBefore(pointsDisplay, bio.nextSibling);
-            bio.parentNode.insertBefore(badgesContainer, pointsDisplay.nextSibling);
         }
     }
 }
@@ -406,18 +431,43 @@ function getLevelImage(badge) {
 }
 
 function updateProfileStats(data) {
-    updateStatWithAnimation('repos', data.public_repos);
-    updateStatWithAnimation('followers', data.followers);
-    updateStatWithAnimation('following', data.following);
-    updateStatWithAnimation('gists', data.public_gists);
+    // Update existing stats in the HTML
+    if (document.getElementById('total-points')) {
+        updateStatWithAnimation('total-points', data.points || 0);
+    }
+    if (document.getElementById('merged-prs')) {
+        updateStatWithAnimation('merged-prs', data.mergedPRs?.length || 0);
+    }
+    if (document.getElementById('total-commits')) {
+        // Calculate total commits from merged PRs
+        const totalCommits = data.mergedPRs?.reduce((total, pr) => total + (pr.commits || 1), 0) || 0;
+        updateStatWithAnimation('total-commits', totalCommits);
+    }
+    if (document.getElementById('days-active')) {
+        // Calculate days active based on PR activity
+        const daysActive = calculateDaysActive(data.mergedPRs || []);
+        updateStatWithAnimation('days-active', daysActive);
+    }
+}
+
+function calculateDaysActive(mergedPRs) {
+    if (!mergedPRs || mergedPRs.length === 0) return 0;
+
+    const dates = mergedPRs.map(pr => new Date(pr.mergedAt)).filter(date => !isNaN(date));
+    if (dates.length === 0) return 0;
+
+    const uniqueDates = [...new Set(dates.map(date => date.toDateString()))];
+    return uniqueDates.length;
 }
 
 function displayActivities(activities) {
     const container = document.querySelector('.activities-grid');
+    if (!container) return; // Exit if container doesn't exist
+
     container.innerHTML = '';
 
     // Display push events
-    if (activities.pushEvents.length > 0) {
+    if (activities && activities.pushEvents && activities.pushEvents.length > 0) {
         const pushSection = createActivitySection('Recent Pushes', activities.pushEvents, (event) => `
             <div class="activity-card push-card">
                 <div class="activity-card__header">
@@ -439,7 +489,7 @@ function displayActivities(activities) {
     }
 
     // Display pull requests
-    if (activities.pullRequests.length > 0) {
+    if (activities && activities.pullRequests && activities.pullRequests.length > 0) {
         const prSection = createActivitySection('Pull Requests', activities.pullRequests, (pr) => `
             <div class="activity-card pr-card">
                 <div class="activity-card__header">
@@ -594,7 +644,7 @@ function initializePRAnimations() {
         const winScroll = document.documentElement.scrollTop;
         const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
         const scrolled = (winScroll / height) * 100;
-        document.document.setProperty('--scroll-percent', `${scrolled}%`);
+        document.documentElement.style.setProperty('--scroll-percent', `${scrolled}%`);
     });
 
     // Initialize Intersection Observer for PR cards
