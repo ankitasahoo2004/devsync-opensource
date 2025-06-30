@@ -20,7 +20,6 @@ router.get('/', async (req, res) => {
             .select('username points badges mergedPRs')
             .lean();
 
-
         // Format user data with required fields only
         let formattedUsers = users.map(user => ({
             username: user.username,

@@ -248,7 +248,6 @@ module.exports = {
     retryWithBackoff,
     submitPRForApproval,
     fetchPRDetails,
-    normalizeAndValidateGitHubUrl,
     getApprovedMergedPRs,
     calculatePointsFromApprovedPRs,
     isValidEmail,

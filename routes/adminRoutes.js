@@ -798,7 +798,6 @@ router.post("/send-email", async (req, res) => {
         details: "Recipient email, subject, and message are required",
       });
     }
-    console.log("emailServiceBefore");
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -809,6 +808,7 @@ router.post("/send-email", async (req, res) => {
     }
 
     // Send the email using the EmailService
+    const emailService = require("./services/emailService");
     const result = await emailService.sendMessageEmail(
       to,
       recipientName || "DevSync User",
@@ -816,7 +816,6 @@ router.post("/send-email", async (req, res) => {
       message,
       templateData
     );
-    console.log("emailService");
 
     res.status(200).json({
       success: true,
