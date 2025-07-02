@@ -195,18 +195,31 @@ class EmailService {
                 throw new Error('Missing required fields');
             }
 
+            // Prepare template data with additional contact inquiry fields
+            const templateData = {
+                organization: formData.organization,
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone || 'Not provided',
+                sponsorshipType: formData.sponsorshipType,
+                organizationType: formData.organizationType || 'Not specified',
+                message: formData.message,
+                services: formData.services || 'Not specified',
+                inquirySource: formData.inquirySource || 'Unknown',
+                submissionDate: new Date().toLocaleDateString(),
+                // Additional contact inquiry fields
+                website: formData.additionalInfo?.website || formData.website || 'Not provided',
+                budget: formData.additionalInfo?.budget || formData.budget || 'Not specified',
+                deadline: formData.additionalInfo?.deadline || formData.deadline || 'Not specified',
+                startDate: formData.additionalInfo?.startDate || formData.startDate || 'Not specified',
+                discoverySource: formData.additionalInfo?.discoverySource || formData.discoverySource || 'Not specified'
+            };
+
             const mailOptions = {
                 from: process.env.gmail_email,
                 to: ['sponsors@devsync-opensource.tech', formData.email], // Send to both admin and applicant
                 subject: 'New Sponsorship Inquiry - DevSync',
-                html: template({
-                    organization: formData.organization,
-                    name: formData.name,
-                    email: formData.email,
-                    phone: formData.phone || 'Not provided',
-                    sponsorshipType: formData.sponsorshipType,
-                    message: formData.message
-                })
+                html: template(templateData)
             };
 
             const result = await this.transporter.sendMail(mailOptions);

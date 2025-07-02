@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Use API_CONFIG if available, otherwise fallback to local serverUrl
+    const serverUrl = window.API_CONFIG ? window.API_CONFIG.serverUrl : 'http://localhost:3000';
+
+    // Debug logging
+    console.log('Ticket system initializing with serverUrl:', serverUrl);
     let currentUser = null;
     let isAdmin = false;
 
@@ -6,13 +11,28 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeTicketSystem();
 
     async function initializeTicketSystem() {
+        // Check if required elements exist
+        const requiredElements = [
+            'create-tab',
+            'my-tickets-tab',
+            'admin-panel-tab'
+        ];
+
+        const missingElements = requiredElements.filter(id => !document.getElementById(id));
+        if (missingElements.length > 0) {
+            console.warn('Missing ticket system elements:', missingElements);
+            // Continue anyway as some elements might be dynamically created
+        }
+
         await checkAuthStatus();
         setupTabNavigation();
         setupEventListeners();
 
         // Load initial tab content
-        const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
-        loadTabContent(activeTab);
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab) {
+            loadTabContent(activeTab.dataset.tab);
+        }
     }
 
     async function checkAuthStatus() {
@@ -310,9 +330,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadAdminStats() {
-        const adminStats = document.getElementById('adminTicketsStats');
+        const adminStats = document.getElementById('adminStats');
 
-        if (!isAdmin) return;
+        if (!isAdmin || !adminStats) {
+            console.log('Admin stats not loaded: isAdmin =', isAdmin, 'adminStats element =', !!adminStats);
+            return;
+        }
 
         try {
             console.log('Fetching admin stats from:', `${serverUrl}/api/tickets/admin/stats`);
@@ -324,7 +347,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Stats response status:', response.status);
 
             if (response.status === 403) {
-                adminStats.innerHTML = '<p>Unauthorized access</p>';
+                if (adminStats) {
+                    adminStats.innerHTML = '<p>Unauthorized access</p>';
+                }
                 return;
             }
 
@@ -341,7 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const stats = await response.json();
 
-            adminStats.innerHTML = `
+            if (adminStats) {
+                adminStats.innerHTML = `
                 <div class="admin-stat-card">
                     <span class="admin-stat-number">${stats.total}</span>
                     <span class="admin-stat-label">Total Tickets</span>
@@ -361,11 +387,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="admin-stat-card">
                     <span class="admin-stat-number">${stats.urgent}</span>
                     <span class="admin-stat-label">Urgent</span>
-                </div>
-            `;
+                </div>                `;
+            }
         } catch (error) {
             console.error('Error loading admin stats:', error);
-            adminStats.innerHTML = '<p>Failed to load statistics</p>';
+            if (adminStats) {
+                adminStats.innerHTML = '<p>Failed to load statistics</p>';
+            }
         }
     }
 
@@ -745,6 +773,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const modalTitle = document.getElementById('modalTicketTitle');
         const modalBody = document.getElementById('modalTicketBody');
 
+        if (!modal || !modalTitle || !modalBody) {
+            console.error('Ticket modal elements not found');
+            showToast('error', 'Unable to open ticket modal');
+            return;
+        }
+
         modalBody.innerHTML = '<div class="loading"><i class="bx bx-loader-alt bx-spin"></i><p>Loading ticket details...</p></div>';
         modal.classList.add('show');
 
@@ -823,9 +857,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Add missing global functions and variables
+    window.currentTicketId = null;
+
+    // Global modal functions
     window.closeTicketModal = function () {
-        document.getElementById('ticketModal').classList.remove('show');
+        const modal = document.getElementById('ticketModal');
+        if (modal) {
+            modal.classList.remove('show');
+        }
     };
+
+    // Close modal when clicking overlay
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('ticket-modal-overlay')) {
+            closeTicketModal();
+        }
+    });
+
+    // Close modal on ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeTicketModal();
+        }
+    });
 
     // Utility functions
     function calculateTicketStats(tickets) {
@@ -836,10 +891,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function switchToTab(tabId) {
-        const tabBtn = document.querySelector(`[data-tab="${tabId}"]`);
-        if (tabBtn) {
-            tabBtn.click();
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Update active tab button
+        tabBtns.forEach(btn => btn.classList.remove('active'));
+        const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+        if (targetBtn) {
+            targetBtn.classList.add('active');
         }
+
+        // Update active tab content
+        tabContents.forEach(content => content.classList.remove('active'));
+        const targetContent = document.getElementById(`${tabId}-tab`);
+        if (targetContent) {
+            targetContent.classList.add('active');
+        }
+
+        // Load tab content
+        loadTabContent(tabId);
     }
 
     function debounce(func, wait) {
