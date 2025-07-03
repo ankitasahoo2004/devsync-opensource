@@ -59,7 +59,7 @@ div.btn-inner {
     transition: none !important;
     animation: none !important;
     transform: none !important;
-}
+    }
 
 div.btn-inner:hover {
     transition: none !important;
@@ -1544,7 +1544,7 @@ html.dark [faq-svg] path {
 
 .auth-button.authenticated .btn-txt {
     font-weight: 500;
-    text-transform: capitalize;
+    text-transform: uppercase;
 }
 
 /* Profile image in auth buttons */
