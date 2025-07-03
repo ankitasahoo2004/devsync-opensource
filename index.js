@@ -6,6 +6,7 @@ const passport = require('passport');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 // const { Octokit } = require('@octokit/rest');
 // const User = require('./models/User');
 const Repo = require('./models/Repo');
@@ -166,6 +167,88 @@ require('./config/passport')(passport);
 app.use(passport.initialize());
 app.use(passport.session());
 
+// API Key Authentication Middleware
+const API_SECRET_KEY = process.env.API_SECRET_KEY;
+
+// Log API key configuration status (but not the actual key)
+if (!API_SECRET_KEY) {
+    console.warn('⚠️  WARNING: API_SECRET_KEY is not configured. All API endpoints will be inaccessible without authentication.');
+} else {
+    console.log('✅ API_SECRET_KEY is configured');
+}
+
+// Rate limiting middleware for API endpoints
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: {
+        error: 'Too many requests from this IP',
+        message: 'Please try again after 15 minutes'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Stricter rate limiting for auth endpoints
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // limit each IP to 10 auth attempts per windowMs
+    message: {
+        error: 'Too many authentication attempts',
+        message: 'Please try again after 15 minutes'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// General rate limiter for public endpoints
+const publicLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 50, // limit each IP to 50 requests per windowMs for public endpoints
+    message: {
+        error: 'Too many requests from this IP',
+        message: 'Please try again after 15 minutes'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Middleware to check API key or session authentication
+const requireApiKeyOrAuth = (req, res, next) => {
+    const apiKey = req.headers['x-api-key'];
+
+    // First check if API_SECRET_KEY is configured
+    if (!API_SECRET_KEY) {
+        return res.status(500).json({
+            error: 'Server configuration error',
+            message: 'API key not configured on server'
+        });
+    }
+
+    // Check if API key is provided and valid
+    if (apiKey && apiKey === API_SECRET_KEY) {
+        // Set a flag to indicate API key authentication
+        req.isApiAuthenticated = true;
+        // Override isAuthenticated method for this request
+        const originalIsAuthenticated = req.isAuthenticated;
+        req.isAuthenticated = function () {
+            return this.isApiAuthenticated || originalIsAuthenticated.call(this);
+        };
+        return next();
+    }
+
+    // Check if user is authenticated via session
+    if (req.isAuthenticated()) {
+        return next();
+    }
+
+    // Neither API key nor session authentication found
+    return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Valid API key (x-api-key header) or authentication required'
+    });
+};
+
 // Passport configuration
 // passport.use(new GitHubStrategy({
 //     clientID: process.env.GITHUB_CLIENT_ID,
@@ -233,22 +316,32 @@ app.use(passport.session());
 // passport.serializeUser((user, done) => done(null, user));
 // passport.deserializeUser((user, done) => done(null, user));
 
-// Auth routes
+// Auth routes (no authentication required for login/logout)
 const authRoutes = require('./routes/authRoutes');
-app.use("/auth", authRoutes);
-// app.get('/auth/github',
-//     passport.authenticate('github', { scope: ['user'] })
-// );
+app.use("/auth", authLimiter, authRoutes);
 
-// app.get('/auth/github/callback',
-//     passport.authenticate('github', { failureRedirect: '/login' }),
-//     (req, res) => {
-//         res.redirect(process.env.FRONTEND_URL);
-//     }
-// );
+// API Status endpoint (public with rate limiting)
+app.get('/api/status', publicLimiter, (req, res) => {
+    res.json({
+        status: 'ok',
+        message: 'API is running',
+        authentication: {
+            apiKeyRequired: !!API_SECRET_KEY,
+            sessionAuthSupported: true
+        },
+        rateLimit: {
+            window: '15 minutes',
+            apiLimits: 100,
+            authLimits: 10,
+            publicLimits: 50
+        },
+        timestamp: new Date().toISOString()
+    });
+});
 
+// Protected API routes - require authentication or API key
 const userRoutes = require('./routes/userRoutes');
-app.use('/api/user', userRoutes);
+app.use('/api/user', apiLimiter, requireApiKeyOrAuth, userRoutes);
 // app.get('/api/user', (req, res) => {
 //     if (req.isAuthenticated()) {
 //         res.json({
@@ -322,7 +415,7 @@ app.use('/api/user', userRoutes);
 
 // Update leaderboard endpoint
 const leaderboard = require('./routes/leaderboardRoutes');
-app.use('/api/leaderboard', leaderboard);
+app.use('/api/leaderboard', apiLimiter, requireApiKeyOrAuth, leaderboard);
 // app.get('/api/leaderboard', async (req, res) => {
 //     try {
 //         // Add cache control headers
@@ -367,7 +460,7 @@ app.use('/api/leaderboard', leaderboard);
 
 // Add global stats endpoint
 const statsRoutes = require('./routes/statsRoutes');
-app.use('/api/stats', statsRoutes);
+app.use('/api/stats', apiLimiter, requireApiKeyOrAuth, statsRoutes);
 // app.get('/api/stats/global', async (req, res) => {
 //     try {
 //         // Get all users and accepted repos
@@ -403,7 +496,7 @@ app.get('/auth/logout', (req, res) => {
 
 // Update GitHub API routes with Octokit
 const githubRoutes = require('./routes/githubRoutes');
-app.use('/api/github', githubRoutes);
+app.use('/api/github', apiLimiter, requireApiKeyOrAuth, githubRoutes);
 // app.get('/api/github/user/:username', async (req, res) => {
 //     try {
 //         const { data: userData } = await octokit.users.getByUsername({
@@ -499,7 +592,7 @@ app.use('/api/github', githubRoutes);
 // Update the project submission route
 // Added
 const projectRoutes = require('./routes/projectRoutes');
-app.use('/api/projects', projectRoutes);
+app.use('/api/projects', apiLimiter, requireApiKeyOrAuth, projectRoutes);
 // app.post('/api/projects', async (req, res) => {
 //     if (!req.isAuthenticated()) {
 //         return res.status(401).json({ error: 'Unauthorized' });
@@ -607,7 +700,7 @@ app.use('/api/projects', projectRoutes);
 
 // Get all accepted projects
 const acceptedProjectsRoutes = require('./routes/acceptedprojects');
-app.use('/api/accepted-projects', acceptedProjectsRoutes);
+app.use('/api/accepted-projects', apiLimiter, requireApiKeyOrAuth, acceptedProjectsRoutes);
 // app.get('/api/accepted-projects', async (req, res) => {
 //     try {
 //         const projects = await Repo.find({ reviewStatus: 'accepted' })
@@ -646,7 +739,7 @@ app.use('/api/accepted-projects', acceptedProjectsRoutes);
 // Admin verification endpoint
 // Added
 const adminRoutes = require('./routes/adminRoutes');
-app.use('/api/admin', adminRoutes);
+app.use('/api/admin', apiLimiter, requireApiKeyOrAuth, adminRoutes);
 // app.get('/api/admin/verify', (req, res) => {
 //     if (!req.isAuthenticated()) {
 //         return res.status(401).json({ isAdmin: false });
@@ -1609,7 +1702,7 @@ app.use((req, res, next) => {
 
 // Get all registered users endpoint
 const usersRoutes = require('./routes/usersRoutes');
-app.use('/api/users', usersRoutes);
+app.use('/api/users', apiLimiter, requireApiKeyOrAuth, usersRoutes);
 // app.get('/api/users', async (req, res) => {
 //     try {
 //         const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
@@ -1822,7 +1915,7 @@ app.use('/api/users', usersRoutes);
 
 // Create event
 const eventRoutes = require('./routes/eventsRoutes');
-app.use('/api/events', eventRoutes);
+app.use('/api/events', apiLimiter, requireApiKeyOrAuth, eventRoutes);
 // app.post('/api/events', async (req, res) => {
 //     if (!req.isAuthenticated()) {
 //         return res.status(401).json({ error: 'Unauthorized' });
@@ -1914,7 +2007,7 @@ app.use('/api/events', eventRoutes);
 
 // Add sponsorship inquiry endpoint
 const sponsorshipRoutes = require('./routes/sponsorshipRoutes');
-app.use('/api/sponsorship', sponsorshipRoutes);
+app.use('/api/sponsorship', publicLimiter, sponsorshipRoutes); // Public endpoint with rate limiting only
 // app.post('/api/sponsorship/inquiry', async (req, res) => {
 //     try {
 //         if (!req.body.email || !req.body.organization || !req.body.sponsorshipType) {
@@ -1945,7 +2038,7 @@ app.use('/api/sponsorship', sponsorshipRoutes);
 
 // Add ticket routes BEFORE the catch-all route and AFTER other API routes
 const ticketRoutes = require('./routes/ticketRoutes');
-app.use('/api/tickets', ticketRoutes);
+app.use('/api/tickets', apiLimiter, requireApiKeyOrAuth, ticketRoutes);
 
 // Add ticket cleanup job
 const cleanupExpiredTickets = async () => {
