@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevSync 2025 - Announcement</title>
+    <!--=============== FAVICON ===============-->
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+
+    <!--=============== BOXICONS ===============-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="assets/css/home.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/swiper-bundle.min.css">
+    <!--=============== NAV STYLES ===============-->
+    <link rel="stylesheet" href="assets/css/navstyles.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/events.css">
+    <link rel="stylesheet" href="assets/css/global-search.css">
+</head>
+
+<body>
+    <!-- LOADER -->
+    <div class="page-transition">
+        <div class="transition-content">
+            <h1 class="transition-title" style="font-size: 3rem;">Welcome to DevSync 2025</h1>
+            <p class="transition-subtitle">Join the Future of Open Source</p>
+        </div>
+    </div>
+    <!--==================== HEADER ====================-->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="index.html" class="nav__logo">
+                <img src="assets/img/logo.png" alt="" class="nav__logo-img">
+                DevSync
+            </a>
+
+            <div class="nav__menu" id="nav-menu">
+                <!-- Add close button inside menu -->
+                <div class="nav__close" id="nav-close">
+                    <i class='bx bx-x'></i>
+                </div>
+
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <a href="index.html" class="nav__link">Home</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="projects.html" class="nav__link">Projects</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="team.html" class="nav__link">Team</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="events.html" class="nav__link active-link">Schedule</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="process.html" class="nav__link">Story</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="ticket.html" class="nav__link">Service</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="leaderboard.html" class="nav__link">Leaderboard</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav__buttons">
+                <div class="nav__toggle" id="nav-toggle">
+                    <i class='bx bx-menu'></i>
+                </div>
+                <a href="login.html" class="button button--ghost">Login</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main">
+        <!-- Admin Panel Section -->
+        <section class="admin-section section" id="adminSection">
+            <div class="admin-container container">
+                <div class="admin-welcome" id="adminWelcome" style="display: none;">
+                    <div class="admin-header">
+                        <img src="assets/img/admin-avatar.png" alt="Admin" class="admin-avatar" id="adminAvatar">
+                        <div class="admin-info">
+                            <h1 id="adminName" style="font-size: 3rem;">Welcome, Admin</h1>
+                            <span class="admin-badge">Administrator</span>
+                        </div>
+                    </div>
+                    <div class="admin-controls">
+                        <button class="button admin-button" id="createEventBtn">
+                            <i class='bx bx-plus-circle'></i> Create Event
+                        </button>
+                        <button class="button admin-button" id="manageEventsBtn">
+                            <i class='bx bx-calendar-edit'></i> Manage Events
+                        </button>
+                    </div>
+                    <div class="event-management" id="eventManagement">
+                        <!-- Event management form will be loaded here -->
+                    </div>
+                </div>
+                <div id="unauthorizedMessage" class="unauthorized-message">
+                    <i class='bx bx-lock-alt'></i>
+                    <h3>Unauthorized Access</h3>
+                    <p>You need administrator privileges to access this area.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="events section">
+            <div class="events__container container">
+                <div class="events__header">
+                    <h2 class="section__title">Calendar</h2>
+                    <div class="view-controls">
+                        <button class="view-btn active" data-view="calendar">
+                            <i class='bx bx-calendar'></i> Calendar
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <i class='bx bx-list-ul'></i> List
+                        </button>
+                    </div>
+                </div>
+
+                <div class="calendar-toolbar">
+                    <div class="calendar-nav">
+                        <button class="nav-btn" id="prevBtn">
+                            <i class='bx bx-chevron-left'></i>
+                        </button>
+                        <h3 class="current-date" id="currentDate">September 2023</h3>
+                        <button class="nav-btn" id="nextBtn">
+                            <i class='bx bx-chevron-right'></i>
+                        </button>
+                        <button class="today-btn" id="todayBtn">Today</button>
+                    </div>
+                </div>
+
+                <div class="calendar-views">
+                    <div class="calendar-view active" id="calendarView">
+                        <div class="calendar-grid">
+                            <div class="calendar-header">
+                                <span>Sun</span>
+                                <span>Mon</span>
+                                <span>Tue</span>
+                                <span>Wed</span>
+                                <span>Thu</span>
+                                <span>Fri</span>
+                                <span>Sat</span>
+                            </div>
+                            <div class="calendar-days" id="calendarDays"></div>
+                        </div>
+                    </div>
+
+                    <div class="list-view" id="listView">
+                        <div class="search-box">
+                            <i class='bx bx-search'></i>
+                            <input type="text" id="eventsSearch" placeholder="Search events by name, type, or venue...">
+                        </div>
+                        <div class="timeline-header">
+                            <div class="timeline-scale">
+                            </div>
+                        </div>
+                        <div class="timeline-events" id="timelineEvents"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Include Global Search CSS and JS -->
+    <link rel="stylesheet" href="assets/css/global-search.css">
+    <script src="assets/js/global-search.js"></script>
+    <script src="assets/js/events-admin.js"></script>
+    <script src="assets/js/events-display.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/swiper-bundle.min.js"></script>
+
+</body>
+
+</html>
