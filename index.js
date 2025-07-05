@@ -217,7 +217,6 @@ const publicLimiter = rateLimit({
 const requireApiKeyOrAuth = (req, res, next) => {
     const apiKey = req.headers['x-api-key'];
 
-    console.log("500");
     // First check if API_SECRET_KEY is configured
     if (!API_SECRET_KEY) {
         return res.status(500).json({
@@ -225,7 +224,7 @@ const requireApiKeyOrAuth = (req, res, next) => {
             message: 'API key not configured on server'
         });
     }
-
+    
     // Check if API key is provided and valid
     if (apiKey && apiKey === API_SECRET_KEY) {
         // Set a flag to indicate API key authentication
@@ -237,12 +236,12 @@ const requireApiKeyOrAuth = (req, res, next) => {
         };
         return next();
     }
-
+    
     // Check if user is authenticated via session
     if (req.isAuthenticated()) {
         return next();
     }
-
+    
     // Neither API key nor session authentication found
     return res.status(401).json({
         error: 'Unauthorized',
