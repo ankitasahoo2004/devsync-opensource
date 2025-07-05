@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Detect theme changes and update events container accordingly
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
-                if (mutation.type === 'attributes' && 
+                if (mutation.type === 'attributes' &&
                     (mutation.attributeName === 'class' || mutation.attributeName === 'data-theme')) {
                     updateEventsTheme();
                 }
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateEventsTheme() {
         const html = document.documentElement;
         const eventsContainer = document.querySelector('.events-main-container');
-        
+
         if (!eventsContainer) return;
 
         const isDark = html.classList.contains('dark') ||
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Search functionality with mobile optimization
         if (eventsSearch) {
             eventsSearch.addEventListener('input', debounce(handleSearch, 300));
-            
+
             // Prevent zoom on iOS
             eventsSearch.addEventListener('focus', () => {
                 if (isMobile()) {
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             });
-            
+
             eventsSearch.addEventListener('blur', () => {
                 if (isMobile()) {
                     const viewport = document.querySelector('meta[name=viewport]');
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // View switching with touch feedback
         viewButtons.forEach(btn => {
             btn.addEventListener('click', () => switchView(btn.dataset.view));
-            
+
             // Touch feedback for mobile
             btn.addEventListener('touchstart', () => {
                 btn.style.transform = 'scale(0.95)';
@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle responsive behavior
     function handleResize() {
         const isMobileView = isMobile();
-        
+
         // Adjust admin toggle position on very small screens
         if (adminToggle) {
             if (window.innerWidth <= 360) {
@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add subtle scroll effects for better UX
         const scrollY = window.scrollY;
         const eventsContainer = document.querySelector('.events-main-container');
-        
+
         if (eventsContainer && scrollY > 100) {
             eventsContainer.style.transform = `translateY(${scrollY * -0.02}px)`;
         }
@@ -313,34 +313,34 @@ document.addEventListener('DOMContentLoaded', () => {
         const interactiveElements = document.querySelectorAll(
             '.events-main-container button, .events-main-container input, .events-main-container select, .events-main-container a'
         );
-        
+
         interactiveElements.forEach((el, index) => {
             if (!el.hasAttribute('tabindex')) {
                 el.setAttribute('tabindex', index + 1);
             }
         });
     }
-        if (eventModeFilter) {
-            eventModeFilter.addEventListener('change', handleFilter);
-        }
-
-        // View switching
-        viewButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const view = btn.dataset.view;
-                switchView(view);
-            });
-        });
-
-        // Calendar navigation
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const todayBtn = document.getElementById('todayBtn');
-
-        if (prevBtn) prevBtn.addEventListener('click', () => navigateCalendar(-1));
-        if (nextBtn) nextBtn.addEventListener('click', () => navigateCalendar(1));
-        if (todayBtn) todayBtn.addEventListener('click', goToToday);
+    if (eventModeFilter) {
+        eventModeFilter.addEventListener('change', handleFilter);
     }
+
+    // View switching
+    viewButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const view = btn.dataset.view;
+            switchView(view);
+        });
+    });
+
+    // Calendar navigation
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const todayBtn = document.getElementById('todayBtn');
+
+    if (prevBtn) prevBtn.addEventListener('click', () => navigateCalendar(-1));
+    if (nextBtn) nextBtn.addEventListener('click', () => navigateCalendar(1));
+    if (todayBtn) todayBtn.addEventListener('click', goToToday);
+}
 
     // Admin Panel Setup
     function setupAdminPanel() {

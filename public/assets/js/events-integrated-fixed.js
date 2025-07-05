@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Detect theme changes and update events container accordingly
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
-                if (mutation.type === 'attributes' && 
+                if (mutation.type === 'attributes' &&
                     (mutation.attributeName === 'class' || mutation.attributeName === 'data-theme')) {
                     updateEventsTheme();
                 }
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateEventsTheme() {
         const html = document.documentElement;
         const eventsContainer = document.querySelector('.events-main-container');
-        
+
         if (!eventsContainer) return;
 
         const isDark = html.classList.contains('dark') ||
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Search functionality with mobile optimization
         if (eventsSearch) {
             eventsSearch.addEventListener('input', debounce(handleSearch, 300));
-            
+
             // Prevent zoom on iOS
             eventsSearch.addEventListener('focus', () => {
                 if (isMobile()) {
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             });
-            
+
             eventsSearch.addEventListener('blur', () => {
                 if (isMobile()) {
                     const viewport = document.querySelector('meta[name=viewport]');
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // View switching with touch feedback
         viewButtons.forEach(btn => {
             btn.addEventListener('click', () => switchView(btn.dataset.view));
-            
+
             // Touch feedback for mobile
             btn.addEventListener('touchstart', () => {
                 btn.style.transform = 'scale(0.95)';
@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle responsive behavior
     function handleResize() {
         const isMobileView = isMobile();
-        
+
         // Adjust admin toggle position on very small screens
         if (adminToggle) {
             if (window.innerWidth <= 360) {
@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add subtle scroll effects for better UX
         const scrollY = window.scrollY;
         const eventsContainer = document.querySelector('.events-main-container');
-        
+
         if (eventsContainer && scrollY > 100) {
             eventsContainer.style.transform = `translateY(${scrollY * -0.02}px)`;
         }
@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const interactiveElements = document.querySelectorAll(
             '.events-main-container button, .events-main-container input, .events-main-container select, .events-main-container a'
         );
-        
+
         interactiveElements.forEach((el, index) => {
             if (!el.hasAttribute('tabindex')) {
                 el.setAttribute('tabindex', index + 1);
@@ -361,10 +361,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const modeFilter = eventModeFilter ? eventModeFilter.value : '';
 
         filteredEvents = allEvents.filter(event => {
-            const matchesSearch = !searchTerm || 
+            const matchesSearch = !searchTerm ||
                 event.name.toLowerCase().includes(searchTerm) ||
                 event.description.toLowerCase().includes(searchTerm);
-            
+
             const matchesType = !typeFilter || event.type === typeFilter;
             const matchesMode = !modeFilter || event.mode === modeFilter;
 
@@ -852,17 +852,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Global functions for popup interactions
-    window.copyMeetingLink = function(event) {
+    window.copyMeetingLink = function (event) {
         const linkText = event.target.closest('.meeting-link').querySelector('.link-text').textContent;
         navigator.clipboard.writeText(linkText).then(() => {
             showToast('Meeting link copied to clipboard!', 'success');
         });
     };
 
-    window.showDayEventsPopup = function(events, date) {
+    window.showDayEventsPopup = function (events, date) {
         const popup = document.createElement('div');
         popup.className = 'events-day-popup';
-        
+
         popup.innerHTML = `
             <div class="popup-header">
                 <h3>Events on ${formatEventDate(date)}</h3>
