@@ -14,7 +14,7 @@ const Repo = require('./models/Repo');
 // const PendingPR = require('./models/PendingPR');
 const Ticket = require('./models/Ticket'); // Add Ticket model
 const MongoStore = require('connect-mongo');
-// const emailService = require('./services/emailService');
+const emailService = require('./services/emailService');
 // const dbSync = require('./utils/dbSync');
 // const PORT = process.env.PORT || 5500;
 const serverUrl = process.env.SERVER_URL;
@@ -217,6 +217,7 @@ const publicLimiter = rateLimit({
 const requireApiKeyOrAuth = (req, res, next) => {
     const apiKey = req.headers['x-api-key'];
 
+    console.log("500");
     // First check if API_SECRET_KEY is configured
     if (!API_SECRET_KEY) {
         return res.status(500).json({
