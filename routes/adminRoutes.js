@@ -806,9 +806,8 @@ router.post("/send-email", async (req, res) => {
         error: "Invalid email format",
       });
     }
-
     // Send the email using the EmailService
-    const emailService = require("./services/emailService");
+    const emailService = require("../services/emailService");
     const result = await emailService.sendMessageEmail(
       to,
       recipientName || "DevSync User",
@@ -816,7 +815,6 @@ router.post("/send-email", async (req, res) => {
       message,
       templateData
     );
-
     res.status(200).json({
       success: true,
       message: "Email sent successfully",

@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentUser = data.user;
 
                 // Check if user is admin
-                const adminIds = ['ankitasahoo2004', 'Sayan-dev731', 'Shubham66020']; // From env
+                const adminIds = ['ankitasahoo2004', 'Sayan-dev731', 'Shubham66020', 'NamanSoni18']; // From env
                 if (adminIds.includes(data.user.username)) {
                     adminToggle.style.display = 'flex';
                     setupAdminPanel();

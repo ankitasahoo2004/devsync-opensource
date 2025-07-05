@@ -14,7 +14,7 @@ const Repo = require('./models/Repo');
 // const PendingPR = require('./models/PendingPR');
 const Ticket = require('./models/Ticket'); // Add Ticket model
 const MongoStore = require('connect-mongo');
-// const emailService = require('./services/emailService');
+const emailService = require('./services/emailService');
 // const dbSync = require('./utils/dbSync');
 // const PORT = process.env.PORT || 5500;
 const serverUrl = process.env.SERVER_URL;
@@ -224,7 +224,7 @@ const requireApiKeyOrAuth = (req, res, next) => {
             message: 'API key not configured on server'
         });
     }
-
+    
     // Check if API key is provided and valid
     if (apiKey && apiKey === API_SECRET_KEY) {
         // Set a flag to indicate API key authentication
@@ -236,12 +236,12 @@ const requireApiKeyOrAuth = (req, res, next) => {
         };
         return next();
     }
-
+    
     // Check if user is authenticated via session
     if (req.isAuthenticated()) {
         return next();
     }
-
+    
     // Neither API key nor session authentication found
     return res.status(401).json({
         error: 'Unauthorized',

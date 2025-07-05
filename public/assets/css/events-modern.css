@@ -771,7 +771,7 @@ html[data-theme="dark"] .events-main-container,
 }
 
 .calendar__day {
-    background: white;
+    /* background: white; */
     padding: 1rem 0.5rem;
     min-height: 80px;
     position: relative;

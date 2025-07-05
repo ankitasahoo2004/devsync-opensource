@@ -71,6 +71,19 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-weight: 600;
+    color: var(--white-color);
+}
+
+.event__slots {
+    background: rgba(229, 24, 55, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(229, 24, 55, 0.3);
+}
+
+.event__slots i {
+    color: #e51837;
 }
 
 .speakers__stack {
@@ -1345,31 +1358,86 @@
     position: relative;
     transition: all 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(5px);
 }
 
 .calendar-day:hover {
-    background: rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, 0.35);
     transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.calendar-day:hover .day-number {
+    color: var(--white-color);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .day-number {
-    font-size: 0.85rem;
-    color: var(--text-color-light);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--white-color);
     margin-bottom: 0.5rem;
     text-align: right;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    min-height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 .calendar-day.today .day-number {
-    color: #e51837;
-    font-weight: 600;
-    background: rgba(var(--first-color-rgb), 0.1);
-    width: 24px;
-    height: 24px;
+    color: var(--white-color);
+    font-weight: 700;
+    background: #e51837;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
     margin-left: auto;
+    text-shadow: none;
+    box-shadow: 0 2px 8px rgba(229, 24, 55, 0.4);
+}
+
+.calendar-day.empty {
+    background: rgba(0, 0, 0, 0.1);
+    opacity: 0.5;
+}
+
+.calendar-day.empty .day-number {
+    color: var(--text-color-light);
+    opacity: 0.5;
+}
+
+/* Enhance number visibility for different calendar states */
+.calendar-day.other-month .day-number {
+    color: var(--text-color-light);
+    opacity: 0.4;
+}
+
+.calendar-day.has-events .day-number {
+    color: var(--white-color);
+    font-weight: 700;
+}
+
+/* Add subtle animation for today's number */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.calendar-day.today .day-number {
+    animation: pulse 2s ease-in-out infinite;
 }
 
 .day-events {
@@ -1400,9 +1468,10 @@
 }
 
 .day-event .event-time {
-    font-weight: 600;
-    font-size: 0.65rem;
-    opacity: 0.8;
+    font-weight: 700;
+    font-size: 0.7rem;
+    color: #e51837;
+    opacity: 1;
     margin-right: 0.25rem;
 }
 
@@ -1476,10 +1545,15 @@
 .event-time {
     min-width: 100px;
     color: #e51837;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 0.95rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    background: rgba(229, 24, 55, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(229, 24, 55, 0.2);
 }
 
 .event-content {
@@ -1550,7 +1624,8 @@
     }
 
     .day-number {
-        font-size: 0.75rem;
+        font-size: 0.9rem;
+        font-weight: 600;
         margin-bottom: 0.25rem;
     }
 
@@ -1577,7 +1652,8 @@
     }
 
     .day-event .event-time {
-        font-size: 0.65rem;
+        font-size: 0.7rem;
+        font-weight: 700;
         margin-right: 0.25rem;
     }
 
@@ -1628,7 +1704,8 @@
     }
 
     .day-number {
-        font-size: 0.7rem;
+        font-size: 0.85rem;
+        font-weight: 600;
     }
 
     .day-events {
@@ -1726,5 +1803,41 @@
     .calendar-toolbar,
     .timeline-date {
         backdrop-filter: blur(5px);
+    }
+}
+
+/* Enhanced number clarity overrides */
+.current-date {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: var(--white-color) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Calendar header month/day labels clarity */
+.calendar-header span {
+    font-weight: 600 !important;
+    color: var(--white-color) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Event count numbers in popups */
+.popup-content .event__slots,
+.popup-content .countdown-timer {
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+}
+
+/* Mobile optimizations for numbers */
+@media screen and (max-width: 768px) {
+    .current-date {
+        font-size: 1.25rem !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .current-date {
+        font-size: 1.1rem !important;
     }
 }
