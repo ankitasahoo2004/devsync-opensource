@@ -2,8 +2,8 @@
 const API_CONFIG = {
     // Server URLs - uncomment the one you want to use
     // serverUrl: 'https://devsync-opensource.tech',
-    // serverUrl: 'https://www.devsync.club',
-    serverUrl: 'http://localhost:3000',
+    serverUrl: 'https://www.devsync.club',
+    // serverUrl: 'http://localhost:3000',
 
     // API Endpoints
     endpoints: {

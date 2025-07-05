@@ -138,7 +138,7 @@ mongoose.connect(process.env.MONGODB_URI)
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
 app.use(cors({
-    origin: [serverUrl],
+    origin: ['https://devsync.club', 'https://www.devsync.club', 'http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
 }));
@@ -413,9 +413,9 @@ app.use('/api/user', apiLimiter, requireApiKeyOrAuth, userRoutes);
 //     }
 // }
 
-// Update leaderboard endpoint
+// Update leaderboard endpoint (public endpoint)
 const leaderboard = require('./routes/leaderboardRoutes');
-app.use('/api/leaderboard', apiLimiter, requireApiKeyOrAuth, leaderboard);
+app.use('/api/leaderboard', publicLimiter, leaderboard);
 // app.get('/api/leaderboard', async (req, res) => {
 //     try {
 //         // Add cache control headers
@@ -458,9 +458,9 @@ app.use('/api/leaderboard', apiLimiter, requireApiKeyOrAuth, leaderboard);
 //     }
 // });
 
-// Add global stats endpoint
+// Add global stats endpoint (public endpoint)
 const statsRoutes = require('./routes/statsRoutes');
-app.use('/api/stats', apiLimiter, requireApiKeyOrAuth, statsRoutes);
+app.use('/api/stats', publicLimiter, statsRoutes);
 // app.get('/api/stats/global', async (req, res) => {
 //     try {
 //         // Get all users and accepted repos
@@ -698,20 +698,13 @@ app.use('/api/projects', apiLimiter, requireApiKeyOrAuth, projectRoutes);
 //     }
 // });
 
-// Get all accepted projects
+// Get all accepted projects (public endpoint)
 const acceptedProjectsRoutes = require('./routes/acceptedprojects');
-app.use('/api/accepted-projects', apiLimiter, requireApiKeyOrAuth, acceptedProjectsRoutes);
-// app.get('/api/accepted-projects', async (req, res) => {
-//     try {
-//         const projects = await Repo.find({ reviewStatus: 'accepted' })
-//             .select('repoLink ownerName technology description reviewStatus reviewedAt')
-//             .sort({ submittedAt: -1 });
-//         res.json(projects);
-//     } catch (error) {
-//         console.error('Error fetching accepted projects:', error);
-//         res.status(500).json({ error: 'Failed to fetch projects' });
-//     }
-// });
+app.use('/api/accepted-projects', publicLimiter, acceptedProjectsRoutes);
+
+// Events routes (public endpoint for viewing events)
+const eventsRoutes = require('./routes/eventsRoutes');
+app.use('/api/events', publicLimiter, eventsRoutes);
 
 // Get user's projects
 // Added
@@ -1702,7 +1695,7 @@ app.use((req, res, next) => {
 
 // Get all registered users endpoint
 const usersRoutes = require('./routes/usersRoutes');
-app.use('/api/users', apiLimiter, requireApiKeyOrAuth, usersRoutes);
+app.use('/api/users', publicLimiter, usersRoutes);
 // app.get('/api/users', async (req, res) => {
 //     try {
 //         const adminIds = process.env.ADMIN_GITHUB_IDS.split(',');
@@ -1913,9 +1906,7 @@ app.use('/api/users', apiLimiter, requireApiKeyOrAuth, usersRoutes);
 //     return 'Beginner';
 // }
 
-// Create event
-const eventRoutes = require('./routes/eventsRoutes');
-app.use('/api/events', apiLimiter, requireApiKeyOrAuth, eventRoutes);
+// Note: Events routes are already configured above as public endpoint
 // app.post('/api/events', async (req, res) => {
 //     if (!req.isAuthenticated()) {
 //         return res.status(401).json({ error: 'Unauthorized' });
