@@ -60,14 +60,10 @@
 </script>
 
     <link rel="stylesheet" href="assets/css/services.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/swiper-bundle.min.css">
-    <link rel="stylesheet" href="assets/css/navstyles.css">
-    <link rel="stylesheet" href="assets/css/leaderboard.css">
     <link rel="stylesheet" href="assets/css/global-search.css">
-    <link rel="stylesheet" href="assets/css/events.css">
     <link rel="stylesheet" href="assets/css/modal.css">
+    <link rel="stylesheet" href="assets/css/events-modern.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
 
 
@@ -472,96 +468,147 @@
                             </div>
                             <div servic="" id="w-node-_8c1eb75c-aa56-c9a9-fa7a-d8abd3e0d585-579dfae6"
                                 class="ser-blocks-w">
-                                <!-- Admin Panel Section -->
-                                <section class="admin-section section" id="adminSection">
-                                    <div class="admin-container container">
-                                        <div class="admin-welcome" id="adminWelcome" style="display: none;">
-                                            <div class="admin-header">
-                                                <img src="assets/img/avatars/image1x1.jpg" alt="Admin"
-                                                    class="admin-avatar" id="adminAvatar">
-                                                <div class="admin-info">
-                                                    <h1 id="adminName" style="font-size: 3rem;">Welcome, Admin</h1>
-                                                    <span class="admin-badge">Administrator</span>
-                                                </div>
+                                <br><br>
+                                <!-- Modern Events Section -->
+                                <div class="events-main-container">
+                                    <!-- Events Header -->
+                                    <div class="events__header">
+                                        <div class="events__subtitle">Upcoming Events</div>
+                                        <h2 class="events__title">Join Our Community</h2>
+                                        <p class="events__description">
+                                            Discover workshops, webinars, hackathons, and meetups designed to boost your
+                                            development skills and connect with fellow developers.
+                                        </p>
+                                    </div>
+
+                                    <!-- Events Controls -->
+                                    <div class="events__controls">
+                                        <div class="controls__left">
+                                            <div class="search__container">
+                                                <input type="text" id="eventsSearch" placeholder="Search events..."
+                                                    class="search__input">
+                                                <i class='bx bx-search search__icon'></i>
                                             </div>
-                                            <div class="admin-controls">
-                                                <button class="button admin-button" id="createEventBtn">
-                                                    <i class='bx bx-plus-circle'></i> Create Event
-                                                </button>
-                                                <button class="button admin-button" id="manageEventsBtn">
-                                                    <i class='bx bx-calendar-edit'></i> Manage Events
-                                                </button>
+                                            <div class="filter__container">
+                                                <select id="eventTypeFilter" class="filter__select">
+                                                    <option value="">All Types</option>
+                                                    <option value="workshop">Workshop</option>
+                                                    <option value="webinar">Webinar</option>
+                                                    <option value="hackathon">Hackathon</option>
+                                                    <option value="meetup">Meetup</option>
+                                                    <option value="conference">Conference</option>
+                                                </select>
                                             </div>
-                                            <div class="event-management" id="eventManagement">
-                                                <!-- Event management form will be loaded here -->
+                                            <div class="filter__container">
+                                                <select id="eventModeFilter" class="filter__select">
+                                                    <option value="">All Modes</option>
+                                                    <option value="online">Online</option>
+                                                    <option value="offline">Offline</option>
+                                                    <option value="hybrid">Hybrid</option>
+                                                </select>
                                             </div>
                                         </div>
-                                        <div id="unauthorizedMessage" class="unauthorized-message">
-                                            <i class='bx bx-lock-alt'></i>
-                                            <h3>Unauthorized Access</h3>
-                                            <p>You need administrator privileges to access this area.</p>
+                                        <div class="controls__right">
+                                            <div class="view__switcher">
+                                                <button class="view-btn active" data-view="list">
+                                                    <i class='bx bx-list-ul'></i>
+                                                </button>
+                                                <button class="view-btn" data-view="calendar">
+                                                    <i class='bx bx-calendar'></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </section>
 
-                                <section class="events section">
-                                    <div class="events__container container">
-                                        <div class="events__header">
-                                            <h2 class="section__title">Calendar</h2>
-                                            <div class="view-controls">
-                                                <button class="view-btn active" data-view="calendar">
-                                                    <i class='bx bx-calendar'></i> Calendar
+                                    <!-- Admin Toggle (for admins) -->
+                                    <button id="adminToggle" class="admin-toggle" style="display: none;"
+                                        title="Toggle Admin Panel">
+                                        <i class='bx bx-cog'></i>
+                                    </button>
+
+                                    <!-- Admin Section -->
+                                    <div id="adminSection" class="admin-section" style="display: none;">
+                                        <div id="adminWelcome" class="admin-welcome" style="display: none;">
+                                            <div class="admin-header">
+                                                <div class="admin-info">
+                                                    <h3><i class='bx bx-shield-check'></i> Admin Panel</h3>
+                                                    <p>Welcome! You can create and manage events here.</p>
+                                                </div>
+                                                <button class="admin-close"
+                                                    onclick="document.getElementById('adminSection').style.display='none'">
+                                                    <i class='bx bx-x'></i>
                                                 </button>
-                                                <button class="view-btn" data-view="list">
-                                                    <i class='bx bx-list-ul'></i> List
+                                            </div>
+                                            <div class="admin-actions">
+                                                <button id="createEventBtn" class="button admin-btn">
+                                                    <i class='bx bx-calendar-plus'></i> Create Event
+                                                </button>
+                                                <button id="manageEventsBtn"
+                                                    class="button admin-btn admin-btn--secondary">
+                                                    <i class='bx bx-cog'></i> Manage Events
                                                 </button>
                                             </div>
                                         </div>
+                                        <div id="unauthorizedMessage" class="unauthorized-message"
+                                            style="display: none;">
+                                            <i class='bx bx-lock-alt'></i>
+                                            <h3>Access Restricted</h3>
+                                            <p>Admin access required to manage events.</p>
+                                        </div>
+                                        <div id="eventManagement" class="event-management"></div>
+                                    </div>
 
-                                        <div class="calendar-toolbar">
-                                            <div class="calendar-nav">
-                                                <button class="nav-btn" id="prevBtn">
+                                    <!-- Events Views -->
+                                    <div class="events__views">
+                                        <!-- List View -->
+                                        <div id="listView" class="view-container active">
+                                            <div id="eventsGrid" class="events__grid">
+                                                <!-- Events will be populated by JavaScript -->
+                                            </div>
+                                            <div id="noEventsMessage" class="no-events" style="display: none;">
+                                                <i class='bx bx-calendar-x'></i>
+                                                <h3>No Events Found</h3>
+                                                <p>There are no events matching your criteria. Check back later!</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Calendar View -->
+                                        <div id="calendarView" class="view-container">
+                                            <div class="calendar__header">
+                                                <button id="prevBtn" class="nav-btn">
                                                     <i class='bx bx-chevron-left'></i>
                                                 </button>
-                                                <h3 class="current-date" id="currentDate">September 2023</h3>
-                                                <button class="nav-btn" id="nextBtn">
+                                                <h3 id="currentDate" class="calendar__title"></h3>
+                                                <button id="nextBtn" class="nav-btn">
                                                     <i class='bx bx-chevron-right'></i>
                                                 </button>
-                                                <button class="today-btn" id="todayBtn">Today</button>
                                             </div>
-                                        </div>
-
-                                        <div class="calendar-views">
-                                            <div class="calendar-view active" id="calendarView">
-                                                <div class="calendar-grid">
-                                                    <div class="calendar-header">
-                                                        <span>Sun</span>
-                                                        <span>Mon</span>
-                                                        <span>Tue</span>
-                                                        <span>Wed</span>
-                                                        <span>Thu</span>
-                                                        <span>Fri</span>
-                                                        <span>Sat</span>
-                                                    </div>
-                                                    <div class="calendar-days" id="calendarDays"></div>
-                                                </div>
+                                            <div class="calendar__actions">
+                                                <button id="todayBtn" class="button button--small">Today</button>
                                             </div>
-
-                                            <div class="list-view" id="listView">
-                                                <div class="search-box">
-                                                    <i class='bx bx-search'></i>
-                                                    <input type="text" id="eventsSearch"
-                                                        placeholder="Search events by name, type, or venue...">
+                                            <div class="calendar__container">
+                                                <div class="calendar__weekdays">
+                                                    <div class="weekday">Sun</div>
+                                                    <div class="weekday">Mon</div>
+                                                    <div class="weekday">Tue</div>
+                                                    <div class="weekday">Wed</div>
+                                                    <div class="weekday">Thu</div>
+                                                    <div class="weekday">Fri</div>
+                                                    <div class="weekday">Sat</div>
                                                 </div>
-                                                <div class="timeline-header">
-                                                    <div class="timeline-scale">
-                                                    </div>
-                                                </div>
-                                                <div class="timeline-events" id="timelineEvents"></div>
+                                                <div id="calendarDays" class="calendar__days"></div>
                                             </div>
+                                            <div id="timelineEvents" class="timeline__events"></div>
                                         </div>
                                     </div>
-                                </section>
+
+                                    <!-- Loading State -->
+                                    <div id="eventsLoading" class="loading-state">
+                                        <div class="loading-spinner"></div>
+                                        <p>Loading events...</p>
+                                    </div>
+                                </div>
+                                <!-- End Modern Events Section -->
                             </div>
                         </div>
                         <div class="spacer-10"></div>
@@ -1048,8 +1095,7 @@ new Orb(document.querySelector('[data-orb]') , 'https://cdn.jsdelivr.net/gh/itso
 -->
     <script src="assets/js/main.js"></script>
     <script src="assets/js/auth.js"></script>
-    <script src="assets/js/events-admin.js"></script>
-    <script src="assets/js/events-display.js"></script>
+    <script src="assets/js/events-integrated-fixed.js"></script>
     <script src="assets/js/swiper-bundle.min.js"></script>
     <script src="assets/js/global-search.js"></script>
     <script src="assets/js/leaderboard.js"></script>
