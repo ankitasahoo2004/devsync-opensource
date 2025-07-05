@@ -2775,3 +2775,8 @@ html.light .profile-section::before {
         --profile-card-hover: rgba(255, 255, 255, 0.95);
     }
 }
+
+.grid-main.ft-nav-w {
+    grid-template-columns: 1fr 1fr;
+    padding-left: 3em;
+}

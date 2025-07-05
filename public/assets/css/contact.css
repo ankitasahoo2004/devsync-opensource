@@ -1493,3 +1493,8 @@ html.dark [faq-svg] path {
 [data-edit="true"] ._wf-ent__faq--reveal {
     height: auto;
 }
+
+.grid-main.ft-nav-w {
+    grid-template-columns: 1fr 1fr;
+    padding-left: 3em;
+}
