@@ -179,13 +179,9 @@ function renderWinnerCard(user, position, rank) {
 function renderLeaderboardList(users) {
     if (users.length === 0) return '<div class="no-data">No users found</div>';
 
-    // First 10 runners-up (positions 4-13)
-    const runnersUp = users.slice(0, 10);
-    const remainingUsers = users.slice(10);
-
     return `
         <div class="runners-up-grid">
-            ${runnersUp.map((user, index) => `
+            ${users.map((user, index) => `
                 <div class="runner-up-card" data-user="${user.username}">
                     <span class="rank">#${user.rank || index + 4}</span>
                     <img src="https://github.com/${user.username}.png" 
@@ -204,15 +200,14 @@ function renderLeaderboardList(users) {
                                 <i class='bx bx-git-merge'></i>
                                 ${user.mergedPRs.length}
                             </span>
-                            </div>
-                            <div class="badges-container">
+                        </div>
+                        <div class="badges-container">
                             ${getEssentialBadges(user.badges).map(badge => `<span class="badge">${badge.split('|')[0]}</span>`).join('')}
-                            </div>
-                            </div>
-                            ${renderTrendIndicator(user.trend)}
-                            </div>
-                            `).join('')}
-                            ${remainingUsers.map(user => renderLeaderboardItem(user)).join('')}
+                        </div>
+                    </div>
+                    ${renderTrendIndicator(user.trend)}
+                </div>
+            `).join('')}
         </div>
     `;
 }

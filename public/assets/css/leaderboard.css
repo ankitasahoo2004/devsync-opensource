@@ -10,6 +10,16 @@
   --text-secondary: rgba(255, 255, 255, 0.7);
 }
 
+h3{
+  font-size: 2rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .section__title {
   font-size: 3.5rem;
   margin-bottom: 3rem;
@@ -173,6 +183,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  font-size: 1rem;
 }
 
 .trend {
@@ -294,6 +305,7 @@
 
 .user-info h4 {
   margin-bottom: 0.5rem;
+  font-size: 1rem;
 }
 
 .user-stats {
