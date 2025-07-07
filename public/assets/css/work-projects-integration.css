@@ -800,7 +800,9 @@ html[data-theme="light"] {
 .submit-button,
 .button,
 .expand-toggle {
-    background: linear-gradient(45deg, var(--devsync-primary), var(--devsync-primary-light));
+    background: linear-gradient(135deg, #8FD3F4, #C4E765, #FADB5D, #F0A3B9, #BCAEDC, #9ABFFB);
+    background-size: 400% 400%;
+    animation: smoothGradient 15s ease infinite;
     border: none;
     color: white;
     padding: 0.75rem 1.5rem;
@@ -817,6 +819,18 @@ html[data-theme="light"] {
     gap: 0.5rem;
     position: relative;
     overflow: hidden;
+}
+
+@keyframes smoothGradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
 }
 
 .submit-button:hover,

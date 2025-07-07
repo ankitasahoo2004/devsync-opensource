@@ -1484,6 +1484,10 @@ html.dark [faq-svg] path {
         font-size: clamp(1.2rem, 4vw, 2rem);
     }
 
+    .h-display{
+        font-size: 5em;
+    }
+
     .hud-nav-w {
         flex-wrap: wrap;
         gap: 0.5rem;
