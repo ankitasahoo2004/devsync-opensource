@@ -470,8 +470,8 @@ h3{
   z-index: -1;
 }
 
-/* Theme Integration for Services.html */
-/* Base variables that adapt to services.html theme */
+/* Theme Integration for leaderboard.html */
+/* Base variables that adapt to leaderboard.html theme */
 :root {
   --gradient-gold: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
   --gradient-silver: linear-gradient(135deg, #c0c0c0 0%, #a9a9a9 100%);
@@ -731,7 +731,7 @@ html.dark .leaderboard-section {
   }
 }
 
-/* Additional responsive design for services.html integration */
+/* Additional responsive design for leaderboard.html integration */
 @media screen and (max-width: 1200px) {
   .leaderboard-section {
     padding: 4rem 0;
