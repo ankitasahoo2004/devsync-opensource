@@ -180,7 +180,7 @@ if (!API_SECRET_KEY) {
 // Rate limiting middleware for API endpoints
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    max: 1000, // limit each IP to 1000 requests per windowMs
     message: {
         error: 'Too many requests from this IP',
         message: 'Please try again after 15 minutes'
@@ -192,7 +192,7 @@ const apiLimiter = rateLimit({
 // Stricter rate limiting for auth endpoints
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10, // limit each IP to 10 auth attempts per windowMs
+    max: 25, // limit each IP to 25 auth attempts per windowMs
     message: {
         error: 'Too many authentication attempts',
         message: 'Please try again after 15 minutes'
@@ -204,7 +204,7 @@ const authLimiter = rateLimit({
 // General rate limiter for public endpoints
 const publicLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 50, // limit each IP to 50 requests per windowMs for public endpoints
+    max: 500, // limit each IP to 500 requests per windowMs for public endpoints
     message: {
         error: 'Too many requests from this IP',
         message: 'Please try again after 15 minutes'
