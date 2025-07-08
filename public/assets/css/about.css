@@ -468,6 +468,15 @@ body {
     font-size: 1.0582010582010584vw;
 }
 
+.people-p {
+    font-size: 2rem;
+}
+
+.people-p-black {
+    font-size: 3rem;
+    color: var(--main-dark);
+}
+
 *,
 *:before,
 *:after {
