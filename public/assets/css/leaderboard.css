@@ -1028,3 +1028,18 @@ html.dark .leaderboard-section {
   font-size: 2rem;
   padding: 0.5rem;
 }
+
+@media screen and (max-width: 991px) {
+  .h-display {
+      font-size: 4rem
+64px
+;
+  }
+}
+
+.h-display {
+  text-transform: uppercase;
+  font-size: 9em;
+  font-weight: 400;
+  line-height: .8;
+}
