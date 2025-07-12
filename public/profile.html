@@ -61,6 +61,10 @@
 </script>
     <link rel="stylesheet" href="assets/css/profile.css">
 
+    <!-- Dynamic Asset Loader -->
+    <script src="assets/js/dynamic-asset-loader.js"></script>
+    <script src="assets/js/page-init.js"></script>
+
 
 
     <!-- user dev ob 
@@ -107,7 +111,7 @@
                     </a></div>
                 <div pointer-auto="" class="hud-nav-w">
                     <div class="hud-nav-flex">
-                        <div data-hide="tab"><a data-nav-tl="" stagger-el="" href="about.html" target="_blank"
+                        <div data-hide="tab"><a data-nav-tl="" stagger-el="" href="/about" target="_blank"
                                 class="page-link-w w-inline-block">
                                 <div class="o-hidden page-link-inner">
                                     <div split-text="" stagger-text="" class="text-small btn-txt">ABOUT US</div>
@@ -121,7 +125,7 @@
                                     <div class="link-track-fill"></div>
                                 </div>
                             </a></div>
-                        <div data-hide="tab"><a data-nav-tl="" stagger-el="" href="contact.html"
+                        <div data-hide="tab"><a data-nav-tl="" stagger-el="" href="/contact"
                                 class="page-link-w w-inline-block">
                                 <div class="o-hidden page-link-inner">
                                     <div split-text="" stagger-text="" class="text-small btn-txt">CONTACT US
@@ -179,7 +183,7 @@
                             </div>
                             <div class="o-hidden">
                                 <div class="o-hidden menu-l2">
-                                    <a stagger-el="" href="about.html" class="hud-menu-link w-inline-block">
+                                    <a stagger-el="" href="/about" class="hud-menu-link w-inline-block">
                                         <div class="o-hidden page-link-inner">
                                             <div split-text="" stagger-text="" class="text-small btn-txt">About Us</div>
                                             <div class="btn-icon-w">
@@ -194,7 +198,7 @@
                             </div>
                             <div class="o-hidden">
                                 <div class="o-hidden menu-l2">
-                                    <a stagger-el="" href="projects.html" class="hud-menu-link w-inline-block">
+                                    <a stagger-el="" href="/projects" class="hud-menu-link w-inline-block">
                                         <div class="o-hidden page-link-inner">
                                             <div split-text="" stagger-text="" class="text-small btn-txt">Project</div>
                                             <div class="btn-icon-w">
@@ -209,7 +213,7 @@
                             </div>
                             <div class="o-hidden">
                                 <div class="o-hidden menu-l2">
-                                    <a stagger-el="" href="events.html" class="hud-menu-link w-inline-block">
+                                    <a stagger-el="" href="/events" class="hud-menu-link w-inline-block">
                                         <div class="o-hidden page-link-inner">
                                             <div split-text="" stagger-text="" class="text-small btn-txt">Events</div>
                                             <div class="btn-icon-w">
@@ -224,7 +228,7 @@
                             </div>
                             <div class="o-hidden">
                                 <div class="o-hidden menu-l2">
-                                    <a stagger-el="" href="leaderboard.html" class="hud-menu-link w-inline-block">
+                                    <a stagger-el="" href="/leaderboard" class="hud-menu-link w-inline-block">
                                         <div class="o-hidden page-link-inner">
                                             <div split-text="" stagger-text="" class="text-small btn-txt">Leaderboard
                                             </div>
@@ -696,7 +700,7 @@
                                 </div>
                             </div>
                             <div btn-reveal="" class="page-btn-w hide-d">
-                                <div class="o-hidden is-flex"><a reveal-target="" stagger-el="" href="contact.html"
+                                <div class="o-hidden is-flex"><a reveal-target="" stagger-el="" href="/contact"
                                         class="btn-w is-large w-inline-block">
                                         <div class="btn-inner">
                                             <div class="o-hidden">
@@ -733,7 +737,7 @@
                                                 </a></div>
                                         </div>
                                         <div link-reveal="" class="o-hidden">
-                                            <div class="o-hidden"><a reveal-target="" stagger-el="" href="about.html"
+                                            <div class="o-hidden"><a reveal-target="" stagger-el="" href="/about"
                                                     class="page-link-w w-inline-block">
                                                     <div class="o-hidden page-link-inner">
                                                         <div split-text="" stagger-text="" class="text-small btn-txt">
@@ -748,7 +752,7 @@
                                                 </a></div>
                                         </div>
                                         <div link-reveal="" class="o-hidden">
-                                            <div class="o-hidden"><a reveal-target="" stagger-el="" href="projects.html"
+                                            <div class="o-hidden"><a reveal-target="" stagger-el="" href="/projects"
                                                     aria-current="page" class="page-link-w w-inline-block w--current">
                                                     <div class="o-hidden page-link-inner">
                                                         <div split-text="" stagger-text="" class="text-small btn-txt">
@@ -763,7 +767,7 @@
                                                 </a></div>
                                         </div>
                                         <div link-reveal="" class="o-hidden">
-                                            <div class="o-hidden"><a reveal-target="" stagger-el="" href="events.html"
+                                            <div class="o-hidden"><a reveal-target="" stagger-el="" href="/events"
                                                     aria-current="page" class="page-link-w w-inline-block w--current">
                                                     <div class="o-hidden page-link-inner">
                                                         <div split-text="" stagger-text="" class="text-small btn-txt">
@@ -778,8 +782,8 @@
                                                 </a></div>
                                         </div>
                                         <div link-reveal="" class="o-hidden">
-                                            <div class="o-hidden"><a reveal-target="" stagger-el=""
-                                                    href="leaderboard.html" class="page-link-w w-inline-block">
+                                            <div class="o-hidden"><a reveal-target="" stagger-el="" href="/leaderboard"
+                                                    class="page-link-w w-inline-block">
                                                     <div class="o-hidden page-link-inner">
                                                         <div split-text="" stagger-text="" class="text-small btn-txt">
                                                             Leaderboard</div>
@@ -793,7 +797,7 @@
                                                 </a></div>
                                         </div>
                                         <div link-reveal="" class="o-hidden">
-                                            <div class="o-hidden"><a reveal-target="" stagger-el="" href="contact.html"
+                                            <div class="o-hidden"><a reveal-target="" stagger-el="" href="/contact"
                                                     class="page-link-w w-inline-block">
                                                     <div class="o-hidden page-link-inner">
                                                         <div split-text="" stagger-text="" class="text-small btn-txt">

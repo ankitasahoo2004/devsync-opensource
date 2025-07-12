@@ -224,7 +224,7 @@ const requireApiKeyOrAuth = (req, res, next) => {
             message: 'API key not configured on server'
         });
     }
-    
+
     // Check if API key is provided and valid
     if (apiKey && apiKey === API_SECRET_KEY) {
         // Set a flag to indicate API key authentication
@@ -236,12 +236,12 @@ const requireApiKeyOrAuth = (req, res, next) => {
         };
         return next();
     }
-    
+
     // Check if user is authenticated via session
     if (req.isAuthenticated()) {
         return next();
     }
-    
+
     // Neither API key nor session authentication found
     return res.status(401).json({
         error: 'Unauthorized',
@@ -2075,6 +2075,39 @@ async function startServer() {
         const PORT = process.env.PORT || 3000;
 
         // Ensure all routes are registered before the catch-all
+
+        // Handle clean URLs - serve specific HTML files for clean routes
+        app.get('/about', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public', 'about.html'));
+        });
+
+        app.get('/projects', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public', 'projects.html'));
+        });
+
+        app.get('/events', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public', 'events.html'));
+        });
+
+        app.get('/leaderboard', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public', 'leaderboard.html'));
+        });
+
+        app.get('/profile', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+        });
+
+        app.get('/contact', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public', 'contact.html'));
+        });
+
+        app.get('/login', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public', 'login.html'));
+        });
+
+        app.get('/admin', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+        });
 
         // Catch-all route for SPA - must be LAST after ALL API routes
         // Added

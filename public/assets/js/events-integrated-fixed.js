@@ -25,17 +25,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const noEventsMessage = document.getElementById('noEventsMessage');
     const eventsLoading = document.getElementById('eventsLoading');
 
+    // Debug: Check if elements are found
+    console.log('DOM Elements Check:');
+    console.log('adminToggle:', adminToggle);
+    console.log('adminSection:', adminSection);
+    console.log('adminWelcome:', adminWelcome);
+    console.log('eventsGrid:', eventsGrid);
+
     // Initialize the events system
     init();
 
     async function init() {
+        console.log('Initializing events system...');
         showLoading();
         setupThemeDetection();
+        console.log('About to check admin status...');
         await checkAdminStatus();
+        console.log('Admin status check completed');
         await fetchEvents();
         setupEventListeners();
         renderEvents();
         hideLoading();
+        console.log('Events system initialization completed');
     }
 
     // Enhanced theme detection to work with site's global theme system
@@ -96,21 +107,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Admin Status Check
     async function checkAdminStatus() {
+        console.log('Starting admin status check...');
         try {
             const response = await fetch('/api/user', {
                 credentials: 'include'
             });
+            console.log('User fetch response status:', response.status);
+
+            if (!response.ok) {
+                console.log('User fetch failed with status:', response.status);
+                return;
+            }
+
             const data = await response.json();
+            console.log('User data:', data);
 
             if (data.isAuthenticated) {
                 currentUser = data.user;
+                console.log('User is authenticated:', data.user.username);
 
-                // Check if user is admin
-                const adminIds = ['ankitasahoo2004', 'Sayan-dev731', 'Shubham66020', 'NamanSoni18']; // From env
-                if (adminIds.includes(data.user.username)) {
-                    adminToggle.style.display = 'flex';
+                // Check if user is admin using hardcoded list for now
+                const adminIds = ['ankitasahoo2004', 'Sayan-dev731', 'Shubham66020', 'NamanSoni18'];
+                const isAdmin = adminIds.includes(data.user.username);
+                console.log('Is admin check:', isAdmin, 'for user:', data.user.username);
+
+                if (isAdmin) {
+                    console.log('Granting admin access...');
+                    if (adminToggle) {
+                        adminToggle.style.display = 'flex';
+                        console.log('Admin toggle button shown');
+                    } else {
+                        console.error('adminToggle element not found!');
+                    }
                     setupAdminPanel();
+                } else {
+                    console.log('Admin access denied - user not in admin list');
+                    if (adminToggle) {
+                        adminToggle.style.display = 'none';
+                    }
                 }
+            } else {
+                console.log('User is not authenticated');
             }
         } catch (error) {
             console.error('Error checking admin status:', error);
@@ -323,27 +360,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Admin Panel Setup
     function setupAdminPanel() {
+        console.log('Setting up admin panel...');
+
+        if (!adminWelcome) {
+            console.error('adminWelcome element not found');
+            return;
+        }
+
         adminWelcome.style.display = 'block';
+        console.log('Admin welcome panel displayed');
 
         // Setup admin event listeners
         const createEventBtn = document.getElementById('createEventBtn');
         const manageEventsBtn = document.getElementById('manageEventsBtn');
 
+        console.log('Create event button:', createEventBtn);
+        console.log('Manage events button:', manageEventsBtn);
+
         if (createEventBtn) {
-            createEventBtn.addEventListener('click', showCreateEventForm);
+            createEventBtn.addEventListener('click', () => {
+                console.log('Create event button clicked');
+                showCreateEventForm();
+            });
+        } else {
+            console.error('Create event button not found');
         }
 
         if (manageEventsBtn) {
-            manageEventsBtn.addEventListener('click', showManageEvents);
+            manageEventsBtn.addEventListener('click', () => {
+                console.log('Manage events button clicked');
+                showManageEvents();
+            });
+        } else {
+            console.error('Manage events button not found');
         }
     }
 
     function toggleAdminPanel() {
+        console.log('toggleAdminPanel called');
+        console.log('adminSection element:', adminSection);
+        console.log('adminSection display:', adminSection.style.display);
+
         if (adminSection.style.display === 'none' || !adminSection.style.display) {
             adminSection.style.display = 'block';
             adminSection.scrollIntoView({ behavior: 'smooth' });
+            console.log('Admin panel opened');
         } else {
             adminSection.style.display = 'none';
+            console.log('Admin panel closed');
         }
     }
 
@@ -760,15 +824,342 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.onclick = closePopup;
     }
 
-    // Admin Functions (simplified)
+    // Admin Functions - Full Implementation
     function showCreateEventForm() {
-        console.log('Create event form - feature available');
-        showToast('Event creation feature is available for admins', 'info');
+        console.log('showCreateEventForm called');
+
+        const eventManagement = document.getElementById('eventManagement');
+        if (!eventManagement) {
+            console.error('eventManagement element not found');
+            return;
+        }
+
+        console.log('Creating event form...');
+
+        eventManagement.innerHTML = `
+            <form id="eventForm" class="event-form">
+                <h4><i class='bx bx-calendar-plus'></i> Create New Event</h4>
+                
+                <div class="form-group">
+                    <label for="eventName">Event Name</label>
+                    <input type="text" id="eventName" required placeholder="Enter event name">
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="eventDate">Date</label>
+                        <input type="date" id="eventDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventTime">Time</label>
+                        <input type="time" id="eventTime" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventDescription">Description</label>
+                    <textarea id="eventDescription" rows="4" required placeholder="Enter event description"></textarea>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="eventType">Event Type</label>
+                        <select id="eventType" required>
+                            <option value="">Select type</option>
+                            <option value="workshop">Workshop</option>
+                            <option value="webinar">Webinar</option>
+                            <option value="hackathon">Hackathon</option>
+                            <option value="meetup">Meetup</option>
+                            <option value="conference">Conference</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventMode">Event Mode</label>
+                        <select id="eventMode" required>
+                            <option value="">Select mode</option>
+                            <option value="online">Online</option>
+                            <option value="offline">Offline</option>
+                            <option value="hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventSlots">Available Slots</label>
+                    <input type="number" id="eventSlots" min="1" required placeholder="Enter number of slots">
+                </div>
+
+                <div class="form-group">
+                    <label for="registerLink">Registration Link</label>
+                    <input type="url" id="registerLink" required placeholder="Enter registration link">
+                </div>
+
+                <div id="locationDetails"></div>
+
+                <div class="form-group">
+                    <label>Speakers/Mentors</label>
+                    <div id="speakersContainer">
+                        <div class="speaker-input">
+                            <input type="url" class="speaker-linkedin" placeholder="LinkedIn Profile URL" required>
+                            <button type="button" class="remove-speaker" title="Remove speaker"><i class='bx bx-x'></i></button>
+                        </div>
+                    </div>
+                    <button type="button" class="button button--small add-speaker" id="addSpeaker">
+                        <i class='bx bx-user-plus'></i> Add Speaker
+                    </button>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="button">
+                        <i class='bx bx-save'></i> Create Event
+                    </button>
+                    <button type="button" class="button button--ghost" id="cancelEventForm">
+                        <i class='bx bx-x'></i> Cancel
+                    </button>
+                </div>
+            </form>
+        `;
+
+        // Handle event mode change
+        const eventMode = document.getElementById('eventMode');
+        const locationDetails = document.getElementById('locationDetails');
+
+        eventMode.addEventListener('change', () => {
+            const mode = eventMode.value;
+            locationDetails.innerHTML = '';
+
+            if (mode === 'online' || mode === 'hybrid') {
+                locationDetails.innerHTML = `
+                    <div class="form-group">
+                        <label for="meetingLink">Meeting Link <span class="form-hint">(Will be hidden until 24h before event)</span></label>
+                        <input type="url" id="meetingLink" required placeholder="Enter meeting link">
+                        <small class="form-hint">This link will only be visible to attendees 24 hours before the event</small>
+                    </div>
+                `;
+            }
+            if (mode === 'offline' || mode === 'hybrid') {
+                locationDetails.innerHTML += `
+                    <div class="form-group">
+                        <label for="venue">Venue</label>
+                        <input type="text" id="venue" required placeholder="Enter venue name">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <textarea id="address" rows="2" required placeholder="Enter full address"></textarea>
+                    </div>
+                `;
+            }
+        });
+
+        // Handle add/remove speakers
+        const addSpeaker = document.getElementById('addSpeaker');
+        const speakersContainer = document.getElementById('speakersContainer');
+
+        addSpeaker.addEventListener('click', () => {
+            const speakerInput = document.createElement('div');
+            speakerInput.className = 'speaker-input';
+            speakerInput.innerHTML = `
+                <input type="url" class="speaker-linkedin" placeholder="LinkedIn Profile URL" required>
+                <button type="button" class="remove-speaker" title="Remove speaker"><i class='bx bx-x'></i></button>
+            `;
+            speakersContainer.appendChild(speakerInput);
+        });
+
+        speakersContainer.addEventListener('click', (e) => {
+            if (e.target.closest('.remove-speaker')) {
+                const speakerInput = e.target.closest('.speaker-input');
+                if (speakersContainer.children.length > 1) {
+                    speakerInput.remove();
+                }
+            }
+        });
+
+        // Handle form submission
+        const eventForm = document.getElementById('eventForm');
+        eventForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const mode = document.getElementById('eventMode').value;
+            const formData = {
+                name: document.getElementById('eventName').value,
+                date: document.getElementById('eventDate').value,
+                time: document.getElementById('eventTime').value,
+                description: document.getElementById('eventDescription').value,
+                type: document.getElementById('eventType').value,
+                mode: mode,
+                registerLink: document.getElementById('registerLink').value,
+                speakers: Array.from(document.querySelectorAll('.speaker-linkedin')).map(input => input.value),
+            };
+
+            // Add offline/hybrid specific fields
+            if (mode === 'offline' || mode === 'hybrid') {
+                formData.venue = document.getElementById('venue').value;
+                formData.address = document.getElementById('address').value;
+                formData.totalSlots = parseInt(document.getElementById('eventSlots').value);
+                formData.filledSlots = 0; // Initialize filled slots to 0
+            }
+
+            // Add online/hybrid specific fields
+            if (mode === 'online' || mode === 'hybrid') {
+                formData.meetingLink = document.getElementById('meetingLink')?.value || '';
+            }
+
+            try {
+                const response = await fetch('/api/events', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to create event');
+                }
+
+                showModal('success', 'Success', 'Event created successfully!');
+                eventForm.reset();
+                document.getElementById('locationDetails').innerHTML = ''; // Clear location details
+
+                // Refresh events list
+                await fetchEvents();
+                renderEvents();
+            } catch (error) {
+                console.error('Error creating event:', error);
+                showModal('error', 'Error', error.message || 'Failed to create event. Please try again.');
+            }
+        });
+
+        // Handle cancel button
+        document.getElementById('cancelEventForm').addEventListener('click', () => {
+            eventManagement.innerHTML = '';
+        });
     }
 
     async function showManageEvents() {
-        console.log('Manage events - feature available');
-        showToast('Event management feature is available for admins', 'info');
+        console.log('showManageEvents called');
+
+        const eventManagement = document.getElementById('eventManagement');
+        if (!eventManagement) {
+            console.error('eventManagement element not found');
+            return;
+        }
+
+        console.log('Loading events for management...');
+
+        try {
+            const response = await fetch('/api/events', {
+                credentials: 'include'
+            });
+            const events = await response.json();
+
+            eventManagement.innerHTML = `
+                <h4><i class='bx bx-calendar-edit'></i> Manage Events</h4>
+                <div id="eventsList">
+                    ${events.map(event => `
+                        <div class="admin-event-card" data-id="${event._id}">
+                            <div class="admin-event-header">
+                                <h3>${event.name}</h3>
+                                <button class="delete-event" data-id="${event._id}">
+                                    <i class='bx bx-trash'></i>
+                                </button>
+                            </div>
+                            <div class="admin-event-details">
+                                <span class="event-type">${event.type}</span>
+                                <span>${new Date(event.date).toLocaleDateString()}</span>
+                                <span>${event.mode}</span>
+                                ${event.mode !== 'online' ? `
+                                    <div class="slots-management">
+                                        <label>Slots:</label>
+                                        <input type="number" 
+                                               class="slots-input" 
+                                               value="${event.filledSlots || 0}"
+                                               min="0" 
+                                               max="${event.totalSlots}">
+                                        <span>/ ${event.totalSlots} slots</span>
+                                        <button class="update-slots button--small" data-id="${event._id}">
+                                            Update
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            // Add event listeners for slots management
+            const eventsList = document.getElementById('eventsList');
+            eventsList.addEventListener('click', async (e) => {
+                const updateBtn = e.target.closest('.update-slots');
+                const deleteBtn = e.target.closest('.delete-event');
+
+                if (updateBtn) {
+                    const eventId = updateBtn.dataset.id;
+                    const slotsInput = updateBtn.parentElement.querySelector('.slots-input');
+                    const newSlots = parseInt(slotsInput.value);
+
+                    console.log('Updating slots for event:', eventId, 'with slots:', newSlots);
+
+                    try {
+                        const response = await fetch(`/api/events/${eventId}/slots`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            credentials: 'include',
+                            body: JSON.stringify({ filledSlots: newSlots })
+                        });
+
+                        console.log('Response status:', response.status);
+                        console.log('Response headers:', response.headers);
+
+                        if (response.ok) {
+                            showModal('success', 'Success', 'Slots updated successfully!');
+                        } else {
+                            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                            console.error('Error response:', errorData);
+                            showModal('error', 'Error', `Failed to update slots: ${errorData.error || 'Unknown error'}`);
+                        }
+                    } catch (error) {
+                        console.error('Error updating slots:', error);
+                        showModal('error', 'Error', 'Failed to update slots');
+                    }
+                }
+
+                if (deleteBtn) {
+                    const eventId = deleteBtn.dataset.id;
+                    if (await showModal('confirm', 'Delete Event', 'Are you sure you want to delete this event?')) {
+                        try {
+                            const response = await fetch(`/api/events/${eventId}`, {
+                                method: 'DELETE',
+                                credentials: 'include'
+                            });
+
+                            if (response.ok) {
+                                showModal('success', 'Success', 'Event deleted successfully!');
+                                // Refresh the manage events view
+                                showManageEvents();
+                                // Refresh events list
+                                await fetchEvents();
+                                renderEvents();
+                            } else {
+                                showModal('error', 'Error', 'Failed to delete event');
+                            }
+                        } catch (error) {
+                            console.error('Error deleting event:', error);
+                            showModal('error', 'Error', 'Failed to delete event');
+                        }
+                    }
+                }
+            });
+
+        } catch (error) {
+            console.error('Error loading events:', error);
+            showModal('error', 'Error', 'Failed to load events');
+        }
     }
 
     // Utility Functions
@@ -848,6 +1239,63 @@ document.addEventListener('DOMContentLoaded', () => {
                     </button>
                 </div>
             `;
+        }
+    }
+
+    function showModal(type, title, message, callback) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        const overlay = document.createElement('div');
+        overlay.className = 'modal__overlay';
+
+        modal.innerHTML = `
+            <div class="modal__content">
+                <h3 class="modal__title">${title}</h3>
+                <p class="modal__message">${message}</p>
+                ${type === 'confirm' ? `
+                    <div class="modal__actions">
+                        <button class="modal__button modal__button--confirm">Confirm</button>
+                        <button class="modal__button modal__button--cancel">Cancel</button>
+                    </div>
+                ` : `
+                    <button class="modal__button modal__button--ok">OK</button>
+                `}
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+        document.body.appendChild(modal);
+
+        setTimeout(() => {
+            modal.classList.add('show');
+            overlay.classList.add('show');
+        }, 10);
+
+        const closeModal = () => {
+            modal.classList.remove('show');
+            overlay.classList.remove('show');
+            setTimeout(() => {
+                modal.remove();
+                overlay.remove();
+            }, 300);
+        };
+
+        if (type === 'confirm') {
+            return new Promise((resolve) => {
+                modal.querySelector('.modal__button--confirm').onclick = () => {
+                    closeModal();
+                    resolve(true);
+                };
+                modal.querySelector('.modal__button--cancel').onclick = () => {
+                    closeModal();
+                    resolve(false);
+                };
+            });
+        } else {
+            modal.querySelector('.modal__button--ok').onclick = () => {
+                closeModal();
+                if (callback) callback();
+            };
         }
     }
 

@@ -1,4 +1,4 @@
-/* DevSync Projects Integration with projects.html */
+/* DevSync Projects Integration with /projects */
 
 /* Server URL Configuration */
 :root {
@@ -89,7 +89,7 @@ html[data-theme="light"] {
     --devsync-gradient: linear-gradient(45deg, rgba(34, 197, 94, 0.8), rgba(34, 197, 94, 1));
 }
 
-/* Override and blend projects styles with projects.html aesthetic - fully transparent */
+/* Override and blend projects styles with /projects aesthetic - fully transparent */
 .devsync-projects-section {
     background: transparent !important;
     color: var(--devsync-text);
@@ -143,7 +143,7 @@ html[data-theme="light"] {
     line-height: 1.6;
 }
 
-/* Blend section title with projects.html typography */
+/* Blend section title with /projects typography */
 .devsync-projects-container .section__title {
     font-family: inherit;
     font-size: clamp(1.8rem, 4vw, 3rem);
@@ -741,7 +741,7 @@ html[data-theme="light"] {
     letter-spacing: 0.5px;
 }
 
-/* Form styling to match projects.html - transparent */
+/* Form styling to match /projects - transparent */
 .project-form {
     background: transparent;
     border: none;
@@ -823,13 +823,15 @@ html[data-theme="light"] {
 
 @keyframes smoothGradient {
     0% {
-      background-position: 0% 50%;
+        background-position: 0% 50%;
     }
+
     50% {
-      background-position: 100% 50%;
+        background-position: 100% 50%;
     }
+
     100% {
-      background-position: 0% 50%;
+        background-position: 0% 50%;
     }
 }
 
@@ -1559,7 +1561,9 @@ html[data-theme="light"] {
 }
 
 /* High DPI displays */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+
     .tech-chip,
     .summary-card,
     .user-card-compact {
@@ -2261,7 +2265,7 @@ html[data-theme="light"] {
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
-/* Complete transparency override for projects.html integration */
+/* Complete transparency override for /projects integration */
 .devsync-projects-section * {
     backdrop-filter: none !important;
 }
@@ -2275,7 +2279,7 @@ html[data-theme="light"] {
     box-shadow: none !important;
 }
 
-/* === FINAL TRANSPARENCY OVERRIDES FOR SEAMLESS projects.html INTEGRATION === */
+/* === FINAL TRANSPARENCY OVERRIDES FOR SEAMLESS /projects INTEGRATION === */
 
 /* Make all project-related containers completely transparent */
 .devsync-projects-section,

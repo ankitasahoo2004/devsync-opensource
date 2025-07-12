@@ -250,7 +250,7 @@ class EmailService {
                 recipientEmail: recipientEmail,
                 subject: subject,
                 message: message,
-                dashboardUrl: 'https://www.devsync.club/profile.html',
+                dashboardUrl: 'https://www.devsync.club/profile',
                 githubUrl: 'https://github.com/devsync-opensource',
                 websiteUrl: 'https://www.devsync.club',
                 discordUrl: 'https://discord.gg/vZnqjWaph8',

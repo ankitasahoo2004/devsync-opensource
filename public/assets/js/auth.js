@@ -295,13 +295,13 @@ function updateAuthButton(selector, data) {
                     </div>
                 `;
             }
-            button.href = 'profile.html';
+            button.href = '/profile';
             button.classList.add('authenticated', 'auth-button');
 
             // Add click event listener to ensure redirect works
             button.onclick = function (e) {
                 e.preventDefault();
-                window.location.href = 'profile.html';
+                window.location.href = '/profile';
             };
         } else {
             // Keep the login button
@@ -380,13 +380,13 @@ function updateCtaButton(selector, data) {
             <div class="btn-bg-w">
                 <div class="btn-bg-fill"></div>
             </div>        `;
-        button.href = 'profile.html';
+        button.href = '/profile';
         button.classList.add('cta-auth-welcome');
 
         // Add click event listener to ensure redirect works
         button.onclick = function (e) {
             e.preventDefault();
-            window.location.href = 'profile.html';
+            window.location.href = '/profile';
         };
     } else {
         // Keep the "Join DevSync" button

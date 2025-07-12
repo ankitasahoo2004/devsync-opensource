@@ -1,5 +1,5 @@
 // DevSync Projects Integration Configuration
-// This script ensures proper initialization of projects functionality within projects.html
+// This script ensures proper initialization of projects functionality within /projects
 
 document.addEventListener('DOMContentLoaded', function () {
     // Set server URL based on environment

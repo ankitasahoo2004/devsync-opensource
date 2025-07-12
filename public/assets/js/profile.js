@@ -23,7 +23,7 @@ async function fetchUserProfile() {
         const data = await response.json();
 
         if (!data.isAuthenticated) {
-            window.location.href = 'login.html';
+            window.location.href = '/login';
             return;
         }
 

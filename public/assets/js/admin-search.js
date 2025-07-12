@@ -520,7 +520,7 @@ class AdminSearch {
 
     navigateToEvents() {
         // Navigate to events page
-        window.location.href = 'events.html';
+        window.location.href = '/events';
     }
 }
 

@@ -475,7 +475,7 @@ class GlobalSearch {
 
     navigateToUser(username) {
         // Navigate to user profile or leaderboard with user highlighted
-        window.location.href = `/leaderboard.html#${username}`;
+        window.location.href = `/leaderboard#${username}`;
     }
 
     navigateToProject(url) {

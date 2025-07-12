@@ -1,158 +1,210 @@
-/*=============== SHOW MENU ===============*/
-const navMenu = document.getElementById('nav-menu'),
-    navToggle = document.getElementById('nav-toggle'),
-    navClose = document.getElementById('nav-close')
+/*=============== MAIN INITIALIZATION ===============*/
+document.addEventListener('DOMContentLoaded', function () {
+    initializeNavigation();
+    initializeSwipers();
+    initializeScrollEffects();
+    initializePageTransitions();
+    initializeScrollReveal();
+});
 
-if (navToggle && navMenu) {
+/*=============== NAVIGATION INITIALIZATION ===============*/
+function initializeNavigation() {
+    const navMenu = document.getElementById('nav-menu');
+    const navToggle = document.getElementById('nav-toggle');
+    const navClose = document.getElementById('nav-close');
+    const navLinks = document.querySelectorAll('.nav__link');
 
-    navToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        navMenu.classList.toggle('show-menu');
-    });
-}
-
-// Hide menu when clicking outside
-document.addEventListener('click', (e) => {
-    if (navMenu && navMenu.classList.contains('show-menu')) {
-        if (!e.target.closest('.nav__menu') && !e.target.closest('#nav-toggle')) {
-            navMenu.classList.remove('show-menu');
-        }
+    // Show menu toggle
+    if (navToggle && navMenu) {
+        navToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navMenu.classList.toggle('show-menu');
+        });
     }
-});
 
-// Close menu when clicking nav links
-const navLinks = document.querySelectorAll('.nav__link');
-navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        if (navMenu) navMenu.classList.remove('show-menu');
-    });
-});
-
-if (navClose && navMenu) {
-    navClose.addEventListener('click', () => {
-        navMenu.classList.remove('show-menu');
-    });
-}
-
-/*=============== HOME SWIPER ===============*/
-new Swiper(".home-swiper", {
-    spaceBetween: 30,
-    loop: true,
-    pagination: {
-        el: ".swiper-pagination",
-        clickable: true,
-    },
-});
-
-/*=============== CHANGE BACKGROUND HEADER ===============*/
-function scrollHeader() {
-    const nav = document.querySelector('.nav');
-    if (window.scrollY >= 50) {
-        nav.classList.add('scroll-header');
-    } else {
-        nav.classList.remove('scroll-header');
-    }
-}
-window.addEventListener('scroll', scrollHeader);
-
-/*=============== NEW SWIPER ===============*/
-new Swiper(".new-swiper", {
-    centeredSlides: true,
-    slidesPerView: "auto",
-    loop: true,
-    spaceBetween: 16,
-});
-
-/*=============== TEAM SWIPER ===============*/
-new Swiper(".team-swiper", {
-    loop: true,
-    grabCursor: true,
-    spaceBetween: 32,
-    pagination: {
-        el: ".swiper-pagination",
-        clickable: true,
-    },
-    autoplay: {
-        delay: 3500,
-        disableOnInteraction: false,
-    }
-});
-
-/*=============== SCROLL SECTIONS ACTIVE LINK ===============*/
-const sections = document.querySelectorAll('section[id]');
-function scrollActive() {
-    const scrollY = window.pageYOffset;
-
-    sections.forEach(current => {
-        const sectionHeight = current.offsetHeight,
-            sectionTop = current.offsetTop - 58,
-            sectionId = current.getAttribute('id');
-
-        const link = document.querySelector('.nav__menu a[href*=' + sectionId + ']');
-        if (link) {
-            if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-                link.classList.add('active-link');
-            } else {
-                link.classList.remove('active-link');
+    // Hide menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (navMenu && navMenu.classList.contains('show-menu')) {
+            if (!e.target.closest('.nav__menu') && !e.target.closest('#nav-toggle')) {
+                navMenu.classList.remove('show-menu');
             }
         }
     });
-}
-window.addEventListener('scroll', scrollActive);
 
-/*=============== SHOW SCROLL UP ===============*/
-function scrollUp() {
-    const scrollUp = document.getElementById('scroll-up');
-    if (scrollUp) {
-        if (window.scrollY >= 460) scrollUp.classList.add('show-scroll');
-        else scrollUp.classList.remove('show-scroll');
+    // Close menu when clicking nav links
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (navMenu) navMenu.classList.remove('show-menu');
+        });
+    });
+
+    // Close menu button
+    if (navClose && navMenu) {
+        navClose.addEventListener('click', () => {
+            navMenu.classList.remove('show-menu');
+        });
     }
 }
-window.addEventListener('scroll', scrollUp);
 
-/*=============== PAGE TRANSITIONS ===============*/
-const transition = document.querySelector('.page-transition');
-const content = document.querySelector('.main');
-if (transition && content) {
-    transition.classList.add('show');
-    content.style.opacity = '0';
+/*=============== SWIPER INITIALIZATION ===============*/
+function initializeSwipers() {
+    // Check if Swiper is available
+    if (typeof Swiper === 'undefined') {
+        console.warn('Swiper is not loaded');
+        return;
+    }
 
-    setTimeout(() => {
-        transition.classList.remove('show');
-        content.style.opacity = '1';
-    }, 2000);
+    // Home Swiper
+    const homeSwiper = document.querySelector('.home-swiper');
+    if (homeSwiper) {
+        new Swiper(".home-swiper", {
+            spaceBetween: 30,
+            loop: true,
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+        });
+    }
+
+    // New Swiper
+    const newSwiper = document.querySelector('.new-swiper');
+    if (newSwiper) {
+        new Swiper(".new-swiper", {
+            centeredSlides: true,
+            slidesPerView: "auto",
+            loop: true,
+            spaceBetween: 16,
+        });
+    }
+
+    // Team Swiper
+    const teamSwiper = document.querySelector('.team-swiper');
+    if (teamSwiper) {
+        new Swiper(".team-swiper", {
+            loop: true,
+            grabCursor: true,
+            spaceBetween: 32,
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+            autoplay: {
+                delay: 3500,
+                disableOnInteraction: false,
+            }
+        });
+    }
 }
 
-navLinks.forEach(link => {
-    link.addEventListener('click', e => {
-        const href = link.getAttribute('href');
-        if (!href || href.startsWith('#')) return;
-
-        e.preventDefault();
-        if (transition && content) {
-            transition.classList.add('show');
-            content.style.opacity = '0';
-
-            setTimeout(() => {
-                window.location.href = href;
-            }, 500);
+/*=============== SCROLL EFFECTS INITIALIZATION ===============*/
+function initializeScrollEffects() {
+    // Change background header
+    function scrollHeader() {
+        const nav = document.querySelector('.nav');
+        if (nav) {
+            if (window.scrollY >= 50) {
+                nav.classList.add('scroll-header');
+            } else {
+                nav.classList.remove('scroll-header');
+            }
         }
+    }
+    window.addEventListener('scroll', scrollHeader);
+
+    // Scroll sections active link
+    const sections = document.querySelectorAll('section[id]');
+    function scrollActive() {
+        if (sections.length === 0) return;
+
+        const scrollY = window.pageYOffset;
+
+        sections.forEach(current => {
+            const sectionHeight = current.offsetHeight;
+            const sectionTop = current.offsetTop - 58;
+            const sectionId = current.getAttribute('id');
+
+            const link = document.querySelector('.nav__menu a[href*=' + sectionId + ']');
+            if (link) {
+                if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                    link.classList.add('active-link');
+                } else {
+                    link.classList.remove('active-link');
+                }
+            }
+        });
+    }
+    window.addEventListener('scroll', scrollActive);
+
+    // Show scroll up button
+    function scrollUp() {
+        const scrollUpBtn = document.getElementById('scroll-up');
+        if (scrollUpBtn) {
+            if (window.scrollY >= 460) {
+                scrollUpBtn.classList.add('show-scroll');
+            } else {
+                scrollUpBtn.classList.remove('show-scroll');
+            }
+        }
+    }
+    window.addEventListener('scroll', scrollUp);
+}
+
+/*=============== PAGE TRANSITIONS INITIALIZATION ===============*/
+function initializePageTransitions() {
+    const transition = document.querySelector('.page-transition');
+    const content = document.querySelector('.main');
+    const navLinks = document.querySelectorAll('.nav__link');
+
+    if (transition && content) {
+        transition.classList.add('show');
+        content.style.opacity = '0';
+
+        setTimeout(() => {
+            transition.classList.remove('show');
+            content.style.opacity = '1';
+        }, 2000);
+    }
+
+    // Handle nav link transitions
+    navLinks.forEach(link => {
+        link.addEventListener('click', e => {
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#')) return;
+
+            e.preventDefault();
+            if (transition && content) {
+                transition.classList.add('show');
+                content.style.opacity = '0';
+
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 500);
+            }
+        });
     });
-});
+}
 
-/*=============== SCROLL REVEAL ANIMATION ===============*/
-const sr = ScrollReveal({
-    origin: 'top',
-    distance: '60px',
-    duration: 2500,
-    delay: 400,
-});
+/*=============== SCROLL REVEAL INITIALIZATION ===============*/
+function initializeScrollReveal() {
+    if (typeof ScrollReveal === 'undefined') {
+        console.warn('ScrollReveal is not loaded');
+        return;
+    }
 
-sr.reveal(`.home-swiper, .new-swiper, .newsletter__container`);
+    const sr = ScrollReveal({
+        origin: 'top',
+        distance: '60px',
+        duration: 2500,
+        delay: 400,
+    });
+
+    sr.reveal(`.home-swiper, .new-swiper, .newsletter__container`);
+}
 
 /*=============== GLOBAL SEARCH HINT ===============*/
-// Show search hint to users
-document.addEventListener('DOMContentLoaded', () => {
+// Initialize search hint functionality
+function initializeSearchHint() {
     // Check authentication status when page loads
     if (typeof checkAuthStatus === 'function') {
         checkAuthStatus();
@@ -165,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('searchHintShown', 'true');
         }, 3000);
     }
-});
+}
 
 function showSearchHint() {
     const hint = document.createElement('div');
@@ -205,6 +257,9 @@ function showSearchHint() {
     }, 5000);
 }
 
+// Initialize search hint when DOM is ready
+document.addEventListener('DOMContentLoaded', initializeSearchHint);
+
 // Add CSS for hint animations
 const hintStyle = document.createElement('style');
 hintStyle.textContent = `
@@ -237,6 +292,11 @@ function updateNavigation() {
     const nav = document.querySelector('.nav__list');
     const navButtons = document.querySelector('.nav__buttons');
 
+    if (!nav || !navButtons) {
+        console.warn('Navigation elements not found');
+        return;
+    }
+
     fetch('/api/user')
         .then(res => res.json())
         .then(user => {
@@ -257,9 +317,9 @@ function updateNavigation() {
                 }
 
                 // Replace the login button in nav__buttons with profile link
-                const loginButton = navButtons.querySelector('a[href="login.html"]');
+                const loginButton = navButtons.querySelector('a[href="/login"]');
                 if (loginButton) {
-                    loginButton.href = "profile.html";
+                    loginButton.href = "/profile";
                     loginButton.className = "nav__profile";
                     loginButton.innerHTML = `
                         <img src="${profileImg}" alt="Profile" class="nav__profile-img">
@@ -268,37 +328,67 @@ function updateNavigation() {
             }
         }).catch(err => console.error('Error fetching user data:', err));
 }
-updateNavigation();
+
+// Initialize navigation update when DOM is ready
+document.addEventListener('DOMContentLoaded', updateNavigation);
 
 /*=============== PROFILE PAGE LOADER ===============*/
-if (window.location.pathname === '/profile') {
+function initializeProfilePage() {
+    if (window.location.pathname !== '/profile') return;
+
+    const profileImg = document.getElementById('profile-img');
+    const profileName = document.getElementById('profile-name');
+    const profileBio = document.getElementById('profile-bio');
+    const leaderboardList = document.getElementById('leaderboard-list');
+
+    // Load user profile data
     fetch('/api/user')
         .then(res => res.json())
         .then(user => {
-            document.getElementById('profile-img').src = user.photos[0].value;
-            document.getElementById('profile-name').textContent = user.displayName;
-            document.getElementById('profile-bio').textContent = user._json.bio || '';
-        });
+            if (user.error) {
+                console.error('User not authenticated');
+                return;
+            }
 
+            if (profileImg && user.photos && user.photos[0]) {
+                profileImg.src = user.photos[0].value;
+            }
+            if (profileName && user.displayName) {
+                profileName.textContent = user.displayName;
+            }
+            if (profileBio && user._json && user._json.bio) {
+                profileBio.textContent = user._json.bio;
+            }
+        })
+        .catch(err => console.error('Error loading profile:', err));
+
+    // Load leaderboard data
     fetch('/api/leaderboard')
         .then(res => res.json())
         .then(data => {
-            const leaderboardList = document.getElementById('leaderboard-list');
-            leaderboardList.innerHTML = data.map(user => `
+            if (leaderboardList && Array.isArray(data)) {
+                leaderboardList.innerHTML = data.map(user => `
                     <div class="leaderboard__item">
-                        <span class="leaderboard__rank">#${user.rank}</span>
-                        <img src="${user.avatar}" alt="${user.username}" class="leaderboard__img">
+                        <span class="leaderboard__rank">#${user.rank || 'N/A'}</span>
+                        <img src="${user.avatar || 'assets/img/default-avatar.png'}" alt="${user.username || 'Unknown'}" class="leaderboard__img">
                         <div class="leaderboard__info">
-                            <h3>${user.username}</h3>
-                            <p>${user.contributions} contributions</p>
+                            <h3>${user.username || 'Unknown User'}</h3>
+                            <p>${user.contributions || 0} contributions</p>
                         </div>
                     </div>
                 `).join('');
-        });
+            }
+        })
+        .catch(err => console.error('Error loading leaderboard:', err));
 }
 
+// Initialize profile page when DOM is ready
+document.addEventListener('DOMContentLoaded', initializeProfilePage);
+
 /*=============== REDIRECT POPUP ===============*/
-if (window.location.hostname === 'devsync-opensource.tech') {
+function initializeRedirectPopup() {
+    if (window.location.hostname !== 'devsync-opensource.tech') return;
+
     const createRedirectPopup = () => {
         const popup = document.createElement('div');
         popup.className = 'redirect-popup';
@@ -320,12 +410,23 @@ if (window.location.hostname === 'devsync-opensource.tech') {
                 <button class="redirect-now">Go now</button>
             </div>
         `;
-        document.body.appendChild(popup);
+
+        if (document.body) {
+            document.body.appendChild(popup);
+        } else {
+            console.error('Document body not available');
+            return;
+        }
 
         // Start countdown
         let count = 3;
         const countdownElement = popup.querySelector('.countdown');
         const progressBar = popup.querySelector('.progress-bar');
+
+        if (!countdownElement || !progressBar) {
+            console.error('Popup elements not found');
+            return;
+        }
 
         const countdown = setInterval(() => {
             count--;
@@ -339,13 +440,19 @@ if (window.location.hostname === 'devsync-opensource.tech') {
         }, 1000);
 
         // Immediate redirect button
-        popup.querySelector('.redirect-now').onclick = () => {
-            clearInterval(countdown);
-            window.location.href = 'https://www.devsync.club';
-        };
+        const redirectBtn = popup.querySelector('.redirect-now');
+        if (redirectBtn) {
+            redirectBtn.onclick = () => {
+                clearInterval(countdown);
+                window.location.href = 'https://www.devsync.club';
+            };
+        }
 
         setTimeout(() => popup.classList.add('show'), 100);
     };
 
     createRedirectPopup();
 }
+
+// Initialize redirect popup when DOM is ready
+document.addEventListener('DOMContentLoaded', initializeRedirectPopup);

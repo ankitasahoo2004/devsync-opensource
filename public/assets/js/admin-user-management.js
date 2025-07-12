@@ -1008,7 +1008,7 @@ class UserManagement {
                         message: message,
                         recipientEmail: email,
                         recipientName: username,
-                        dashboardUrl: `${window.location.origin}/profile.html`,
+                        dashboardUrl: `${window.location.origin}/profile`,
                         githubUrl: 'https://github.com/devsync-opensource',
                         websiteUrl: window.location.origin,
                         discordUrl: 'https://discord.gg/vZnqjWaph8',
