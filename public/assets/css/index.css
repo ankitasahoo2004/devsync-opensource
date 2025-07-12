@@ -1600,3 +1600,36 @@ html.dark [faq-svg] path {
     grid-template-columns: 1fr 1fr;
     padding-left: 3em;
 }
+
+/* Remove hover effects from card text elements */
+.recognition-card:hover .card-name,
+.recognition-card:hover .card-title,
+.recognition-card:hover .card-badge {
+    transform: none;
+}
+
+.card-name,
+.card-title,
+.card-badge {
+    transition: none;
+}
+
+/* Keep only the card container hover effect */
+.recognition-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary-color);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+html.light .recognition-card:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Keep image hover effect but remove text transforms */
+.recognition-card:hover .card-image {
+    border-color: var(--primary-color);
+}
+
+.recognition-card:hover .card-image img {
+    transform: scale(1.1);
+}
