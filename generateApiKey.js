@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 /**
  * Generate a secure API key for the DevSync application
- * 
  * Usage: node generateApiKey.js
  */
 
