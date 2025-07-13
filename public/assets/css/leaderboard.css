@@ -24,7 +24,7 @@ h3 {
   font-size: 3.5rem;
   margin-bottom: 3rem;
   text-align: center;
-  background: linear-gradient(135deg, #FF3366, #FF6B6B, #E95060, #e51837);
+  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -492,15 +492,23 @@ html.light .leaderboard-section {
   --text-secondary: rgba(0, 0, 0, 0.7);
 }
 
+html.light .leaderboard-section h3 {
+  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--text-primary);
+}
+
 html.light .leaderboard-section .section__title {
-  background: linear-gradient(135deg, #FF3366, #FF6B6B, #E95060, #e51837);
+  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 html.light .leaderboard-section .stat h3 {
-  background: linear-gradient(135deg, #ff6b6b, #feca57);
+  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -514,6 +522,60 @@ html.light .leaderboard-section .search-input {
   color: var(--text-primary);
 }
 
+/* Enhanced light mode gradient text support */
+html[data-theme="light"] .leaderboard-section h3,
+[data-theme="light"] .leaderboard-section h3,
+.light .leaderboard-section h3 {
+  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--text-primary);
+}
+
+html[data-theme="light"] .leaderboard-section .section__title,
+[data-theme="light"] .leaderboard-section .section__title,
+.light .leaderboard-section .section__title {
+  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html[data-theme="light"] .leaderboard-section .stat h3,
+[data-theme="light"] .leaderboard-section .stat h3,
+.light .leaderboard-section .stat h3 {
+  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Auto-detect light mode */
+@media (prefers-color-scheme: light) {
+  :root:not(.dark):not([data-theme="dark"]) .leaderboard-section h3 {
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
+  }
+  
+  :root:not(.dark):not([data-theme="dark"]) .leaderboard-section .section__title {
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  :root:not(.dark):not([data-theme="dark"]) .leaderboard-section .stat h3 {
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
 /* Dark theme adaptation */
 html.dark .leaderboard-section {
   --card-bg: rgba(255, 255, 255, 0.05);
@@ -521,6 +583,61 @@ html.dark .leaderboard-section {
   --hover-bg: rgba(255, 255, 255, 0.1);
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
+}
+
+/* Dark mode gradient styling */
+html.dark .leaderboard-section .section__title,
+html[data-theme="dark"] .leaderboard-section .section__title,
+[data-theme="dark"] .leaderboard-section .section__title,
+.dark .leaderboard-section .section__title {
+  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html.dark .leaderboard-section h3,
+html[data-theme="dark"] .leaderboard-section h3,
+[data-theme="dark"] .leaderboard-section h3,
+.dark .leaderboard-section h3 {
+  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html.dark .leaderboard-section .stat h3,
+html[data-theme="dark"] .leaderboard-section .stat h3,
+[data-theme="dark"] .leaderboard-section .stat h3,
+.dark .leaderboard-section .stat h3 {
+  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Auto-detect dark mode */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light):not([data-theme="light"]) .leaderboard-section .section__title {
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  :root:not(.light):not([data-theme="light"]) .leaderboard-section h3 {
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  :root:not(.light):not([data-theme="light"]) .leaderboard-section .stat h3 {
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 /* Ensure leaderboard section blends with services theme */
@@ -1031,13 +1148,6 @@ html.dark .leaderboard-section {
 
 @media screen and (max-width: 991px) {
   .h-display {
-    font-size: 4rem 64px;
+    font-size: 4rem;
   }
-}
-
-.h-display {
-  text-transform: uppercase;
-  font-size: 9em;
-  font-weight: 400;
-  line-height: .8;
 }
