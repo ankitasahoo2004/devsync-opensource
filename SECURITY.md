@@ -216,9 +216,9 @@ This security policy is reviewed and updated regularly. Changes will be:
 
 For security-related questions or concerns:
 
-- **Security Team**: [sayan.karmakar.dev@gmail.com](mailto:sayan.karmakar.dev@gmail.com)
+- **Security Team**: [sayan.karmakar@devsync.club](mailto:sayan.karmakar@devsync.club)
 - **General Inquiries**: Create an issue in the repository (non-security related only)
-- **Emergency Contact**: [ankita.sahoo.dev@gmail.com](mailto:ankita.sahoo.dev@gmail.com)
+- **Emergency Contact**: [ankita.sahoo@devsync.club](mailto:ankita.sahoo@devsync.club)
 
 ## Legal
 
