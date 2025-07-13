@@ -148,6 +148,8 @@ Different endpoints have different rate limits:
 5. **Audit Access** - Monitor API key usage and access logs
 6. **Principle of Least Privilege** - Only share keys with authorized team members
 
+For comprehensive security guidelines, please refer to our [Security Policy](SECURITY.md).
+
 ## Testing API Access
 
 Check if your API key is working:
