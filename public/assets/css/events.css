@@ -1168,7 +1168,7 @@
 }
 
 .view-btn.active {
-    background: #e51837;
+    background: white;
     color: var(--white-color);
 }
 

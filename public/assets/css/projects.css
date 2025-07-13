@@ -239,7 +239,7 @@
 .auth-prompt h3 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
-  background: #e51837;
+  background: white;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -468,9 +468,9 @@
 }
 
 .tab-button.active {
-  background: #e51837;
+  background: white;
   color: #fff;
-  border-color: #e51837;
+  border-color: white;
 }
 
 .tab-content {
