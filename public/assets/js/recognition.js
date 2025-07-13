@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="recognition-header">
                 <h2 class="recognition-title">Recognition & Awards</h2>
                 <p class="recognition-subtitle">
-                    Celebrating the outstanding contributors who have made significant impact in our community
+                    Shouting out the student stars who don’t just contribute they lead, build, and spark the DevSync vibe.
                 </p>
             </div>
             <div class="recognition-grid">
