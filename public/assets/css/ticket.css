@@ -1,10 +1,12 @@
 /* Ticket Management Styles - Modern Black Theme */
 .ticket-section {
-    padding: 6rem 0 4rem;
+    padding: 4rem 2rem 4rem;
     min-height: 100vh;
     /* background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d1421 100%); */
     position: relative;
     overflow: hidden;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .ticket-section::before {
@@ -21,15 +23,16 @@
 
 .section-header {
     text-align: center;
-    margin-bottom: 4rem;
+    margin-bottom: 2.5rem;
     position: relative;
     z-index: 2;
+    padding: 0 1rem;
 }
 
 .section__title {
     font-size: 3.5rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #ffffff 0%, #e51837 50%, #667eea 100%);
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -48,29 +51,31 @@
 .ticket-tabs {
     display: flex;
     justify-content: center;
-    gap: 1.5rem;
-    margin-bottom: 4rem;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
     flex-wrap: wrap;
     position: relative;
     z-index: 2;
+    padding: 0 1rem;
 }
 
 .tab-btn {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.9);
-    padding: 1.2rem 2.5rem;
+    padding: 1rem 2rem;
     border-radius: 16px;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     gap: 0.7rem;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     backdrop-filter: blur(20px);
     position: relative;
     overflow: hidden;
+    min-width: auto;
 }
 
 .tab-btn::before {
@@ -96,10 +101,10 @@
 }
 
 .tab-btn.active {
-    background: linear-gradient(135deg, #e51837, #ff4569);
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
     color: #ffffff;
-    border-color: #e51837;
-    box-shadow: 0 15px 35px rgba(229, 24, 55, 0.3);
+    border-color: #bcaedc;
+    box-shadow: 0 15px 35px rgba(188, 174, 220, 0.3);
 }
 
 .tab-btn i {
@@ -112,12 +117,13 @@
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 24px;
-    padding: 3rem;
+    padding: 2rem;
     backdrop-filter: blur(20px);
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
     position: relative;
     z-index: 2;
     animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0 1rem;
 }
 
 .tab-content.active {
@@ -139,19 +145,24 @@
 /* Auth Messages */
 .auth-message {
     text-align: center;
-    padding: 4rem 3rem;
+    padding: 3rem 2rem;
     background: linear-gradient(135deg, rgba(229, 24, 55, 0.1), rgba(102, 126, 234, 0.1));
     border: 1px solid rgba(229, 24, 55, 0.2);
     border-radius: 20px;
     color: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(20px);
+    margin: 0 auto;
+    max-width: 600px;
 }
 
 .auth-message i {
     font-size: 4rem;
     margin-bottom: 1.5rem;
     display: block;
-    color: #e51837;
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .auth-message p {
@@ -160,7 +171,10 @@
 }
 
 .auth-message a {
-    color: #e51837;
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     text-decoration: none;
     font-weight: 700;
     transition: all 0.3s ease;
@@ -168,17 +182,18 @@
 }
 
 .auth-message a:hover {
-    border-bottom-color: #e51837;
+    border-bottom-color: #bcaedc;
 }
 
 /* Form Styles */
 .ticket-form {
-    max-width: 900px;
+    max-width: 800px;
     margin: 0 auto;
+    padding: 0 1rem;
 }
 
 .form-group {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .form-group label {
@@ -213,23 +228,24 @@
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #e51837;
+    border-color: #bcaedc;
     background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 3px rgba(229, 24, 55, 0.1);
+    box-shadow: 0 0 0 3px rgba(188, 174, 220, 0.1);
     transform: translateY(-1px);
 }
 
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .form-actions {
     display: flex;
-    gap: 1.5rem;
+    gap: 1rem;
     justify-content: center;
-    margin-top: 3rem;
+    margin-top: 2rem;
+    padding: 0 1rem;
 }
 
 .button {
@@ -249,13 +265,13 @@
 }
 
 .button:not(.button--ghost) {
-    background: linear-gradient(135deg, #e51837, #ff4569);
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
     color: white;
 }
 
 .button:not(.button--ghost):hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 35px rgba(229, 24, 55, 0.3);
+    box-shadow: 0 15px 35px rgba(188, 174, 220, 0.3);
 }
 
 .button--ghost {
@@ -1832,4 +1848,256 @@
 
 .modal-body::-webkit-scrollbar-thumb:hover {
     background: #ff4569;
+}
+
+/* Light mode text colors for ticket section */
+html.light .section__subtitle {
+    color: rgba(0, 0, 0, 0.8) !important;
+}
+
+html.light .tab-btn {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+html.light .auth-message {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+html.light .auth-message p {
+    color: rgba(0, 0, 0, 0.8) !important;
+}
+
+html.light .ticket-form label {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+html.light .form-group input,
+html.light .form-group select,
+html.light .form-group textarea {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+html.light .form-group input::placeholder,
+html.light .form-group textarea::placeholder {
+    color: rgba(0, 0, 0, 0.5) !important;
+}
+
+html.light .button--ghost {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+html.light .tickets-header h3 {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+html.light .tickets-stats span {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+/* Additional light mode text styles for ticket section */
+html.light .tab-content {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+html.light .tab-content h2,
+html.light .tab-content h3,
+html.light .tab-content h4 {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+html.light .tab-content p {
+    color: rgba(0, 0, 0, 0.8) !important;
+}
+
+html.light .tab-content label {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+html.light .ticket-list-item {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+html.light .ticket-title {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+html.light .ticket-description {
+    color: rgba(0, 0, 0, 0.7) !important;
+}
+
+html.light .ticket-status {
+    color: rgba(0, 0, 0, 0.8) !important;
+}
+
+html.light .priority-badge {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+html.light .ticket-date {
+    color: rgba(0, 0, 0, 0.6) !important;
+}
+
+html.light .empty-state {
+    color: rgba(0, 0, 0, 0.7) !important;
+}
+
+html.light .empty-state h3 {
+    color: rgba(0, 0, 0, 0.9) !important;
+}
+
+html.light .empty-state p {
+    color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Responsive Design Fixes */
+@media (max-width: 768px) {
+    .ticket-section {
+        padding: 2rem 1rem;
+    }
+    
+    .section-header {
+        margin-bottom: 2rem;
+        padding: 0 0.5rem;
+    }
+    
+    .section__title {
+        font-size: 2.5rem;
+    }
+    
+    .section__subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .ticket-tabs {
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+        padding: 0 0.5rem;
+    }
+    
+    .tab-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+        min-width: 140px;
+    }
+    
+    .tab-content {
+        padding: 1.5rem;
+        margin: 0 0.5rem;
+        border-radius: 16px;
+    }
+    
+    .auth-message {
+        padding: 2rem 1.5rem;
+        margin: 0;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .tickets-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+    }
+    
+    .tickets-stats {
+        justify-content: center;
+    }
+    
+    .tickets-filters {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .admin-filters {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .admin-filters input,
+    .admin-filters select {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .admin-stats {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+    
+    .admin-stat-card {
+        padding: 1.5rem;
+    }
+    
+    .admin-ticket-card {
+        padding: 1.5rem;
+    }
+    
+    .admin-ticket-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .status-select,
+    .action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .ticket-section {
+        padding: 1.5rem 0.75rem;
+    }
+    
+    .section__title {
+        font-size: 2rem;
+    }
+    
+    .tab-btn {
+        padding: 0.7rem 1rem;
+        font-size: 0.85rem;
+        min-width: 120px;
+    }
+    
+    .tab-content {
+        padding: 1rem;
+        margin: 0 0.25rem;
+    }
+    
+    .auth-message {
+        padding: 1.5rem 1rem;
+    }
+    
+    .auth-message i {
+        font-size: 3rem;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 1rem;
+    }
+    
+    .ticket-card {
+        padding: 1.5rem;
+    }
+    
+    .admin-stat-number {
+        font-size: 2rem;
+    }
 }

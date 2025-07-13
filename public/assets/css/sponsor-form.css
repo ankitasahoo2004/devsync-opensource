@@ -63,8 +63,11 @@
 }
 
 .sponsor-form-close:hover {
-    color: #FF4D5A;
-    background: rgba(255, 77, 90, 0.15);
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background: rgba(240, 163, 185, 0.15);
     transform: rotate(90deg);
 }
 
@@ -114,9 +117,26 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     padding: 12px 15px;
-    color: #e51837;
+    color: #ffffff;
     font-size: 16px;
     transition: all 0.3s ease;
+}
+
+/* Light mode text visibility */
+html.light .sponsor-form-input,
+html.light .sponsor-form-textarea {
+    background: rgba(255, 255, 255, 0.9);
+    color: #2f2f2f;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode text with gradient effect */
+html.dark .sponsor-form-input,
+html.dark .sponsor-form-textarea {
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .sponsor-form-textarea {
@@ -127,13 +147,29 @@
 .sponsor-form-input:focus,
 .sponsor-form-textarea:focus {
     outline: none;
-    border-color: #FF4D5A;
+    border-color: #bcaedc;
     background: rgba(255, 255, 255, 0.1);
+}
+
+/* Light mode focus states */
+html.light .sponsor-form-input:focus,
+html.light .sponsor-form-textarea:focus {
+    border-color: #bcaedc;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 0 3px rgba(188, 174, 220, 0.1);
+}
+
+/* Dark mode focus states */
+html.dark .sponsor-form-input:focus,
+html.dark .sponsor-form-textarea:focus {
+    border-color: #bcaedc;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(188, 174, 220, 0.1);
 }
 
 .sponsor-form-submit {
     width: 100%;
-    background: #FF4D5A;
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -145,6 +181,12 @@
     transform: translateY(20px);
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sponsor-form-submit:hover {
+    background: linear-gradient(135deg, #bcaedc, #9abffd, #f0a3b9);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(188, 174, 220, 0.3);
 }
 
 .sponsor-form-modal.show .sponsor-form-submit {

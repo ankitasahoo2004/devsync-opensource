@@ -132,6 +132,10 @@ npm run dev
 
 We welcome contributions from developers of all skill levels! Check out our [Contributing Guide](CONTRIBUTING.md) to get started.
 
+### Security
+
+Please review our [Security Policy](SECURITY.md) before contributing to ensure you understand our security guidelines and procedures.
+
 <div align="center">
   <img src="public/assets/img/contribution-graph.png" alt="Contribution Graph">
 </div>

@@ -2397,6 +2397,55 @@ html.light .profile-section::before {
     border-color: rgba(255, 255, 255, 0.3);
 }
 
+/* Light Mode Outline Button Fixes */
+html.light .btn-w.is--outline,
+html.light .logout-btn,
+html.light .btn-outline {
+    border: 2px solid #1a1a1a !important;
+    color: #1a1a1a !important;
+    background: transparent !important;
+}
+
+html.light .btn-w.is--outline .btn-txt,
+html.light .logout-btn .btn-txt,
+html.light .btn-outline .btn-txt {
+    color: #1a1a1a !important;
+}
+
+html.light .btn-w.is--outline:hover,
+html.light .logout-btn:hover,
+html.light .btn-outline:hover {
+    border-color: #1a1a1a !important;
+    background: rgba(26, 26, 26, 0.1) !important;
+    color: #1a1a1a !important;
+}
+
+html.light .btn-w.is--outline:focus,
+html.light .logout-btn:focus,
+html.light .btn-outline:focus {
+    outline: 2px solid #1a1a1a !important;
+    outline-offset: 2px !important;
+}
+
+/* Generic outline buttons in light mode */
+html.light .btn[class*="outline"],
+html.light button[class*="outline"],
+html.light .button[class*="outline"] {
+    border: 2px solid #1a1a1a !important;
+    color: #1a1a1a !important;
+    background: transparent !important;
+}
+
+html.light .btn[class*="outline"]:hover,
+html.light button[class*="outline"]:hover,
+html.light .button[class*="outline"]:hover {
+    background: rgba(26, 26, 26, 0.1) !important;
+    border-color: #1a1a1a !important;
+    color: #1a1a1a !important;
+}
+
+/* End Light Mode Outline Button Fixes */
+
 /* Animations */
 @keyframes slideOut {
     to {
@@ -2780,3 +2829,323 @@ html.light .profile-section::before {
     grid-template-columns: 1fr 1fr;
     padding-left: 3em;
 }
+
+/* Light Mode Text Visibility Fixes */
+html.light .profile__name,
+html.light .section-title {
+    color: #1a1a1a !important;
+    text-shadow: none !important;
+}
+
+html.light .profile__bio,
+html.light .section-subtitle {
+    color: #4a5568 !important;
+    text-shadow: none !important;
+}
+
+html.light .stat__number {
+    color: #1a1a1a !important;
+    text-shadow: none !important;
+}
+
+html.light .stat__label {
+    color: #4a5568 !important;
+    text-shadow: none !important;
+}
+
+html.light .detail-item {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #1a1a1a !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+html.light .stat {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #1a1a1a !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+html.light .pr-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #1a1a1a !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+html.light .pr-card h3,
+html.light .pr-card h4,
+html.light .pr-card p,
+html.light .pr-card span {
+    color: #1a1a1a !important;
+    text-shadow: none !important;
+}
+
+html.light .activity-item {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #1a1a1a !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+html.light .activity-item h4,
+html.light .activity-item p,
+html.light .activity-item span {
+    color: #1a1a1a !important;
+    text-shadow: none !important;
+}
+
+html.light .achievement-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #1a1a1a !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+html.light .achievement-card h3,
+html.light .achievement-card p {
+    color: #1a1a1a !important;
+    text-shadow: none !important;
+}
+
+html.light .text-small,
+html.light .text-mini {
+    color: #4a5568 !important;
+    text-shadow: none !important;
+}
+
+html.light .banner-sidebar__header h3 {
+    color: #1a1a1a !important;
+    text-shadow: none !important;
+}
+
+html.light .profile-toast {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #1a1a1a !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+html.light .profile-toast small {
+    color: #4a5568 !important;
+}
+
+/* Profile sidebar content */
+html.light .profile-sidebar h2,
+html.light .profile-sidebar h3,
+html.light .profile-sidebar h4 {
+    color: #1a1a1a !important;
+    text-shadow: none !important;
+}
+
+html.light .profile-sidebar p,
+html.light .profile-sidebar span,
+html.light .profile-sidebar div {
+    color: #4a5568 !important;
+    text-shadow: none !important;
+}
+
+/* Profile main content */
+html.light .profile-main h1,
+html.light .profile-main h2,
+html.light .profile-main h3,
+html.light .profile-main h4,
+html.light .profile-main h5,
+html.light .profile-main h6 {
+    color: #1a1a1a !important;
+    text-shadow: none !important;
+}
+
+html.light .profile-main p,
+html.light .profile-main span,
+html.light .profile-main label {
+    color: #4a5568 !important;
+    text-shadow: none !important;
+}
+
+/* Generic profile text elements */
+html.light .profile-section h1,
+html.light .profile-section h2,
+html.light .profile-section h3,
+html.light .profile-section h4,
+html.light .profile-section h5,
+html.light .profile-section h6 {
+    color: #1a1a1a !important;
+    text-shadow: none !important;
+}
+
+html.light .profile-section p,
+html.light .profile-section span,
+html.light .profile-section div:not([class*="icon"]):not([class*="btn"]) {
+    color: #4a5568 !important;
+    text-shadow: none !important;
+}
+
+/* Ensure white text is visible in light mode */
+html.light [style*="color: white"],
+html.light [style*="color: #fff"],
+html.light [style*="color: rgba(255, 255, 255"] {
+    color: #1a1a1a !important;
+    text-shadow: none !important;
+}
+
+/* Dark Mode Text Visibility Fixes */
+html.dark .profile__name,
+html.dark .section-title {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .profile__bio,
+html.dark .section-subtitle {
+    color: #e2e8f0 !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.dark .stat__number {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .stat__label {
+    color: #cbd5e0 !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.dark .detail-item {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark .stat {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark .pr-card {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark .pr-card h3,
+html.dark .pr-card h4,
+html.dark .pr-card p,
+html.dark .pr-card span {
+    color: #ffffff !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.dark .activity-item {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark .activity-item h4,
+html.dark .activity-item p,
+html.dark .activity-item span {
+    color: #ffffff !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.dark .achievement-card {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark .achievement-card h3,
+html.dark .achievement-card p {
+    color: #ffffff !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.dark .text-small,
+html.dark .text-mini {
+    color: #cbd5e0 !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.dark .banner-sidebar__header h3 {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .profile-toast {
+    background: rgba(0, 0, 0, 0.85) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+html.dark .profile-toast small {
+    color: #cbd5e0 !important;
+}
+
+/* Profile sidebar content - Dark Mode */
+html.dark .profile-sidebar h2,
+html.dark .profile-sidebar h3,
+html.dark .profile-sidebar h4 {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .profile-sidebar p,
+html.dark .profile-sidebar span,
+html.dark .profile-sidebar div {
+    color: #e2e8f0 !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Profile main content - Dark Mode */
+html.dark .profile-main h1,
+html.dark .profile-main h2,
+html.dark .profile-main h3,
+html.dark .profile-main h4,
+html.dark .profile-main h5,
+html.dark .profile-main h6 {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .profile-main p,
+html.dark .profile-main span,
+html.dark .profile-main label {
+    color: #e2e8f0 !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Generic profile text elements - Dark Mode */
+html.dark .profile-section h1,
+html.dark .profile-section h2,
+html.dark .profile-section h3,
+html.dark .profile-section h4,
+html.dark .profile-section h5,
+html.dark .profile-section h6 {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .profile-section p,
+html.dark .profile-section span,
+html.dark .profile-section div:not([class*="icon"]):not([class*="btn"]) {
+    color: #e2e8f0 !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Profile content containers - Dark Mode */
+html.dark .profile__content {
+    color: #ffffff !important;
+}
+
+html.dark .profile__content * {
+    color: inherit !important;
+}
+
+/* Ensure gradient text effects work properly in dark mode */
+html.dark .gradient-text {
+    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    text-shadow: none !important;
+}
+
+/* End Dark Mode Text Visibility Fixes */

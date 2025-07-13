@@ -405,6 +405,153 @@ document.addEventListener('DOMContentLoaded', function() {
             .recognition-card {
                 opacity: 0;
             }
+
+            /* Gradient Text Styles */
+            .card-name, .modal-name, .recognition-title {
+                background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            /* Button Styles with Gradient and Shadow */
+            .card-badge, button:not(.modal-close):not(.social-link), .btn:not(.modal-close):not(.social-link) {
+                background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+                box-shadow: 0 8px 25px rgb(232 226 227 / 40%);
+                color: #000000 !important;
+                border: none;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .card-badge:hover, button:not(.modal-close):not(.social-link):hover, .btn:not(.modal-close):not(.social-link):hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgb(232 226 227 / 40%);
+                background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+            }
+
+            /* Image Shadow Styles for Dark Mode */
+            .card-image img, .modal-image img {
+                box-shadow: 0 10px 30px rgba(240, 163, 185, 0.4), 0 5px 15px rgba(188, 174, 220, 0.3);
+                border-radius: 50%;
+                transition: all 0.3s ease;
+            }
+
+            .card-image:hover img, .modal-image:hover img {
+                box-shadow: 0 15px 40px rgba(240, 163, 185, 0.6), 0 8px 20px rgba(188, 174, 220, 0.5);
+            }
+
+            /* Social Links Hover Effect */
+            .social-link:hover {
+                background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd) !important;
+                color: #000000 !important;
+            }
+
+            .social-link:hover i {
+                color: #000000 !important;
+            }
+
+            /* Light Mode Specific Styles */
+            html.light .card-name, html.light .modal-name, html.light .recognition-title {
+                background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            /* Light Mode Card Glass Effect */
+            html.light .recognition-card {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            /* Light Mode Text Visibility */
+            html.light .card-title {
+                color: #333333 !important;
+            }
+
+            html.light .recognition-subtitle {
+                color: #555555 !important;
+            }
+
+            html.light .modal-content {
+                color: #333333;
+            }
+
+            html.light .detail-label {
+                color: #444444 !important;
+            }
+
+            html.light .detail-value {
+                color: #222222 !important;
+            }
+
+            html.light .card-badge, html.light button:not(.modal-close):not(.social-link), html.light .btn:not(.modal-close):not(.social-link) {
+                background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+                box-shadow: 0 8px 25px rgb(232 226 227 / 40%);
+                color: #000000 !important;
+            }
+
+            html.light .card-badge:hover, html.light button:not(.modal-close):not(.social-link):hover, html.light .btn:not(.modal-close):not(.social-link):hover {
+                box-shadow: 0 8px 25px rgb(232 226 227 / 40%);
+                background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+            }
+
+            /* Light Mode Image Shadow */
+            html.light .card-image img, html.light .modal-image img {
+                box-shadow: 0 10px 30px rgba(240, 163, 185, 0.2), 0 5px 15px rgba(188, 174, 220, 0.15);
+            }
+
+            html.light .card-image:hover img, html.light .modal-image:hover img {
+                box-shadow: 0 15px 40px rgba(240, 163, 185, 0.3), 0 8px 20px rgba(188, 174, 220, 0.25);
+            }
+
+            /* Light Mode Social Links Hover */
+            html.light .social-link:hover {
+                background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd) !important;
+                color: #000000 !important;
+            }
+
+            html.light .social-link:hover i {
+                color: #000000 !important;
+            }
+
+            /* Ensure text readability in buttons */
+            .card-badge {
+                color: #000000 !important;
+                text-shadow: none;
+            }
+
+            /* Additional button padding and styling */
+            .modal-close {
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                font-weight: bold;
+            }
+
+            .social-link {
+                width: 56px;
+                height: 56px;
+                border-radius: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 22px;
+                text-decoration: none;
+            }
+
+            .card-badge {
+                padding: 8px 16px;
+                border-radius: 25px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                display: inline-block;
+            }
         `;
         document.head.appendChild(style);
     }
