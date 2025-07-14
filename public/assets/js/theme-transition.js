@@ -8,7 +8,7 @@ class ThemeTransition {
         this.isTransitioning = false;
         this.currentTheme = this.getCurrentTheme();
         this.transitionDuration = 1200; // ms
-        this.rippleCount = 6; // Number of ripple waves
+        this.rippleCount = 3; // Number of ripple waves
 
         this.init();
     }
