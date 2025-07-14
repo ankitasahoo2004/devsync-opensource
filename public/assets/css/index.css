@@ -59,7 +59,7 @@ div.btn-inner {
     transition: none !important;
     animation: none !important;
     transform: none !important;
-    }
+}
 
 div.btn-inner:hover {
     transition: none !important;
@@ -496,6 +496,12 @@ body {
     --perspective: 4000px;
     --grid-inner-scale: 1;
     --grid-item-ratio: 1.5;
+
+    /* Theme transition properties */
+    --theme-transition-duration: 0.5s;
+    --theme-transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+    --ripple-color: var(--main-dark);
+    --transition-delay: 0ms;
 }
 
 /* ---- Global Styles ---- */
