@@ -788,7 +788,7 @@ html[data-theme="light"] {
     outline: none;
     border-color: var(--devsync-primary);
     background: var(--devsync-card-hover);
-    box-shadow: 0 0 0 3px rgba(229, 24, 55, 0.1);
+    /* box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1); */
 }
 
 .form-group input::placeholder,
@@ -888,7 +888,7 @@ html[data-theme="light"] {
 
 .tech-chips-wrapper:focus-within {
     border-color: var(--devsync-primary);
-    box-shadow: 0 0 0 3px rgba(229, 24, 55, 0.1);
+    /* box-shadow: 0 0 0 3px rgba(229, 24, 55, 0.1); */
 }
 
 .tech-chip {
@@ -944,7 +944,7 @@ html[data-theme="light"] {
 .users-search input:focus {
     outline: none;
     border-color: var(--devsync-primary);
-    box-shadow: 0 0 0 3px rgba(229, 24, 55, 0.1);
+    /* box-shadow: 0 0 0 3px rgba(229, 24, 55, 0.1); */
 }
 
 .users-search i {

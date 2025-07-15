@@ -105,7 +105,7 @@ html.light [data-nav-tl] .link-track-fill {
 }
 
 html.dark [data-nav-tl] .link-track-fill {
-    background-color: var(--main-light) !important;
+    background-color: var(--
 }
 
 html.dark .checkbox-toggle:focus {

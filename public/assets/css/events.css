@@ -1841,3 +1841,67 @@
         font-size: 1.1rem !important;
     }
 }
+
+/* Text truncation utility classes */
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.text-truncate-sm {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 80px;
+}
+
+.text-truncate-md {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 120px;
+}
+
+.text-truncate-lg {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}
+
+/* Event name and description truncation */
+.event-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 220px;
+}
+
+.event-description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 280px;
+}
+
+.event-organizer {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 150px;
+}
+
+@media screen and (max-width: 768px) {
+    .event-name {
+        max-width: 160px;
+    }
+    
+    .event-description {
+        max-width: 200px;
+    }
+    
+    .event-organizer {
+        max-width: 120px;
+    }
+}

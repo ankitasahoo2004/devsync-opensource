@@ -896,6 +896,7 @@
   justify-content: space-between;
   gap: 1rem;
   position: relative;
+  color: white
 }
 
 .terms-progress {
@@ -910,7 +911,7 @@
 
 .terms-progress__bar {
   height: 100%;
-  background: linear-gradient(90deg, #e51837, #ff6b6b);
+  background: linear-gradient(90deg, #186ae5, #6bdfff);
   width: 0;
   transition: width 0.3s ease;
 }
@@ -977,6 +978,7 @@
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s ease;
+  color: white
 }
 
 .terms-section.expanded .terms-section__content {
@@ -1003,8 +1005,8 @@
 }
 
 .custom-checkbox input:checked + label {
-  background: #e51837;
-  border-color: #e51837;
+  background: #1863e5;
+  border-color: #1863e5;
 }
 
 .custom-checkbox input:checked + label::after {
@@ -1048,7 +1050,7 @@
 }
 
 .terms-modal__button--primary.ready {
-  background: linear-gradient(135deg, #e51837, #ff6b6b);
+  background: linear-gradient(90deg, #186ae5, #6bdfff);
   color: white;
   cursor: pointer;
 }
@@ -2051,4 +2053,82 @@
     width: 95%;
     margin: 1rem;
   }
+}
+
+/* Text truncation utility classes */
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.text-truncate-sm {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 80px;
+}
+
+.text-truncate-md {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 120px;
+}
+
+.text-truncate-lg {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}
+
+/* Project name and description truncation */
+.project-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 250px;
+}
+
+.project-description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 300px;
+}
+
+.project-author {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 150px;
+}
+
+@media screen and (max-width: 768px) {
+    .project-name {
+        max-width: 180px;
+    }
+    
+    .project-description {
+        max-width: 200px;
+    }
+    
+    .project-author {
+        max-width: 120px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .project-name {
+        max-width: 140px;
+    }
+    
+    .project-description {
+        max-width: 160px;
+    }
+    
+    .project-author {
+        max-width: 100px;
+    }
 }
