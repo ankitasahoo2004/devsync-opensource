@@ -1503,3 +1503,67 @@ html.dark [faq-svg] path {
 [data-edit="true"] ._wf-ent__faq--reveal {
     height: auto;
 }
+
+/* Text truncation utility classes */
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.text-truncate-sm {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 80px;
+}
+
+.text-truncate-md {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 120px;
+}
+
+.text-truncate-lg {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}
+
+/* Team member name truncation */
+.team-member-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 180px;
+}
+
+.team-member-role {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 150px;
+}
+
+.about-section-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 250px;
+}
+
+@media screen and (max-width: 768px) {
+    .team-member-name {
+        max-width: 140px;
+    }
+    
+    .team-member-role {
+        max-width: 120px;
+    }
+    
+    .about-section-title {
+        max-width: 180px;
+    }
+}

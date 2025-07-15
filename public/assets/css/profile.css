@@ -3148,4 +3148,73 @@ html.dark .gradient-text {
     text-shadow: none !important;
 }
 
-/* End Dark Mode Text Visibility Fixes */
+/* Text truncation utility classes */
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.text-truncate-sm {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 80px;
+}
+
+.text-truncate-md {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 120px;
+}
+
+.text-truncate-lg {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}
+
+.text-truncate-xl {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 300px;
+}
+
+/* Profile name specific truncation */
+.profile__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 250px;
+}
+
+@media screen and (max-width: 768px) {
+    .profile__name {
+        max-width: 180px;
+    }
+    
+    .text-truncate-lg {
+        max-width: 150px;
+    }
+    
+    .text-truncate-xl {
+        max-width: 200px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .profile__name {
+        max-width: 120px;
+    }
+    
+    .text-truncate-md {
+        max-width: 100px;
+    }
+    
+    .text-truncate-lg {
+        max-width: 120px;
+    }
+}
