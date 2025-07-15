@@ -799,15 +799,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <input type="checkbox" id="term1">
                                         <label for="term1"></label>
                                     </div>
-                                    <h4>Code Quality Standards</h4>
+                                    <h4>Follow coding standards and write clean, tested code.</h4>
                                 </div>
                                 <div class="terms-section__content">
-                                    <p>I agree to maintain high code quality standards, including:</p>
-                                    <ul>
-                                        <li>Following project coding conventions</li>
-                                        <li>Writing clean, documented code</li>
-                                        <li>Performing proper testing before submission</li>
-                                    </ul>
                                 </div>
                             </div>
                             <div class="terms-section">
@@ -816,15 +810,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <input type="checkbox" id="term2">
                                         <label for="term2"></label>
                                     </div>
-                                    <h4>Intellectual Property Rights</h4>
+                                    <h4>Submit only original or properly licensed work.</h4>
                                 </div>
                                 <div class="terms-section__content">
-                                    <p>I confirm that:</p>
-                                    <ul>
-                                        <li>All submitted code is my original work</li>
-                                        <li>I have rights to share this code</li>
-                                        <li>I understand the project's licensing terms</li>
-                                    </ul>
                                 </div>
                             </div>
                             <div class="terms-section">
@@ -833,15 +821,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <input type="checkbox" id="term3">
                                         <label for="term3"></label>
                                     </div>
-                                    <h4>Community Guidelines</h4>
+                                    <h4>Respect community guidelines and communicate professionally.</h4>
                                 </div>
                                 <div class="terms-section__content">
-                                    <p>I agree to follow community guidelines, including:</p>
-                                    <ul>
-                                        <li>Respectful communication</li>
-                                        <li>Collaborative problem-solving</li>
-                                        <li>Supporting fellow developers</li>
-                                    </ul>
                                 </div>
                             </div>
                             <div class="terms-section">
@@ -850,15 +832,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <input type="checkbox" id="term4">
                                         <label for="term4"></label>
                                     </div>
-                                    <h4>Project Maintenance</h4>
+                                    <h4>Maintain my code and respond to feedback on time.</h4>
                                 </div>
                                 <div class="terms-section__content">
-                                    <p>I understand my responsibilities regarding:</p>
-                                    <ul>
-                                        <li>Timely response to feedback</li>
-                                        <li>Bug fixes and maintenance</li>
-                                        <li>Version control best practices</li>
-                                    </ul>
                                 </div>
                             </div>
                             <div class="terms-section">
@@ -867,15 +843,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <input type="checkbox" id="term5">
                                         <label for="term5"></label>
                                     </div>
-                                    <h4>Code Review Process</h4>
+                                    <h4>Participate in code reviews and implement required changes.</h4>
                                 </div>
                                 <div class="terms-section__content">
-                                    <p>I agree to participate in the code review process by:</p>
-                                    <ul>
-                                        <li>Accepting constructive feedback</li>
-                                        <li>Making requested changes</li>
-                                        <li>Following review guidelines</li>
-                                    </ul>
                                 </div>
                             </div>
                         </div>
