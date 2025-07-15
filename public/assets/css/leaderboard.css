@@ -493,7 +493,7 @@ html.light .leaderboard-section {
 }
 
 html.light .leaderboard-section h3 {
-  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+  background: linear-gradient(135deg, #d63384, #7952b3, #0d6efd);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -501,14 +501,14 @@ html.light .leaderboard-section h3 {
 }
 
 html.light .leaderboard-section .section__title {
-  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+  background: linear-gradient(135deg, #d63384, #7952b3, #0d6efd);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 html.light .leaderboard-section .stat h3 {
-  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+  background: linear-gradient(135deg, #d63384, #7952b3, #0d6efd);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -526,7 +526,7 @@ html.light .leaderboard-section .search-input {
 html[data-theme="light"] .leaderboard-section h3,
 [data-theme="light"] .leaderboard-section h3,
 .light .leaderboard-section h3 {
-  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+  background: linear-gradient(135deg, #d63384, #7952b3, #0d6efd);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -536,7 +536,7 @@ html[data-theme="light"] .leaderboard-section h3,
 html[data-theme="light"] .leaderboard-section .section__title,
 [data-theme="light"] .leaderboard-section .section__title,
 .light .leaderboard-section .section__title {
-  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+  background: linear-gradient(135deg, #d63384, #7952b3, #0d6efd);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -545,7 +545,7 @@ html[data-theme="light"] .leaderboard-section .section__title,
 html[data-theme="light"] .leaderboard-section .stat h3,
 [data-theme="light"] .leaderboard-section .stat h3,
 .light .leaderboard-section .stat h3 {
-  background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+  background: linear-gradient(135deg, #d63384, #7952b3, #0d6efd);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -554,7 +554,7 @@ html[data-theme="light"] .leaderboard-section .stat h3,
 /* Auto-detect light mode */
 @media (prefers-color-scheme: light) {
   :root:not(.dark):not([data-theme="dark"]) .leaderboard-section h3 {
-    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+    background: linear-gradient(135deg, #d63384, #7952b3, #0d6efd);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -562,14 +562,14 @@ html[data-theme="light"] .leaderboard-section .stat h3,
   }
   
   :root:not(.dark):not([data-theme="dark"]) .leaderboard-section .section__title {
-    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+    background: linear-gradient(135deg, #d63384, #7952b3, #0d6efd);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   
   :root:not(.dark):not([data-theme="dark"]) .leaderboard-section .stat h3 {
-    background: linear-gradient(135deg, #f0a3b9, #bcaedc, #9abffd);
+    background: linear-gradient(135deg, #d63384, #7952b3, #0d6efd);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1157,4 +1157,67 @@ html[data-theme="dark"] .leaderboard-section .stat h3,
   font-size: 9em;
   font-weight: 400;
   line-height: .8;
+}
+
+/* Text truncation utility classes */
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.text-truncate-sm {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 80px;
+}
+
+.text-truncate-md {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 120px;
+}
+
+.text-truncate-lg {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}
+
+/* Username truncation for leaderboard */
+.username-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 150px;
+}
+
+.leaderboard-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 180px;
+}
+
+@media screen and (max-width: 768px) {
+    .username-truncate {
+        max-width: 120px;
+    }
+    
+    .leaderboard-name {
+        max-width: 140px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .username-truncate {
+        max-width: 100px;
+    }
+    
+    .leaderboard-name {
+        max-width: 110px;
+    }
 }
