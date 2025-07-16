@@ -309,6 +309,7 @@ function updateNavigation() {
             } else {
                 // User is logged in, replace login button with profile
                 const displayName = (user.displayName || 'User').split(' ')[0];
+                const truncatedName = displayName.length > 12 ? displayName.substring(0, 12) + '...' : displayName;
                 const profileImg = user.photos[0]?.value || 'assets/img/default-avatar.png';
                 const hasNavListLogin = nav.querySelector('a[href="/login"]');
 

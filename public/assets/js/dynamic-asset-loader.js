@@ -9,19 +9,19 @@ class DynamicAssetLoader {
         this.loadedAssets = new Map();
         this.pageAssets = {
             '/': {
-                css: ['assets/css/index.css', 'assets/css/recognition.css'],
+                css: ['assets/css/index.css', 'assets/css/recognition.css', 'assets/css/username-truncation.css'],
                 js: ['assets/js/main.js', 'assets/js/auth.js', 'assets/js/recognition.js']
             },
             '/index.html': {
-                css: ['assets/css/index.css', 'assets/css/recognition.css'],
+                css: ['assets/css/index.css', 'assets/css/recognition.css', 'assets/css/username-truncation.css'],
                 js: ['assets/js/main.js', 'assets/js/auth.js', 'assets/js/recognition.js']
             },
             '/about': {
-                css: ['assets/css/about.css'],
+                css: ['assets/css/about.css', 'assets/css/username-truncation.css'],
                 js: ['assets/js/main.js', 'assets/js/auth.js']
             },
             '/about.html': {
-                css: ['assets/css/about.css'],
+                css: ['assets/css/about.css', 'assets/css/username-truncation.css'],
                 js: ['assets/js/main.js', 'assets/js/auth.js']
             },
             '/projects': {
@@ -31,7 +31,8 @@ class DynamicAssetLoader {
                     'assets/css/modal.css',
                     'assets/css/toast.css',
                     'assets/css/work-projects-integration.css',
-                    'assets/css/projects.css'
+                    'assets/css/projects.css',
+                    'assets/css/username-truncation.css'
                 ],
                 js: [
                     'assets/js/main.js',
@@ -47,7 +48,8 @@ class DynamicAssetLoader {
                     'assets/css/modal.css',
                     'assets/css/toast.css',
                     'assets/css/work-projects-integration.css',
-                    'assets/css/projects.css'
+                    'assets/css/projects.css',
+                    'assets/css/username-truncation.css'
                 ],
                 js: [
                     'assets/js/main.js',
@@ -61,7 +63,8 @@ class DynamicAssetLoader {
                     'assets/css/services.css',
                     'assets/css/global-search.css',
                     'assets/css/modal.css',
-                    'assets/css/events-modern.css'
+                    'assets/css/events-modern.css',
+                    'assets/css/username-truncation.css'
                 ],
                 js: [
                     'assets/js/main.js',
@@ -75,7 +78,8 @@ class DynamicAssetLoader {
                     'assets/css/services.css',
                     'assets/css/global-search.css',
                     'assets/css/modal.css',
-                    'assets/css/events-modern.css'
+                    'assets/css/events-modern.css',
+                    'assets/css/username-truncation.css'
                 ],
                 js: [
                     'assets/js/main.js',
@@ -88,7 +92,8 @@ class DynamicAssetLoader {
                 css: [
                     'assets/css/leaderboard.css',
                     'assets/css/global-search.css',
-                    'assets/css/modal.css'
+                    'assets/css/modal.css',
+                    'assets/css/username-truncation.css'
                 ],
                 js: [
                     'assets/js/main.js',
@@ -101,7 +106,8 @@ class DynamicAssetLoader {
                 css: [
                     'assets/css/leaderboard.css',
                     'assets/css/global-search.css',
-                    'assets/css/modal.css'
+                    'assets/css/modal.css',
+                    'assets/css/username-truncation.css'
                 ],
                 js: [
                     'assets/js/main.js',
@@ -114,7 +120,8 @@ class DynamicAssetLoader {
                 css: [
                     'assets/css/profile.css',
                     'assets/css/global-search.css',
-                    'assets/css/modal.css'
+                    'assets/css/modal.css',
+                    'assets/css/username-truncation.css'
                 ],
                 js: [
                     'assets/js/main.js',
@@ -127,7 +134,8 @@ class DynamicAssetLoader {
                 css: [
                     'assets/css/profile.css',
                     'assets/css/global-search.css',
-                    'assets/css/modal.css'
+                    'assets/css/modal.css',
+                    'assets/css/username-truncation.css'
                 ],
                 js: [
                     'assets/js/main.js',
@@ -143,7 +151,8 @@ class DynamicAssetLoader {
                     'assets/css/global-search.css',
                     'assets/css/modal.css',
                     'assets/css/toast.css',
-                    'assets/css/ticket.css'
+                    'assets/css/ticket.css',
+                    'assets/css/username-truncation.css'
                 ],
                 js: [
                     'assets/js/main.js',
@@ -160,7 +169,8 @@ class DynamicAssetLoader {
                     'assets/css/global-search.css',
                     'assets/css/modal.css',
                     'assets/css/toast.css',
-                    'assets/css/ticket.css'
+                    'assets/css/ticket.css',
+                    'assets/css/username-truncation.css'
                 ],
                 js: [
                     'assets/js/main.js',
@@ -173,7 +183,8 @@ class DynamicAssetLoader {
             '/login': {
                 css: [
                     'assets/css/login.css',
-                    'assets/css/global-search.css'
+                    'assets/css/global-search.css',
+                    'assets/css/username-truncation.css'
                 ],
                 js: [
                     'assets/js/main.js',
@@ -184,7 +195,8 @@ class DynamicAssetLoader {
             '/login.html': {
                 css: [
                     'assets/css/login.css',
-                    'assets/css/global-search.css'
+                    'assets/css/global-search.css',
+                    'assets/css/username-truncation.css'
                 ],
                 js: [
                     'assets/js/main.js',
@@ -200,7 +212,8 @@ class DynamicAssetLoader {
                     'assets/css/admin-user-management.css',
                     'assets/css/global-search.css',
                     'assets/css/modal.css',
-                    'assets/css/toast.css'
+                    'assets/css/toast.css',
+                    'assets/css/username-truncation.css'
                 ],
                 js: [
                     'assets/js/main.js',
@@ -220,7 +233,8 @@ class DynamicAssetLoader {
                     'assets/css/admin-user-management.css',
                     'assets/css/global-search.css',
                     'assets/css/modal.css',
-                    'assets/css/toast.css'
+                    'assets/css/toast.css',
+                    'assets/css/username-truncation.css'
                 ],
                 js: [
                     'assets/js/main.js',
