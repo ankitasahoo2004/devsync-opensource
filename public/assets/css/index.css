@@ -401,9 +401,9 @@ html.light .hud-menu-link [stagger-text] {
     text-shadow: 0px 1em 0px var(--main-dark);
 }
 
-/* html.light .page-link-w [split-text] {
-    text-shadow: 0px 1em 0px var(--main-light);
-} */
+html.light .page-link-w [split-text] {
+    /* text-shadow: 0px 1em 0px var(--main-light); */
+}
 
 html.light .hud-menu-link .btn-icon-w .btn-txt {
     text-shadow: -1em 0px 0px var(--main-dark);
