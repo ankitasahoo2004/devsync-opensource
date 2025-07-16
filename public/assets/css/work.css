@@ -398,7 +398,7 @@ html.light .btn-w .btn-icon-w .btn-txt {
 }
 
 html.light .hud-menu-link [stagger-text] {
-    text-shadow: 0px 1em 0px var(--main-dark);
+    /* text-shadow: 0px 1em 0px var(--main-dark); */
 }
 
 html.light .page-link-w [split-text] {
@@ -645,7 +645,7 @@ a {
 /* Simple Buttons */
 .hud-menu-link [stagger-text],
 .page-link-w [split-text] {
-    text-shadow: 0px 1em 0px var(--main-dark);
+    /* text-shadow: 0px 1em 0px var(--main-dark); */
 }
 
 .hud-menu-link .btn-icon-w .btn-txt {
@@ -1204,7 +1204,7 @@ html.dark [faq-svg] path {
     /* Simple Buttons */
     .hud-menu-link [stagger-text],
     .page-link-w [split-text] {
-        text-shadow: 0px 1rem 0px var(--main-dark);
+        /* text-shadow: 0px 1rem 0px var(--main-dark); */
     }
 
     .hud-menu-link .btn-icon-w .btn-txt {
