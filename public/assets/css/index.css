@@ -401,9 +401,9 @@ html.light .hud-menu-link [stagger-text] {
     text-shadow: 0px 1em 0px var(--main-dark);
 }
 
-html.light .page-link-w [split-text] {
-    /* text-shadow: 0px 1em 0px var(--main-light); */
-}
+/* html.light .page-link-w [split-text] {
+    text-shadow: 0px 1em 0px var(--main-light); 
+} */
 
 html.light .hud-menu-link .btn-icon-w .btn-txt {
     text-shadow: -1em 0px 0px var(--main-dark);
@@ -1545,7 +1545,8 @@ html.dark [faq-svg] path {
 }
 
 /* User name display in auth buttons */
-.auth-button .btn-txt {
+.auth-button .btn-txt,
+.auth-user-name {
     max-width: 150px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1570,12 +1571,17 @@ html.dark [faq-svg] path {
 }
 
 /* User welcome message in CTA buttons */
-.cta-auth-welcome .btn-txt {
+.cta-auth-welcome .btn-txt,
+.cta-user-name {
     background: linear-gradient(135deg, #4CAF50, #45a049);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     font-weight: 600;
+    max-width: 280px;
+    overflow: hidden;
+    /* text-overflow: ellipsis; */
+    white-space: nowrap;
 }
 
 /* Hover effect for authenticated buttons */
@@ -1586,14 +1592,40 @@ html.dark [faq-svg] path {
 
 /* Mobile responsive adjustments */
 @media screen and (max-width: 768px) {
-    .auth-button .btn-txt {
+
+    .auth-button .btn-txt,
+    .auth-user-name {
         max-width: 120px;
+        font-size: 0.9rem;
+    }
+
+    .cta-user-name {
+        max-width: 220px;
         font-size: 0.9rem;
     }
 
     .auth-button .btn-icon-w img {
         width: 16px;
         height: 16px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+
+    .auth-button .btn-txt,
+    .auth-user-name {
+        max-width: 100px;
+        font-size: 0.8rem;
+    }
+
+    .cta-user-name {
+        max-width: 200px;
+        font-size: 0.8rem;
+    }
+
+    .auth-button .btn-icon-w img {
+        width: 14px;
+        height: 14px;
     }
 }
 
@@ -1772,15 +1804,15 @@ html.light .recognition-card:hover {
     .text-truncate-lg {
         max-width: 150px;
     }
-    
+
     .text-truncate-xl {
         max-width: 200px;
     }
-    
+
     .header-title {
         max-width: 180px;
     }
-    
+
     .nav-item-text {
         max-width: 140px;
     }
@@ -1790,15 +1822,15 @@ html.light .recognition-card:hover {
     .text-truncate-md {
         max-width: 100px;
     }
-    
+
     .text-truncate-lg {
         max-width: 120px;
     }
-    
+
     .header-title {
         max-width: 140px;
     }
-    
+
     .nav-item-text {
         max-width: 110px;
     }
