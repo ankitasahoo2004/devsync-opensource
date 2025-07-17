@@ -2,6 +2,16 @@
 // const serverUrl = 'https://www.devsync.club';
 const serverUrl = 'http://localhost:3000';
 
+/**
+ * Extract the first word/name from a full name or username
+ * @param {string} fullName - Full name or username
+ * @returns {string} First word of the name
+ */
+function getFirstName(fullName) {
+    if (!fullName) return 'User';
+    return fullName.trim().split(' ')[0];
+}
+
 // Page transition animation functions
 function getOrCreatePageWipeElement() {
     // First check if the page wipe already exists in the DOM (from index.html)
@@ -262,7 +272,9 @@ function updateAuthButton(selector, data) {
         if (data.isAuthenticated) {
             // Update to profile button with user's name
             const isMainButton = selector === '#auth-button';
-            const userName = data.user.displayName || data.user.username || 'Profile';
+            const fullUserName = data.user.displayName || data.user.username || 'Profile';
+            // Extract only the first word of the username using utility function
+            const userName = getFirstName(fullUserName);
 
             if (isMainButton) {
                 button.innerHTML = `
@@ -363,10 +375,10 @@ function updateAuthButton(selector, data) {
 
 function updateCtaButton(selector, data) {
     const button = document.querySelector(selector);
-    if (!button) return; if (data.isAuthenticated) {
+    if (!button) return;    if (data.isAuthenticated) {
         // Update to personalized dashboard button
-        const userName = data.user.displayName || data.user.username || 'User';
-        const firstName = userName.split(' ')[0]; // Get first name if full name is available
+        const fullUserName = data.user.displayName || data.user.username || 'User';
+        const firstName = getFirstName(fullUserName);
 
         button.innerHTML = `
             <div class="btn-inner">
