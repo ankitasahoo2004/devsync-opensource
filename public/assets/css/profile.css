@@ -3185,8 +3185,8 @@ html.dark .gradient-text {
 
 /* Profile name specific truncation */
 .profile__name {
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
+    /* text-overflow: ellipsis; */
     white-space: nowrap;
     max-width: 250px;
 }

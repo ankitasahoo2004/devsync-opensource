@@ -155,6 +155,124 @@ button {
   width: 100%;
 }
 
+/*=============== TEXT ELLIPSIS UTILITIES ===============*/
+/* Text ellipsis for button text elements */
+.btn-txt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  display: inline-block;
+}
+
+/* Text ellipsis for footer mini text */
+.text-mini {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  display: inline-block;
+}
+
+/* Profile name with ellipsis */
+.profile__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Specific styles for auth buttons with wider max-width */
+.btn-w .btn-txt,
+.hud-menu-link .btn-txt {
+  max-width: 150px;
+  /* Adjust based on button size */
+}
+
+/* Auth button user name with ellipsis */
+.auth-user-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 140px;
+  /* Slightly smaller to account for profile image */
+  display: inline-block;
+}
+
+/* CTA button user name with ellipsis */
+.cta-user-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 280px;
+  /* Larger for CTA buttons which are typically bigger */
+  display: inline-block;
+}
+
+/* Footer links in menu */
+.hud-menu-sublink-w .text-mini {
+  max-width: 120px;
+}
+
+/* Navigation profile name with ellipsis */
+.nav__profile-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+/* Responsive max-width for smaller screens */
+@media screen and (max-width: 768px) {
+
+  .btn-w .btn-txt,
+  .hud-menu-link .btn-txt {
+    max-width: 120px;
+  }
+
+  .auth-user-name {
+    max-width: 100px;
+  }
+
+  .cta-user-name {
+    max-width: 220px;
+  }
+
+  .nav__profile-name {
+    max-width: 100px;
+  }
+
+  .hud-menu-sublink-w .text-mini {
+    max-width: 100px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+
+  .btn-w .btn-txt,
+  .hud-menu-link .btn-txt {
+    max-width: 90px;
+  }
+
+  .auth-user-name {
+    max-width: 80px;
+  }
+
+  .cta-user-name {
+    max-width: 220px;
+  }
+
+  .nav__profile-name {
+    max-width: 80px;
+  }
+
+  .hud-menu-sublink-w .text-mini {
+    max-width: 80px;
+  }
+}
+
 /*=============== LAYOUT ===============*/
 .container {
   max-width: 1400px;
