@@ -1201,6 +1201,17 @@ html.dark [faq-svg] path {
         transform: translate(1em, 0em);
     }
 
+    /* Hero section responsive styling for desktop */
+    .ow-hl-row h1[style*="font-size: 15em"] {
+        font-size: clamp(8rem, 12vw, 15rem) !important;
+        line-height: 0.9;
+    }
+
+    .h-display[style*="font-size: 15em"] {
+        font-size: clamp(8rem, 12vw, 15rem) !important;
+        line-height: 0.9;
+    }
+
     /* Simple Buttons */
     .hud-menu-link [stagger-text],
     .page-link-w [split-text] {
@@ -1340,6 +1351,22 @@ html.dark [faq-svg] path {
         display: none !important;
     }
 
+    /* Hero section responsive styling for tablets */
+    .ow-hl-wrap {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .ow-hl-row h1[style*="font-size: 15em"] {
+        font-size: clamp(4rem, 15vw, 8rem) !important;
+        line-height: 0.9;
+    }
+
+    .h-display[style*="font-size: 15em"] {
+        font-size: clamp(4rem, 15vw, 8rem) !important;
+        line-height: 0.9;
+    }
+
     /* Colour Toggle  */
     .hud-mode-toggle-w[mode-toggle="light"] .mode-toggle-btn {
         transform: translate(2.5rem, 0px);
@@ -1451,6 +1478,22 @@ html.dark [faq-svg] path {
         display: inline-block !important;
     }
 
+    /* Hero section responsive styling */
+    .ow-hl-wrap {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .ow-hl-row h1[style*="font-size: 15em"] {
+        font-size: clamp(3rem, 12vw, 6rem) !important;
+        line-height: 0.9;
+    }
+
+    .h-display[style*="font-size: 15em"] {
+        font-size: clamp(3rem, 12vw, 6rem) !important;
+        line-height: 0.9;
+    }
+
     /* --- radio --- */
     html.dark .checkbox-toggle.is-radio.is-range {
         border-color: var(--dark-grey);
@@ -1478,6 +1521,29 @@ html.dark [faq-svg] path {
     .h-display {
         font-size: clamp(2rem, 8vw, 4rem);
         line-height: 1.1;
+    }
+
+    /* Enhanced hero section responsive styling for small mobile */
+    .ow-hl-wrap {
+        text-align: center;
+        margin-bottom: 1rem;
+        padding: 0 0.5rem;
+    }
+
+    .ow-hl-row {
+        margin-bottom: 0.5rem;
+    }
+
+    .ow-hl-row h1[style*="font-size: 15em"] {
+        font-size: clamp(2.5rem, 10vw, 4rem) !important;
+        line-height: 0.8;
+        margin: 0;
+    }
+
+    .h-display[style*="font-size: 15em"] {
+        font-size: clamp(2.5rem, 10vw, 4rem) !important;
+        line-height: 0.8;
+        margin: 0;
     }
 
     .text-brand {
