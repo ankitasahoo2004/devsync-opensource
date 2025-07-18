@@ -2,6 +2,16 @@
 // const serverUrl = 'https://www.devsync.club';
 const serverUrl = 'http://localhost:3000';
 
+/**
+ * Extract the first word/name from a full name or username
+ * @param {string} fullName - Full name or username
+ * @returns {string} First word of the name
+ */
+function getFirstName(fullName) {
+    if (!fullName) return 'User';
+    return fullName.trim().split(' ')[0];
+}
+
 // Page transition animation functions
 function getOrCreatePageWipeElement() {
     // First check if the page wipe already exists in the DOM (from index.html)
