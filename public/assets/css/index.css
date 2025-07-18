@@ -447,7 +447,7 @@ html.light .btn-w .btn-icon-w .btn-txt {
 }
 
 html.light .hud-menu-link [stagger-text] {
-    text-shadow: 0px 1em 0px var(--main-dark);
+    /* text-shadow: 0px 1em 0px var(--main-dark); */
 }
 
 /* html.light .page-link-w [split-text] {
@@ -1609,7 +1609,7 @@ html.dark [faq-svg] path {
 
 /* Profile image in auth buttons */
 .auth-button .btn-icon-w img {
-    margin-left: 8px;
+    margin-left: 4px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     transition: all 0.3s ease;
 }
