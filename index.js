@@ -2112,11 +2112,22 @@ async function startServer() {
         // Catch-all route for SPA - must be LAST after ALL API routes
         // Added
         app.get('*', (req, res) => {
-            // Only serve index.html for non-API routes
-            if (!req.path.startsWith('/api/')) {
-                res.sendFile(path.join(__dirname, 'public', 'index.html'));
-            } else {
+            if (req.path.startsWith('/api/')) {
                 res.status(404).json({ error: 'API endpoint not found' });
+            } else {
+                // Define valid frontend routes
+                const validRoutes = [
+                    '/', '/about', '/projects', '/events', '/leaderboard',
+                    '/profile', '/contact', '/login', '/admin'
+                ];
+
+                // Check if the requested path is a valid route
+                if (validRoutes.includes(req.path)) {
+                    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+                } else {
+                    // Serve 404 page for invalid routes
+                    res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+                }
             }
         });
 

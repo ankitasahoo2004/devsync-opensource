@@ -70,7 +70,10 @@ async function fetchUserProfile() {
 
 function updateProfileInfo(data) {
     document.getElementById('profile-img').src = data.avatar_url;
-    document.getElementById('profile-name').textContent = data.name || data.login;
+    const profileNameElement = document.getElementById('profile-name');
+    const fullName = data.name || data.login;
+    profileNameElement.textContent = fullName;
+    profileNameElement.title = fullName; // Add title for full name on hover
     document.getElementById('profile-bio').textContent = data.bio || '';
 
     // Add banner customization with dynamic update handling

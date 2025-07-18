@@ -2,16 +2,6 @@
 // const serverUrl = 'https://www.devsync.club';
 const serverUrl = 'http://localhost:3000';
 
-/**
- * Extract the first word/name from a full name or username
- * @param {string} fullName - Full name or username
- * @returns {string} First word of the name
- */
-function getFirstName(fullName) {
-    if (!fullName) return 'User';
-    return fullName.trim().split(' ')[0];
-}
-
 // Page transition animation functions
 function getOrCreatePageWipeElement() {
     // First check if the page wipe already exists in the DOM (from index.html)
@@ -270,17 +260,16 @@ function updateAuthButton(selector, data) {
 
     setTimeout(() => {
         if (data.isAuthenticated) {
-            // Update to profile button with user's name
+            // Update to profile button with user's full name
             const isMainButton = selector === '#auth-button';
             const fullUserName = data.user.displayName || data.user.username || 'Profile';
-            // Extract only the first word of the username using utility function
-            const userName = getFirstName(fullUserName);
+            // Use full name with ellipsis handling in CSS
 
             if (isMainButton) {
                 button.innerHTML = `
                     <div class="btn-inner">
                         <div class="o-hidden">
-                            <div split-text="" stagger-text="" class="btn-txt">${userName}</div>
+                            <div split-text="" stagger-text="" class="btn-txt auth-user-name" title="${fullUserName}">${fullUserName}</div>
                         </div>
                         <div class="btn-icon-w">
                             <img src="${data.user.photos[0].value}" 
@@ -295,7 +284,7 @@ function updateAuthButton(selector, data) {
             } else {
                 button.innerHTML = `
                     <div class="o-hidden page-link-inner">
-                        <div split-text="" stagger-text="" class="text-small btn-txt">${userName}</div>
+                        <div split-text="" stagger-text="" class="text-small btn-txt auth-user-name" title="${fullUserName}">${fullUserName}</div>
                         <div class="btn-icon-w">
                             <img src="${data.user.photos[0].value}" 
                                  alt="Profile" 
@@ -375,15 +364,18 @@ function updateAuthButton(selector, data) {
 
 function updateCtaButton(selector, data) {
     const button = document.querySelector(selector);
-    if (!button) return;    if (data.isAuthenticated) {
+    if (!button) return;
+
+    if (data.isAuthenticated) {
         // Update to personalized dashboard button
         const fullUserName = data.user.displayName || data.user.username || 'User';
-        const firstName = getFirstName(fullUserName);
+        const firstName = fullUserName.split(' ')[0] || 'User';
+        // Use full name with proper greeting and ellipsis handling
 
         button.innerHTML = `
             <div class="btn-inner">
                 <div class="o-hidden">
-                    <div split-text="" stagger-text="" class="btn-txt">Welcome, ${firstName}!</div>
+                    <div split-text="" stagger-text="" class="btn-txt cta-user-name" title="Welcome, ${firstName}!">Welcome, ${firstName}!</div>
                 </div>
                 <div class="btn-icon-w">
                     <div class="text-small btn-txt">-&gt;</div>
