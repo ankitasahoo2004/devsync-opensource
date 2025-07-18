@@ -371,6 +371,55 @@ html.light .btn-w {
     border-color: var(--light-grey);
 }
 
+html.light .home-client__grid-img {
+    filter: none;
+    opacity: 1;
+}
+
+html.light .home-client__grid-img img {
+    filter: brightness(0) saturate(0);
+    opacity: 1;
+    mix-blend-mode: normal;
+}
+
+/* Ensure sponsor logos are visible in dark theme */
+html.dark .home-client__grid-img {
+    filter: none;
+    opacity: 1;
+}
+
+html.dark .home-client__grid-img img {
+    filter: brightness(0) invert(1);
+    opacity: 1;
+    mix-blend-mode: normal;
+}
+
+/* Make sure the logo containers have proper styling */
+.home-client__grid-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.home-client__grid-img img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Ensure corner images remain styled properly */
+html.light .home-client__corner-img {
+    filter: none;
+    opacity: 0.3;
+}
+
+html.dark .home-client__corner-img {
+    filter: invert(1) brightness(0.8);
+    opacity: 0.3;
+}
+
 html.light [data-brand] {
     fill: var(--main-dark);
 }
