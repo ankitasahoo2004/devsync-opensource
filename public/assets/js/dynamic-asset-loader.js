@@ -9,10 +9,10 @@ class DynamicAssetLoader {
         this.loadedAssets = new Map();
 
         // Global assets that load on every page
-        this.globalAssets = {
-            css: ['assets/css/toast.css'],
-            js: ['assets/js/offline-detector.js']
-        };
+        // this.globalAssets = {
+        //     css: ['assets/css/toast.css'],
+        //     js: ['assets/js/offline-detector.js']
+        // };
 
         this.pageAssets = {
             '/': {

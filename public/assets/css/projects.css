@@ -795,7 +795,7 @@
 }
 
 .terms-checkbox-container input[type="checkbox"] {
-  margin-top: 0.25rem;
+  margin-top: 0.25rem; 
 }
 
 .terms-modal .modal__content {
@@ -2130,5 +2130,9 @@
     
     .project-author {
         max-width: 100px;
+    }
+
+    .label {
+        font-size: 2em;
     }
 }

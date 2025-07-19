@@ -303,9 +303,9 @@ html.dark .btn-w .btn-icon-w .btn-txt {
 }
 
 html.dark .hud-menu-link [stagger-text],
-.page-link-w [split-text] {
+/* .page-link-w [split-text] {
     text-shadow: 0px 1em 0px var(--main-light);
-}
+} */
 
 html.dark .page-link-w [split-text] {
     text-shadow: 0px 1em 0px var(--main-light);
@@ -700,10 +700,10 @@ a {
 }
 
 /* Simple Buttons */
-.hud-menu-link [stagger-text],
+/* .hud-menu-link [stagger-text],
 .page-link-w [split-text] {
     text-shadow: 0px 1em 0px var(--main-dark);
-}
+} */
 
 .hud-menu-link .btn-icon-w .btn-txt {
     text-shadow: -1em 0px 0px var(--main-dark);
@@ -1609,7 +1609,7 @@ html.dark [faq-svg] path {
 
 /* Profile image in auth buttons */
 .auth-button .btn-icon-w img {
-    margin-left: 4px;
+    margin-left: 8px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     transition: all 0.3s ease;
 }
