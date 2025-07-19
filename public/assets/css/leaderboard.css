@@ -1220,4 +1220,14 @@ html[data-theme="dark"] .leaderboard-section .stat h3,
     .leaderboard-name {
         max-width: 110px;
     }
+
+    p.section__subtitle {
+      font-size: 4em;
+    }
+}
+
+
+p.section__subtitle {
+  font-size: 3em;
+  text-align: center;
 }

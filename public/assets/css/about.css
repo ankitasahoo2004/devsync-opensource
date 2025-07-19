@@ -1567,3 +1567,7 @@ html.dark [faq-svg] path {
         max-width: 180px;
     }
 }
+
+.div-line {
+    font-size: 2.5em;
+}
