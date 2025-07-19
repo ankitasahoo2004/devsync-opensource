@@ -7,6 +7,13 @@
 class DynamicAssetLoader {
     constructor() {
         this.loadedAssets = new Map();
+
+        // Global assets that load on every page
+        this.globalAssets = {
+            css: ['assets/css/toast.css'],
+            js: ['assets/js/offline-detector.js']
+        };
+
         this.pageAssets = {
             '/': {
                 css: ['assets/css/index.css', 'assets/css/recognition.css'],
@@ -321,6 +328,9 @@ class DynamicAssetLoader {
             return;
         }
 
+        // Always load global assets first
+        await this.loadGlobalAssets();
+
         // Remove current page assets that are not needed for the new page
         this.cleanupUnusedAssets(assets);
 
@@ -338,14 +348,26 @@ class DynamicAssetLoader {
     }
 
     /**
+     * Load global assets that should be available on every page
+     */
+    async loadGlobalAssets() {
+        // Load global CSS files
+        await this.loadCSSFiles(this.globalAssets.css);
+
+        // Load global JS files
+        await this.loadJSFiles(this.globalAssets.js);
+    }
+
+    /**
      * Remove assets that are not needed for the new page
      */
     cleanupUnusedAssets(newAssets) {
         const newAssetSet = new Set([...newAssets.css, ...newAssets.js]);
+        const globalAssetSet = new Set([...this.globalAssets.css, ...this.globalAssets.js]);
 
-        // Remove CSS files that are not needed
+        // Remove CSS files that are not needed (but keep global assets)
         this.currentPageAssets.forEach(asset => {
-            if (asset.endsWith('.css') && !newAssetSet.has(asset)) {
+            if (asset.endsWith('.css') && !newAssetSet.has(asset) && !globalAssetSet.has(asset)) {
                 const link = document.querySelector(`link[href="${asset}"]`);
                 if (link && !link.dataset.permanent) {
                     link.remove();
