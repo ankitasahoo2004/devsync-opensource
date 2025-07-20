@@ -91,7 +91,7 @@ function updateProfileInfo(data) {
                 });
             }, 300);
         };
-        newImage.src = `assets/img/banners/${bannerId}`;
+        newImage.src = `https://cdn.devsync.club/devsync-assets/Banners/${bannerId}`;
     };
 
     // Initialize banner
@@ -148,7 +148,7 @@ function updateProfileInfo(data) {
                 return `
                     <div class="level-badge" onclick="showBadgePreview(this)" 
                          data-badge-name="${name}" data-badge-desc="${description}">
-                        <img src="assets/img/badges/levels/${getLevelImage(badge)}" 
+                        <img src="https://cdn.devsync.club/devsync-assets/Badges/${getLevelImage(badge)}" 
                              alt="${name}"
                              class="level-badge__img">
                     </div>
@@ -170,16 +170,16 @@ function openBannerSidebar() {
     sidebar.className = 'banner-sidebar';
 
     const banners = [
-        { id: 'banner1.png', name: 'Dark Forest', requiredLevel: 1, theme: 'Mystical' },
-        { id: 'banner2.png', name: 'Mystic Night', requiredLevel: 2, theme: 'Enchanted' },
-        { id: 'banner3.png', name: 'Haunted Castle', requiredLevel: 3, theme: 'Gothic' },
-        { id: 'banner4.png', name: 'Spooky Woods', requiredLevel: 4, theme: 'Horror' },
-        { id: 'banner5.png', name: 'Shadow Realm', requiredLevel: 5, theme: 'Dark' },
-        { id: 'banner6.png', name: 'Phantom Palace', requiredLevel: 6, theme: 'Royal' },
-        { id: 'banner7.png', name: 'Dragon\'s Lair', requiredLevel: 7, theme: 'Epic' },
-        { id: 'banner8.png', name: 'Void Gateway', requiredLevel: 8, theme: 'Cosmic' },
-        { id: 'banner9.png', name: 'Demon\'s Court', requiredLevel: 9, theme: 'Infernal' },
-        { id: 'banner10.png', name: 'Eternal Darkness', requiredLevel: 10, theme: 'Ultimate' }
+        { id: 'banner1.gif', name: 'Dark Forest', requiredLevel: 1, theme: 'Mystical' },
+        { id: 'banner2.gif', name: 'Mystic Night', requiredLevel: 2, theme: 'Enchanted' },
+        { id: 'banner3.gif', name: 'Haunted Castle', requiredLevel: 3, theme: 'Gothic' },
+        { id: 'banner4.gif', name: 'Spooky Woods', requiredLevel: 4, theme: 'Horror' },
+        { id: 'banner5.gif', name: 'Shadow Realm', requiredLevel: 5, theme: 'Dark' },
+        { id: 'banner6.gif', name: 'Phantom Palace', requiredLevel: 6, theme: 'Royal' },
+        { id: 'banner7.gif', name: 'Dragon\'s Lair', requiredLevel: 7, theme: 'Epic' },
+        { id: 'banner8.gif', name: 'Void Gateway', requiredLevel: 8, theme: 'Cosmic' },
+        { id: 'banner9.gif', name: 'Demon\'s Court', requiredLevel: 9, theme: 'Infernal' },
+        { id: 'banner10.gif', name: 'Eternal Darkness', requiredLevel: 10, theme: 'Ultimate' }
     ];
 
     // Get user's current level from badges
@@ -208,7 +208,7 @@ function openBannerSidebar() {
                              data-banner="${banner.id}"
                              ${isUnlocked ? '' : 'disabled'}>
                             <div class="banner-preview">
-                                <img src="assets/img/banners/${banner.id}" alt="${banner.name}">
+                                <img src="https://cdn.devsync.club/devsync-assets/Banners/${banner.id}" alt="${banner.name}">
                                 ${!isUnlocked ? `
                                     <div class="lock-overlay">
                                         <i class='bx bx-lock'></i>
@@ -269,7 +269,7 @@ function openBannerSidebar() {
                     });
                 }, 300);
             };
-            newImage.src = `assets/img/banners/${bannerId}`;
+            newImage.src = `https://cdn.devsync.club/devsync-assets/Banners/${bannerId}`;
 
             localStorage.setItem('profileBanner', bannerId);
 

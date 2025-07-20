@@ -326,7 +326,7 @@ function getLevelImage(levelBadge) {
         'Demon Crafter': 'level9',
         'Eternal Revenge': 'level10'
     };
-    return levelMap[badgeName] ? `assets/img/badges/levels/${levelMap[badgeName]}.png` : null;
+    return levelMap[badgeName] ? `https://cdn.devsync.club/devsync-assets/Badges/${levelMap[badgeName]}.png` : null;
 }
 
 function createBadgePreviewPopup(badgeImage, badgeName) {
