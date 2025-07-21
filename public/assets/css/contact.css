@@ -736,11 +736,11 @@ a {
     user-select: none;
 }
 
-.mbm-diff {
+/* .mbm-diff {
     mix-blend-mode: difference;
     color: var(--main-light);
     user-select: none;
-}
+} */
 
 [no-mbm] {
     color: var(--main-dark);

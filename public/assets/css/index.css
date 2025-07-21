@@ -743,9 +743,14 @@ a {
     user-select: none;
 }
 
-.mbm-diff {
-    mix-blend-mode: difference;
+html.dark .mbm-diff {
+    /* mix-blend-mode: difference; */
     color: var(--main-light);
+    user-select: none;
+}
+html.light .mbm-diff {
+    /* mix-blend-mode: difference; */
+    color: var(--main-dark);
     user-select: none;
 }
 

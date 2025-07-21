@@ -1,0 +1,120 @@
+/* About Page Specific Styles */
+
+/* About Page Typography */
+.people-p {
+    font-size: 2rem;
+}
+
+.people-p-black {
+    font-size: 3rem;
+    color: var(--main-dark);
+}
+
+/* ----- About Page Team Section ----- */
+.team-titles .text-small {
+    line-height: 1;
+}
+
+/* team card hover*/
+.team-cross-w,
+.team-cross {
+    transition-duration: 600ms;
+    transition-timing-function: ease;
+    transition-property: transform, opacity;
+}
+
+.team-title-w {
+    transition-duration: 600ms;
+    transition-timing-function: ease;
+    transition-property: opacity;
+}
+
+/* team card active */
+.team-item-w.is--active .team-img-w {
+    transform: scale(1.1);
+}
+
+.team-item-w.is--active .team-title-w {
+    opacity: 1;
+}
+
+.team-item-w.is--active .team-cross-w {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.team-item-w.is--active .team-cross {
+    transform: rotate(45deg);
+}
+
+/* bento blocks */
+.abt-block-w.is-2 {
+    aspect-ratio: 1 / 1;
+}
+
+.abt-block-w.is-1 .abt-block-info-w {
+    color: var(--main-light);
+}
+
+.abt-block-w.is-4 .abt-block-info-w {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+[abt-vid] {
+    height: 100%;
+    width: 100%;
+}
+
+.abt-block-w.is-1 .abt-txt,
+.abt-block-w.is-1 .span-small {
+    color: var(--main-dark) !important;
+}
+
+.text-small.flip-text {
+    transform: rotate(180deg);
+    display: inline-block;
+}
+
+.abt-cross-svg {
+    fill: var(--main-dark);
+}
+
+html.dark .abt-cross-svg {
+    fill: var(--main-light);
+}
+
+.abt-rotator-svg {
+    fill: var(--main-light-alt);
+}
+
+html.dark .abt-rotator-svg {
+    fill: var(--main-dark-alt);
+}
+
+.abt-block-w.is-2 {
+    background: var(--main-light-alt);
+    border: 1px solid var(--light-grey);
+}
+
+html.dark .abt-block-w.is-2 {
+    background: var(--main-dark-alt);
+    border: 1px solid var(--light-grey);
+}
+
+/* Desktop hover effects for team cards */
+@media only screen and (min-width: 992px) {
+    .team-item-w:hover .team-img-w {
+        transform: scale(1.1);
+    }
+
+    .team-item-w:hover .team-cross-w {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .team-item-w:hover .team-title-w {
+        opacity: 1;
+    }
+}
