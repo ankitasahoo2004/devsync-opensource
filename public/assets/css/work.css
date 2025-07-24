@@ -736,11 +736,11 @@ a {
     user-select: none;
 }
 
-.mbm-diff {
+/* .mbm-diff {
     mix-blend-mode: difference;
     color: var(--main-light);
     user-select: none;
-}
+} */
 
 [no-mbm] {
     color: var(--main-dark);
@@ -925,6 +925,53 @@ html.dark .ser-grid-item.is--active .ser-cross-svg {
 
 html.dark .ser-grid-item.is--active .is-ser-title {
     color: var(--main-light);
+}
+
+/* Light mode styles for service grid */
+html.light .ser-grid-item {
+    background: var(--main-light-alt);
+    border: 1px solid var(--light-grey);
+    color: var(--main-dark);
+}
+
+html.light .ser-grid-item .is-ser-title {
+    color: var(--main-dark);
+}
+
+html.light .ser-grid-item.is--active .is-ser-title {
+    color: var(--main-dark);
+}
+
+html.light .ser-grid-item .h-c {
+    color: var(--main-dark);
+}
+
+html.light .ser-grid-item .h-d {
+    color: var(--main-dark);
+}
+
+html.light .ser-grid-item .text-large {
+    color: var(--main-dark);
+    opacity: 0.8;
+}
+
+html.light .ser-grid-item .ser-cross-svg {
+    fill: var(--main-dark);
+}
+
+html.light .ser-grid-item.is--active .btn-w {
+    background: var(--main-dark);
+    color: var(--main-light);
+}
+
+html.light .ser-grid-item .btn-w [stagger-text] {
+    color: var(--main-light);
+    text-shadow: 0px 1em 0px var(--main-light);
+}
+
+html.light .ser-grid-item .btn-w .btn-icon-w .btn-txt {
+    color: var(--main-light);
+    text-shadow: -1em 0px 0px var(--main-light);
 }
 
 

@@ -132,7 +132,7 @@ function manageSectionCSS(newSection) {
 function removeUnneededSectionCSS(newCSSFile) {
     // Define all section-specific CSS files
     const allSectionCSSFiles = [
-        
+
     ];
 
     // Remove only CSS files that are not needed for the new section
@@ -151,7 +151,7 @@ function removeAllSectionCSS() {
 
     // Remove other section-specific CSS files
     const sectionCSSFiles = [
-        
+
     ];
 
     sectionCSSFiles.forEach(cssFile => {
@@ -748,7 +748,14 @@ async function loadAutomation() {
 }
 
 function openAdvancedPRScan() {
-    // Initialize the PR scanner if not already done
+    // Check if advanced PR scanner is available
+    if (window.advancedPRScanManager) {
+        window.advancedPRScanManager.open();
+        showToast('info', '🚀 Advanced PR Scanner v2.0 opened with terminal interface!');
+        return;
+    }
+
+    // Fallback to original scanner if advanced is not available
     if (!window.prScanManager) {
         // Import the class and create instance
         if (typeof PRScanManager !== 'undefined') {

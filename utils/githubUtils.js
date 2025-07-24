@@ -178,7 +178,7 @@ async function submitPRForApproval(userId, username, repoUrl, prData) {
     }
 }
 
-// Helper function to fetch PRs with caching and rate limit handling
+// Helper function to fetch PRs using GraphQL with caching and rate limit handling
 async function fetchPRDetails(username) {
     try {
         // Check cache first
@@ -189,13 +189,68 @@ async function fetchPRDetails(username) {
             return cachedData.data;
         }
 
-        // Fetch with retry logic for rate limits
+        // Fetch with retry logic for rate limits using GraphQL
         const data = await retryWithBackoff(async () => {
-            const response = await octokit.search.issuesAndPullRequests({
-                q: `type:pr+author:${username}+is:merged+created:>=${PROGRAM_START_DATE}`,
-                per_page: 100
+            const response = await octokit.graphql(`
+                query($searchQuery: String!, $first: Int!) {
+                    search(
+                        query: $searchQuery
+                        type: ISSUE
+                        first: $first
+                    ) {
+                        nodes {
+                            ... on PullRequest {
+                                id
+                                number
+                                title
+                                url
+                                state
+                                createdAt
+                                mergedAt
+                                repository {
+                                    url
+                                    owner {
+                                        login
+                                    }
+                                    name
+                                }
+                                author {
+                                    login
+                                }
+                            }
+                        }
+                        pageInfo {
+                            hasNextPage
+                            endCursor
+                        }
+                    }
+                }
+            `, {
+                first: 100,
+                searchQuery: `type:pr author:${username} is:merged created:>=${PROGRAM_START_DATE}`
             });
-            return response.data;
+
+            // Transform GraphQL response to match REST API format
+            const items = response.search.nodes
+                .filter(pr => pr && pr.state === 'MERGED')
+                .map(pr => ({
+                    id: pr.id,
+                    number: pr.number,
+                    title: pr.title,
+                    html_url: pr.url,
+                    state: pr.state.toLowerCase(),
+                    created_at: pr.createdAt,
+                    merged_at: pr.mergedAt,
+                    repository_url: `https://api.github.com/repos/${pr.repository.owner.login}/${pr.repository.name}`,
+                    user: {
+                        login: pr.author?.login
+                    }
+                }));
+
+            return {
+                items: items,
+                total_count: items.length
+            };
         });
 
         // Cache the result

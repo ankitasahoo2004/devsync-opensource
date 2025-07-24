@@ -1195,6 +1195,107 @@ html[data-theme="dark"] .leaderboard-section .stat h3,
     max-width: 150px;
 }
 
+/* Service Grid Styles for Leaderboard Page */
+.ser-grid-item {
+    background: var(--main-light-alt);
+    border-radius: var(--small-radius);
+    border: 1px solid var(--light-grey);
+}
+
+.is-ser-title {
+    transition-duration: 600ms;
+    transition-property: color;
+    transition-timing-function: ease;
+}
+
+.ser-cross-w {
+    transition-duration: 600ms;
+    transition-timing-function: ease;
+    transition-property: transform, opacity;
+    transform: scale(0.8);
+    opacity: 0.8;
+}
+
+.ser-grid-item.is--active .btn-w {
+    background: black;
+}
+
+/* Light Mode Styles for Service Grid in Leaderboard */
+html.light .ser-grid-item {
+    background: var(--main-light-alt);
+    border: 1px solid var(--light-grey);
+    color: var(--main-dark);
+}
+
+html.light .ser-grid-item .is-ser-title {
+    color: var(--main-dark);
+}
+
+html.light .ser-grid-item.is--active .is-ser-title {
+    color: var(--main-dark);
+}
+
+html.light .ser-grid-item .h-c {
+    color: var(--main-dark);
+}
+
+html.light .ser-grid-item .h-d {
+    color: var(--main-dark);
+}
+
+html.light .ser-grid-item .text-large {
+    color: var(--main-dark);
+    opacity: 0.85;
+}
+
+html.light .ser-grid-item .ser-cross-svg {
+    fill: var(--main-dark);
+}
+
+html.light .ser-grid-item.is--active .ser-cross-svg {
+    fill: var(--main-dark);
+}
+
+html.light .ser-grid-item.is--active .btn-w {
+    background: var(--main-dark);
+    color: var(--main-light);
+}
+
+html.light .ser-grid-item .btn-w [stagger-text] {
+    color: var(--main-light);
+}
+
+html.light .ser-grid-item .btn-w .btn-icon-w .btn-txt {
+    color: var(--main-light);
+}
+
+/* Dark Mode Styles for Service Grid in Leaderboard */
+html.dark .ser-grid-item {
+    background: var(--main-dark-alt);
+    border: 1px solid var(--dark-grey);
+}
+
+html.dark .ser-grid-item.is--active .btn-w {
+    background: white;
+    color: black;
+}
+
+html.dark .ser-grid-item .btn-w [stagger-text] {
+    text-shadow: 0px 1em 0px var(--main-dark);
+}
+
+html.dark .ser-grid-item .btn-w .btn-icon-w .btn-txt {
+    text-shadow: -1em 0px 0px var(--main-dark);
+}
+
+html.dark .ser-grid-item.is--active .ser-cross-svg {
+    fill: var(--main-light);
+}
+
+html.dark .ser-grid-item.is--active .is-ser-title {
+    color: var(--main-light);
+}
+
 .leaderboard-name {
     overflow: hidden;
     text-overflow: ellipsis;

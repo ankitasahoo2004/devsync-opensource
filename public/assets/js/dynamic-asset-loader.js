@@ -74,7 +74,7 @@ class DynamicAssetLoader {
                     'assets/js/main.js',
                     'assets/js/auth.js',
                     'assets/js/global-search.js',
-                    'assets/js/events-integrated.js'
+                    'assets/js/events-integrated-fixed.js'
                 ]
             },
             '/events.html': {
@@ -88,7 +88,7 @@ class DynamicAssetLoader {
                     'assets/js/main.js',
                     'assets/js/auth.js',
                     'assets/js/global-search.js',
-                    'assets/js/events-integrated.js'
+                    'assets/js/events-integrated-fixed.js'
                 ]
             },
             '/leaderboard': {
