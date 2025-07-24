@@ -2,5 +2,7 @@
     "appService.zipIgnorePattern": [
         "node_modules{,/**}",
         ".vscode{,/**}"
-    ]
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/17240482-0a2b-4c4e-9ad7-81bb5f0740fa/resourceGroups/devsync-opensource-rg/providers/Microsoft.Web/sites/devsync",
+    "appService.deploySubpath": "."
 }

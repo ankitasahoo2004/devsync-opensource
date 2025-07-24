@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="assets/css/admin.css">
     <link rel="stylesheet" href="assets/css/admin-search.css">
     <link rel="stylesheet" href="assets/css/admin-pr-scan.css">
+    <link rel="stylesheet" href="assets/css/admin-pr-scan-advanced.css">
 
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
@@ -187,6 +188,9 @@
     </div>
 
     <script>
+        // Define serverUrl early to ensure it's available for all scripts
+        window.serverUrl = 'http://localhost:3000';
+
         // Initialize PR Scanner when page loads
         document.addEventListener('DOMContentLoaded', function () {
             // Initialize the PR scanner
@@ -200,6 +204,7 @@
     </script>
     <script src="assets/js/admin-search.js"></script>
     <script src="assets/js/admin-pr-scan.js"></script>
+    <script src="assets/js/admin-pr-scan-advanced.js"></script>
     <script src="assets/js/admin-user-management.js"></script>
     <script src="assets/js/admin.js"></script>
 </body>

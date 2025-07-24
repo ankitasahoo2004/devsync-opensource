@@ -56,19 +56,58 @@ router.get('/profile/:username', async (req, res) => {
             User.findOne({ username: req.params.username }, 'mergedPRs cancelledPRs')
         ]);
 
-        const { data } = await octokit.search.issuesAndPullRequests({
-            q: `type:pr+author:${req.params.username}+created:>=${PROGRAM_START_DATE}`,
-            per_page: 10,
-            sort: 'updated',
-            order: 'desc'
+        // Use GraphQL to fetch pull requests
+        const { search } = await octokit.graphql(`
+            query($searchQuery: String!, $first: Int!) {
+                search(
+                    query: $searchQuery
+                    type: ISSUE
+                    first: $first
+                ) {
+                    nodes {
+                        ... on PullRequest {
+                            id
+                            number
+                            title
+                            url
+                            state
+                            createdAt
+                            updatedAt
+                            mergedAt
+                            closedAt
+                            repository {
+                                url
+                                owner {
+                                    login
+                                }
+                                name
+                            }
+                            author {
+                                login
+                            }
+                        }
+                    }
+                    pageInfo {
+                        hasNextPage
+                        endCursor
+                    }
+                }
+            }
+        `, {
+            searchQuery: `type:pr author:${req.params.username} created:>=${PROGRAM_START_DATE}`,
+            first: 10
         });
 
-        const pullRequests = await Promise.all(data.items.map(async (pr) => {
-            const repoUrl = `https://github.com/${pr.repository_url.split('/repos/')[1]}`;
+        // Transform GraphQL response to match expected format
+        const pullRequests = await Promise.all(search.nodes.map(async (pr) => {
+            const repoUrl = pr.repository.url;
             const isDevSyncRepo = acceptedRepos.some(repo => repo.repoLink === repoUrl);
 
-            // Get additional PR details
-            const [owner, repo] = pr.repository_url.split('/repos/')[1].split('/');
+            // Extract owner and repo from repository data
+            const owner = pr.repository.owner.login;
+            const repo = pr.repository.name;
+
+            // Get additional PR details using REST API (still needed for merged status)
             const { data: prDetails } = await octokit.pulls.get({
                 owner,
                 repo,
@@ -89,13 +128,13 @@ router.get('/profile/:username', async (req, res) => {
                 id: pr.id,
                 title: pr.title,
                 number: pr.number,
-                state: pr.state,
-                createdAt: pr.created_at,
-                url: pr.html_url,
-                repository: pr.repository_url.split('/repos/')[1],
+                state: pr.state.toLowerCase(),
+                createdAt: pr.createdAt,
+                url: pr.url,
+                repository: `${owner}/${repo}`,
                 isDevSyncRepo,
-                merged: prDetails.merged,
-                closed: pr.state === 'closed' && !prDetails.merged,
+                merged: prDetails.merged || pr.state === 'MERGED',
+                closed: pr.state === 'CLOSED' && pr.state !== 'MERGED',
                 isDevSyncDetected: isDevSyncRepo ? isDevSyncDetected : false,
                 isRejected: isDevSyncRepo ? isRejected : false
             };

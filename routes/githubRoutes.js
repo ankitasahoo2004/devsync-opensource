@@ -274,13 +274,59 @@ router.get('/events/:username/pushes', async (req, res) => {
 
 router.get('/events/:username/prs', async (req, res) => {
     try {
-        const { data } = await octokit.search.issuesAndPullRequests({
-            q: `type:pr+author:${req.params.username}`,
-            per_page: 10,
-            sort: 'updated',
-            order: 'desc'
+        const { search } = await octokit.graphql(`
+            query($searchQuery: String!, $first: Int!) {
+                search(
+                    query: $searchQuery
+                    type: ISSUE
+                    first: $first
+                ) {
+                    nodes {
+                        ... on PullRequest {
+                            id
+                            number
+                            title
+                            url
+                            state
+                            createdAt
+                            updatedAt
+                            mergedAt
+                            repository {
+                                url
+                                owner {
+                                    login
+                                }
+                                name
+                            }
+                            author {
+                                login
+                            }
+                        }
+                    }
+                }
+            }
+        `, {
+            searchQuery: `type:pr author:${req.params.username}`,
+            first: 10
         });
-        res.json(data.items);
+
+        // Transform to match expected format
+        const items = search.nodes.map(pr => ({
+            id: pr.id,
+            number: pr.number,
+            title: pr.title,
+            html_url: pr.url,
+            state: pr.state.toLowerCase(),
+            created_at: pr.createdAt,
+            updated_at: pr.updatedAt,
+            merged_at: pr.mergedAt,
+            repository_url: `https://api.github.com/repos/${pr.repository.owner.login}/${pr.repository.name}`,
+            user: {
+                login: pr.author?.login
+            }
+        }));
+
+        res.json(items);
     } catch (error) {
         console.error('Error fetching PRs:', error);
         res.status(500).json({ error: 'Failed to fetch pull requests' });
@@ -289,13 +335,59 @@ router.get('/events/:username/prs', async (req, res) => {
 
 router.get('/events/:username/merges', async (req, res) => {
     try {
-        const { data } = await octokit.search.issuesAndPullRequests({
-            q: `type:pr+author:${req.params.username}+is:merged`,
-            per_page: 10,
-            sort: 'updated',
-            order: 'desc'
+        const { search } = await octokit.graphql(`
+            query($searchQuery: String!, $first: Int!) {
+                search(
+                    query: $searchQuery
+                    type: ISSUE
+                    first: $first
+                ) {
+                    nodes {
+                        ... on PullRequest {
+                            id
+                            number
+                            title
+                            url
+                            state
+                            createdAt
+                            updatedAt
+                            mergedAt
+                            repository {
+                                url
+                                owner {
+                                    login
+                                }
+                                name
+                            }
+                            author {
+                                login
+                            }
+                        }
+                    }
+                }
+            }
+        `, {
+            searchQuery: `type:pr author:${req.params.username} is:merged`,
+            first: 10
         });
-        res.json(data.items);
+
+        // Transform to match expected format
+        const items = search.nodes.map(pr => ({
+            id: pr.id,
+            number: pr.number,
+            title: pr.title,
+            html_url: pr.url,
+            state: pr.state.toLowerCase(),
+            created_at: pr.createdAt,
+            updated_at: pr.updatedAt,
+            merged_at: pr.mergedAt,
+            repository_url: `https://api.github.com/repos/${pr.repository.owner.login}/${pr.repository.name}`,
+            user: {
+                login: pr.author?.login
+            }
+        }));
+
+        res.json(items);
     } catch (error) {
         console.error('Error fetching merges:', error);
         res.status(500).json({ error: 'Failed to fetch merged PRs' });
