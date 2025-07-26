@@ -297,16 +297,16 @@ function openBannerSidebar() {
 function getUserLevel() {
     const levelBadges = document.querySelectorAll('.level-badge');
     const levelMap = {
-        'Cursed Newbie': 1,
-        'Graveyard Shifter': 2,
-        'Night Stalker': 3,
-        'Skeleton of Structure': 4,
-        'Phantom Architect': 5,
-        'Haunted Debugger': 6,
-        'Lord of Shadows': 7,
-        'Dark Sorcerer': 8,
-        'Demon Crafter': 9,
-        'Eternal Revenge': 10
+        'Seeker': 1,
+        'Explorer': 2,
+        'Tinkerer': 3,
+        'Crafter': 4,
+        'Architect': 5,
+        'Innovator': 6,
+        'Strategist': 7,
+        'Visionary': 8,
+        'Trailblazer': 9,
+        'Luminary': 10
     };
 
     let highestLevel = 0;
@@ -402,16 +402,16 @@ function getLevelBadges(badges) {
     return badges.filter(badge => {
         const badgeName = badge.split('|')[0].trim();
         return [
-            'Cursed Newbie',
-            'Graveyard Shifter',
-            'Night Stalker',
-            'Skeleton of Structure',
-            'Phantom Architect',
-            'Haunted Debugger',
-            'Lord of Shadows',
-            'Dark Sorcerer',
-            'Demon Crafter',
-            'Eternal Revenge'
+            'Seeker',
+            'Explorer',
+            'Tinkerer',
+            'Crafter',
+            'Architect',
+            'Innovator',
+            'Strategist',
+            'Visionary',
+            'Trailblazer',
+            'Luminary'
         ].includes(badgeName);
     });
 }
@@ -419,16 +419,16 @@ function getLevelBadges(badges) {
 function getLevelImage(badge) {
     const badgeName = badge.split('|')[0].trim();
     const levelMap = {
-        'Cursed Newbie': 'level1.png',
-        'Graveyard Shifter': 'level2.png',
-        'Night Stalker': 'level3.png',
-        'Skeleton of Structure': 'level4.png',
-        'Phantom Architect': 'level5.png',
-        'Haunted Debugger': 'level6.png',
-        'Lord of Shadows': 'level7.png',
-        'Dark Sorcerer': 'level8.png',
-        'Demon Crafter': 'level9.png',
-        'Eternal Revenge': 'level10.png'
+        'Seeker': 'level1.png',
+        'Explorer': 'level2.png',
+        'Tinkerer': 'level3.png',
+        'Crafter': 'level4.png',
+        'Architect': 'level5.png',
+        'Innovator': 'level6.png',
+        'Strategist': 'level7.png',
+        'Visionary': 'level8.png',
+        'Trailblazer': 'level9.png',
+        'Luminary': 'level10.png'
     };
     return levelMap[badgeName];
 }

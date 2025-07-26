@@ -370,16 +370,16 @@ async function assignBadgesBasedOnContributions(user) {
   
   // Point-based level badges
   const levelBadges = [
-    { threshold: 0, badge: 'Cursed Newbie | Just awakened.....' },
-    { threshold: 100, badge: 'Graveyard Shifter | Lost but curious' },
-    { threshold: 250, badge: 'Night Stalker | Shadows are friends' },
-    { threshold: 500, badge: 'Skeleton of Structure | Casts magic on code' },
-    { threshold: 1000, badge: 'Phantom Architect | Builds from beyond' },
-    { threshold: 2000, badge: 'Haunted Debugger | Haunting every broken line' },
-    { threshold: 3500, badge: 'Lord of Shadows | Master of the unseen' },
-    { threshold: 5000, badge: 'Dark Sorcerer | Controls the dark arts' },
-    { threshold: 7500, badge: 'Demon Crafter | Shapes the cursed world' },
-    { threshold: 10000, badge: 'Eternal Revenge | Undying ghost' }
+    { threshold: 0, badge: 'Seeker | Curious to explore' },
+    { threshold: 100, badge: 'Explorer | Learning the landscape' },
+    { threshold: 250, badge: 'Tinkerer | Building with intent' },
+    { threshold: 500, badge: 'Crafter | Shaping solutions' },
+    { threshold: 1000, badge: 'Architect | Designing with clarity' },
+    { threshold: 2000, badge: 'Innovator | Creating what's next' },
+    { threshold: 3500, badge: 'Strategist | Solving with vision' },
+    { threshold: 5000, badge: 'Visionary | Thinking beyond the code' },
+    { threshold: 7500, badge: 'Trailblazer | Setting new standards' },
+    { threshold: 10000, badge: 'Luminary | Inspires the ecosystem' }
   ];
   
   levelBadges.forEach(({ threshold, badge }) => {

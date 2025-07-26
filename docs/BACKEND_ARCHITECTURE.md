@@ -330,9 +330,9 @@ async function assignBadges(user) {
   if (validContributions >= 10) badges.push('Super Contributor');
 
   // Point-based level badges
-  if (points >= 100) badges.push('Graveyard Shifter');
-  if (points >= 500) badges.push('Skeleton of Structure');
-  if (points >= 1000) badges.push('Phantom Architect');
+  if (points >= 100) badges.push('Explorer');
+  if (points >= 500) badges.push('Crafter');
+  if (points >= 1000) badges.push('Architect');
   // ... more badge logic
 
   return [...new Set(badges)]; // Remove duplicates
