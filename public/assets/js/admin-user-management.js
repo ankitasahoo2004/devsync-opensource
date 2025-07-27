@@ -7,6 +7,11 @@ class UserManagement {
         this.currentFilter = 'all';
         this.summary = {};
         this.loadCSS();
+        this.loadAdminActions();
+    }
+    loadAdminActions() {
+        // Ensure admin actions are initialized and shown
+        console.log('Admin actions initialized');
     }
 
     loadCSS() {
@@ -1323,25 +1328,25 @@ class UserManagement {
                                     </div>
                                     <div class="form-group">
                                         <label for="editBadge">Current Badge</label>
-                                        <select id="editBadge">
-                                            <option value="Seeker | Curious to explore" ${user.badge === 'Seeker | Curious to explore' ? 'selected' : ''}>Seeker</option>
-                                            <option value="Explorer | Learning the landscape" ${user.badge === 'Explorer | Learning the landscape' ? 'selected' : ''}>Explorer</option>
-                                            <option value="Tinkerer | Building with intent" ${user.badge === 'Tinkerer | Building with intent' ? 'selected' : ''}>Tinkerer</option>
-                                            <option value="Crafter | Shaping solutions" ${user.badge === 'Crafter | Shaping solutions' ? 'selected' : ''}>Crafter</option>
-                                            <option value="Architect | Designing with clarity" ${user.badge === 'Architect | Designing with clarity' ? 'selected' : ''}>Architect</option>
-                                            <option value="Innovator | Creating what's next" ${user.badge === 'Innovator | Creating whats next' ? 'selected' : ''}>Innovator</option>
-            < option value = "Strategist | Solving with vision" ${user.badge === 'Strategist | Solving with vision' ? 'selected' : ''}> Strategist</option >
-                                            <option value="Visionary | Thinking beyond the code" ${user.badge === 'Visionary | Thinking beyond the code' ? 'selected' : ''}>Visionary</option>
-                                            <option value="Trailblazer | Setting new standards" ${user.badge === 'Trailblazer | Setting new standards' ? 'selected' : ''}>Trailblazer</option>
-                                            <option value="Luminary | Inspires the ecosystem" ${user.badge === 'Luminary | Inspires the ecosystem' ? 'selected' : ''}>Luminary</option>
-                                        </select >
-                                    </div >
-                                </div >
-                            </div >
+                        <select id="editBadge">
+                            <option value="Seeker | Curious to explore" ${user.badge === 'Seeker | Curious to explore' ? 'selected' : ''}>Seeker</option>
+                            <option value="Explorer | Learning the landscape" ${user.badge === 'Explorer | Learning the landscape' ? 'selected' : ''}>Explorer</option>
+                            <option value="Tinkerer | Building with intent" ${user.badge === 'Tinkerer | Building with intent' ? 'selected' : ''}>Tinkerer</option>
+                            <option value="Crafter | Shaping solutions" ${user.badge === 'Crafter | Shaping solutions' ? 'selected' : ''}>Crafter</option>
+                            <option value="Architect | Designing with clarity" ${user.badge === 'Architect | Designing with clarity' ? 'selected' : ''}>Architect</option>
+                            <option value="Innovator | Creating what's next" ${user.badge === "Innovator | Creating what's next" ? 'selected' : ''}>Innovator</option>
+                            <option value="Strategist | Solving with vision" ${user.badge === 'Strategist | Solving with vision' ? 'selected' : ''}>Strategist</option>
+                            <option value="Visionary | Thinking beyond the code" ${user.badge === 'Visionary | Thinking beyond the code' ? 'selected' : ''}>Visionary</option>
+                            <option value="Trailblazer | Setting new standards" ${user.badge === 'Trailblazer | Setting new standards' ? 'selected' : ''}>Trailblazer</option>
+                            <option value="Luminary | Inspires the ecosystem" ${user.badge === 'Luminary | Inspires the ecosystem' ? 'selected' : ''}>Luminary</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-                            < !--Account Settings Section-- >
-                            <div class="form-section">
-                                <h3>Account Settings</h3>
+            <!-- Account Settings Section -->
+            <div class="form-section">
+                <h3>Account Settings</h3>
                                 <div class="form-row">
                                     <div class="form-group checkbox-group">
                                         <label class="checkbox-label">
@@ -1362,69 +1367,69 @@ class UserManagement {
                                 </div>
                             </div>
 
-                            <!--Admin Actions Section-- >
-            <div class="form-section danger-section">
-                <h3>Administrative Actions</h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editAdminNote">Admin Notes</label>
-                        <textarea id="editAdminNote" rows="3" placeholder="Add administrative notes about this user...">${user.adminNotes || ''}</textarea>
-                        <small class="field-note">Internal notes for admin reference</small>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Account Actions</label>
-                        <div class="action-buttons">
-                            <button type="button" class="action-btn reset-password-btn" onclick="userManagement.resetUserPassword('${user._id || user.id}')">
-                                <i class='bx bx-key'></i>
-                                Reset Authentication
-                            </button>
-                            <button type="button" class="action-btn resync-data-btn" onclick="userManagement.resyncUserData('${user._id || user.id}')">
-                                <i class='bx bx-refresh'></i>
-                                Resync PR Data
-                            </button>
-                            <button type="button" class="action-btn send-welcome-btn" onclick="userManagement.resendWelcomeEmail('${user._id || user.id}')">
-                                <i class='bx bx-envelope'></i>
-                                Resend Welcome Email
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                ${!user.isAdmin ? `
+                            <!-- Admin Actions Section -->
+                            <div class="form-section danger-section">
+                                <h3>Administrative Actions</h3>
                                 <div class="form-row">
-                                    <div class="form-group danger-group">
-                                        <label class="danger-label">Danger Zone</label>
-                                        <div class="danger-actions">
-                                            <button type="button" class="danger-btn suspend-btn" onclick="userManagement.suspendUser('${user._id || user.id}')">
-                                                <i class='bx bx-user-x'></i>
-                                                Suspend Account
-                                            </button>
-                                            <button type="button" class="danger-btn delete-btn" onclick="userManagement.deleteUser('${user._id || user.id}')">
-                                                <i class='bx bx-trash'></i>
-                                                Delete Account
-                                            </button>
-                                        </div>
-                                        <small class="danger-note">These actions are permanent and cannot be undone</small>
+                                    <div class="form-group">
+                                        <label for="editAdminNote">Admin Notes</label>
+                                        <textarea id="editAdminNote" rows="3" placeholder="Add administrative notes about this user...">${user.adminNotes || ''}</textarea>
+                                        <small class="field-note">Internal notes for admin reference</small>
                                     </div>
                                 </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Account Actions</label>
+                                        <div class="action-buttons">
+                                            <button type="button" class="action-btn reset-password-btn" onclick="userManagement.resetUserPassword('${user._id || user.id}')">
+                                                <i class='bx bx-key'></i>
+                                                Reset Authentication
+                                            </button>
+                                            <button type="button" class="action-btn resync-data-btn" onclick="userManagement.resyncUserData('${user._id || user.id}')">
+                                                <i class='bx bx-refresh'></i>
+                                                Resync PR Data
+                                            </button>
+                                            <button type="button" class="action-btn send-welcome-btn" onclick="userManagement.resendWelcomeEmail('${user._id || user.id}')">
+                                                <i class='bx bx-envelope'></i>
+                                                Resend Welcome Email
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                ${!user.isAdmin ? `
+                                    <div class="form-row">
+                                        <div class="form-group danger-group">
+                                            <label class="danger-label">Danger Zone</label>
+                                            <div class="danger-actions">
+                                                <button type="button" class="danger-btn suspend-btn" onclick="userManagement.suspendUser('${user._id || user.id}')">
+                                                    <i class='bx bx-user-x'></i>
+                                                    Suspend Account
+                                                </button>
+                                                <button type="button" class="danger-btn delete-btn" onclick="userManagement.deleteUser('${user._id || user.id}')">
+                                                    <i class='bx bx-trash'></i>
+                                                    Delete Account
+                                                </button>
+                                            </div>
+                                            <small class="danger-note">These actions are permanent and cannot be undone</small>
+                                        </div>
+                                    </div>
                                 ` : ''}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="cancel-btn" onclick="this.closest('.modal-overlay').remove()">
+                        <i class='bx bx-x'></i>
+                        Cancel
+                    </button>
+                    <button class="save-btn" onclick="userManagement.saveUserChanges('${user._id || user.id}', this)">
+                        <i class='bx bx-save'></i>
+                        Save Changes
+                    </button>
+                </div>
             </div>
-                        </div >
-                    </form >
-                </div >
-            <div class="modal-footer">
-                <button class="cancel-btn" onclick="this.closest('.modal-overlay').remove()">
-                    <i class='bx bx-x'></i>
-                    Cancel
-                </button>
-                <button class="save-btn" onclick="userManagement.saveUserChanges('${user._id || user.id}', this)">
-                    <i class='bx bx-save'></i>
-                    Save Changes
-                </button>
-            </div>
-            </div >
-            `;
+        `;
 
         document.body.appendChild(modal);
         modal.classList.add('show');
