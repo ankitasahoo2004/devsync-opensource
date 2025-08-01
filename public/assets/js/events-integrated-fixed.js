@@ -26,27 +26,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const eventsLoading = document.getElementById('eventsLoading');
 
     // Debug: Check if elements are found
-    console.log('DOM Elements Check:');
-    console.log('adminToggle:', adminToggle);
-    console.log('adminSection:', adminSection);
-    console.log('adminWelcome:', adminWelcome);
-    console.log('eventsGrid:', eventsGrid);
+    // console.log('DOM Elements Check:');
+    // console.log('adminToggle:', adminToggle);
+    // console.log('adminSection:', adminSection);
+    // console.log('adminWelcome:', adminWelcome);
+    // console.log('eventsGrid:', eventsGrid);
 
     // Initialize the events system
     init();
 
     async function init() {
-        console.log('Initializing events system...');
+        // console.log('Initializing events system...');
         showLoading();
         setupThemeDetection();
-        console.log('About to check admin status...');
+        // console.log('About to check admin status...');
         await checkAdminStatus();
-        console.log('Admin status check completed');
+        // console.log('Admin status check completed');
         await fetchEvents();
         setupEventListeners();
         renderEvents();
         hideLoading();
-        console.log('Events system initialization completed');
+        // console.log('Events system initialization completed');
     }
 
     // Enhanced theme detection to work with site's global theme system
@@ -107,47 +107,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Admin Status Check
     async function checkAdminStatus() {
-        console.log('Starting admin status check...');
+        // console.log('Starting admin status check...');
         try {
             const response = await fetch('/api/user', {
                 credentials: 'include'
             });
-            console.log('User fetch response status:', response.status);
+            // console.log('User fetch response status:', response.status);
 
             if (!response.ok) {
-                console.log('User fetch failed with status:', response.status);
+                // console.log('User fetch failed with status:', response.status);
                 return;
             }
 
             const data = await response.json();
-            console.log('User data:', data);
+            // console.log('User data:', data);
 
             if (data.isAuthenticated) {
                 currentUser = data.user;
-                console.log('User is authenticated:', data.user.username);
+                // console.log('User is authenticated:', data.user.username);
 
                 // Check if user is admin using hardcoded list for now
                 const adminIds = ['ankitasahoo2004', 'Sayan-dev731', 'Shubham66020', 'NamanSoni18'];
                 const isAdmin = adminIds.includes(data.user.username);
-                console.log('Is admin check:', isAdmin, 'for user:', data.user.username);
+                // console.log('Is admin check:', isAdmin, 'for user:', data.user.username);
 
                 if (isAdmin) {
-                    console.log('Granting admin access...');
+                    // console.log('Granting admin access...');
                     if (adminToggle) {
                         adminToggle.style.display = 'flex';
-                        console.log('Admin toggle button shown');
+                        // console.log('Admin toggle button shown');
                     } else {
                         console.error('adminToggle element not found!');
                     }
                     setupAdminPanel();
                 } else {
-                    console.log('Admin access denied - user not in admin list');
+                    // console.log('Admin access denied - user not in admin list');
                     if (adminToggle) {
                         adminToggle.style.display = 'none';
                     }
                 }
             } else {
-                console.log('User is not authenticated');
+                // console.log('User is not authenticated');
             }
         } catch (error) {
             console.error('Error checking admin status:', error);
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Admin Panel Setup
     function setupAdminPanel() {
-        console.log('Setting up admin panel...');
+        // console.log('Setting up admin panel...');
 
         if (!adminWelcome) {
             console.error('adminWelcome element not found');
@@ -368,18 +368,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         adminWelcome.style.display = 'block';
-        console.log('Admin welcome panel displayed');
+        // console.log('Admin welcome panel displayed');
 
         // Setup admin event listeners
         const createEventBtn = document.getElementById('createEventBtn');
         const manageEventsBtn = document.getElementById('manageEventsBtn');
 
-        console.log('Create event button:', createEventBtn);
-        console.log('Manage events button:', manageEventsBtn);
+        // console.log('Create event button:', createEventBtn);
+        // console.log('Manage events button:', manageEventsBtn);
 
         if (createEventBtn) {
             createEventBtn.addEventListener('click', () => {
-                console.log('Create event button clicked');
+                // console.log('Create event button clicked');
                 showCreateEventForm();
             });
         } else {
@@ -388,7 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (manageEventsBtn) {
             manageEventsBtn.addEventListener('click', () => {
-                console.log('Manage events button clicked');
+                // console.log('Manage events button clicked');
                 showManageEvents();
             });
         } else {
@@ -397,17 +397,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleAdminPanel() {
-        console.log('toggleAdminPanel called');
-        console.log('adminSection element:', adminSection);
-        console.log('adminSection display:', adminSection.style.display);
+        // console.log('toggleAdminPanel called');
+        // console.log('adminSection element:', adminSection);
+        // console.log('adminSection display:', adminSection.style.display);
 
         if (adminSection.style.display === 'none' || !adminSection.style.display) {
             adminSection.style.display = 'block';
             adminSection.scrollIntoView({ behavior: 'smooth' });
-            console.log('Admin panel opened');
+            // console.log('Admin panel opened');
         } else {
             adminSection.style.display = 'none';
-            console.log('Admin panel closed');
+            // console.log('Admin panel closed');
         }
     }
 
@@ -826,7 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Admin Functions - Full Implementation
     function showCreateEventForm() {
-        console.log('showCreateEventForm called');
+        // console.log('showCreateEventForm called');
 
         const eventManagement = document.getElementById('eventManagement');
         if (!eventManagement) {
@@ -834,7 +834,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        console.log('Creating event form...');
+        // console.log('Creating event form...');
 
         eventManagement.innerHTML = `
             <form id="eventForm" class="event-form">
@@ -1039,7 +1039,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function showManageEvents() {
-        console.log('showManageEvents called');
+        // console.log('showManageEvents called');
 
         const eventManagement = document.getElementById('eventManagement');
         if (!eventManagement) {
@@ -1047,7 +1047,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        console.log('Loading events for management...');
+        // console.log('Loading events for management...');
 
         try {
             const response = await fetch('/api/events', {
@@ -1101,7 +1101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const slotsInput = updateBtn.parentElement.querySelector('.slots-input');
                     const newSlots = parseInt(slotsInput.value);
 
-                    console.log('Updating slots for event:', eventId, 'with slots:', newSlots);
+                    // console.log('Updating slots for event:', eventId, 'with slots:', newSlots);
 
                     try {
                         const response = await fetch(`/api/events/${eventId}/slots`, {
@@ -1113,8 +1113,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             body: JSON.stringify({ filledSlots: newSlots })
                         });
 
-                        console.log('Response status:', response.status);
-                        console.log('Response headers:', response.headers);
+                        // console.log('Response status:', response.status);
+                        // console.log('Response headers:', response.headers);
 
                         if (response.ok) {
                             showModal('success', 'Success', 'Slots updated successfully!');
