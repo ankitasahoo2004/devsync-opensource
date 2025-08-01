@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const serverUrl = window.API_CONFIG ? window.API_CONFIG.serverUrl : 'http://localhost:3000';
 
     // Debug logging
-    console.log('Ticket system initializing with serverUrl:', serverUrl);
+    // console.log('Ticket system initializing with serverUrl:', serverUrl);
     let currentUser = null;
     let isAdmin = false;
 
@@ -57,11 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (adminData.isAdmin) {
                             isAdmin = true;
                             showAdminTab();
-                            console.log(`Welcome Admin ${currentUser.username}!`);
+                            // console.log(`Welcome Admin ${currentUser.username}!`);
                         }
                     }
                 } catch (adminError) {
-                    console.log('Not an admin user');
+                    // console.log('Not an admin user');
                     isAdmin = false;
                 }
             } else {
@@ -209,14 +209,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (statusFilter) queryParams.set('status', statusFilter);
             if (priorityFilter) queryParams.set('priority', priorityFilter);
 
-            console.log('Fetching tickets from:', `${serverUrl}/api/tickets/my?${queryParams}`);
+            // console.log('Fetching tickets from:', `${serverUrl}/api/tickets/my?${queryParams}`);
 
             const response = await fetch(`${serverUrl}/api/tickets/my?${queryParams}`, {
                 credentials: 'include'
             });
 
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
+            // console.log('Response status:', response.status);
+            // console.log('Response headers:', response.headers);
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -280,13 +280,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (priorityFilter) queryParams.set('priority', priorityFilter);
             if (searchFilter) queryParams.set('search', searchFilter);
 
-            console.log('Fetching admin tickets from:', `${serverUrl}/api/tickets/admin?${queryParams}`);
+            // console.log('Fetching admin tickets from:', `${serverUrl}/api/tickets/admin?${queryParams}`);
 
             const response = await fetch(`${serverUrl}/api/tickets/admin?${queryParams}`, {
                 credentials: 'include'
             });
 
-            console.log('Admin response status:', response.status);
+            // console.log('Admin response status:', response.status);
 
             if (response.status === 403) {
                 adminTicketsList.innerHTML = `
@@ -333,18 +333,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const adminStats = document.getElementById('adminStats');
 
         if (!isAdmin || !adminStats) {
-            console.log('Admin stats not loaded: isAdmin =', isAdmin, 'adminStats element =', !!adminStats);
+            // console.log('Admin stats not loaded: isAdmin =', isAdmin, 'adminStats element =', !!adminStats);
             return;
         }
 
         try {
-            console.log('Fetching admin stats from:', `${serverUrl}/api/tickets/admin/stats`);
+            // console.log('Fetching admin stats from:', `${serverUrl}/api/tickets/admin/stats`);
 
             const response = await fetch(`${serverUrl}/api/tickets/admin/stats`, {
                 credentials: 'include'
             });
 
-            console.log('Stats response status:', response.status);
+            // console.log('Stats response status:', response.status);
 
             if (response.status === 403) {
                 if (adminStats) {
