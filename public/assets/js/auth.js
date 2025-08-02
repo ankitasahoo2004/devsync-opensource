@@ -1,6 +1,6 @@
 // const serverUrl = 'https://devsync-opensource.tech';
-// const serverUrl = 'https://www.devsync.club';
-const serverUrl = 'http://localhost:3000';
+const serverUrl = 'https://www.devsync.club';
+// const serverUrl = 'http://localhost:3000';
 
 /**
  * Extract the first word/name from a full name or username
