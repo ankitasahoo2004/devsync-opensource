@@ -489,9 +489,13 @@ app.use('/api/stats', publicLimiter, statsRoutes);
 //     }
 // });
 
-app.get('/api/auth/logout', (req, res) => {
-    req.logout();
-    res.redirect(`${serverUrl}/index.html`);
+app.get('/api/auth/logout', (req, res, next) => {
+    req.logout(function(err) {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  });
 });
 
 // Update GitHub API routes with Octokit
