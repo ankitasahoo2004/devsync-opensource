@@ -318,7 +318,7 @@ const requireApiKeyOrAuth = (req, res, next) => {
 
 // Auth routes (no authentication required for login/logout)
 const authRoutes = require('./routes/authRoutes');
-app.use("/auth", authLimiter, authRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
 
 // API Status endpoint (public with rate limiting)
 app.get('/api/status', publicLimiter, (req, res) => {
@@ -489,7 +489,7 @@ app.use('/api/stats', publicLimiter, statsRoutes);
 //     }
 // });
 
-app.get('/auth/logout', (req, res) => {
+app.get('/api/auth/logout', (req, res) => {
     req.logout();
     res.redirect(`${serverUrl}/index.html`);
 });

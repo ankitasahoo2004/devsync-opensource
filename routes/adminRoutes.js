@@ -504,7 +504,7 @@ router.get("/users", async (req, res) => {
     // Fetch all users with comprehensive data
     const users = await User.find({})
       .select(
-        "githubId username displayName email avatarUrl mergedPRs cancelledPRs points totalPoints badges badge isAdmin createdAt lastLogin welcomeEmailSent"
+        "githubId username displayName email avatarUrl mergedPRs cancelledPRs points totalPoints badges badge isAdmin createdAt lastLogin welcomeEmailSent emailVerified verificationEmailSent verificationEmailSentAt"
       )
       .sort({ createdAt: -1 })
       .lean();
@@ -561,6 +561,11 @@ router.get("/users", async (req, res) => {
               `https://github.com/${user.username || "unknown"}.png`,
             isAdmin: adminUsernames.includes(user.username),
 
+            // Email verification status
+            emailVerified: user.emailVerified || false,
+            verificationEmailSent: user.verificationEmailSent || false,
+            verificationEmailSentAt: user.verificationEmailSentAt || null,
+
             // Points and achievements
             points: user.points || 0,
             totalPoints: calculatedPoints, // More accurate calculation
@@ -591,7 +596,7 @@ router.get("/users", async (req, res) => {
             isNewUser:
               user.createdAt &&
               Date.now() - new Date(user.createdAt).getTime() <
-                30 * 24 * 60 * 60 * 1000, // 30 days
+              30 * 24 * 60 * 60 * 1000, // 30 days
           };
         } catch (userError) {
           console.error(
@@ -610,6 +615,12 @@ router.get("/users", async (req, res) => {
               user.avatarUrl ||
               `https://github.com/${user.username || "unknown"}.png`,
             isAdmin: adminUsernames.includes(user.username),
+
+            // Email verification status
+            emailVerified: user.emailVerified || false,
+            verificationEmailSent: user.verificationEmailSent || false,
+            verificationEmailSentAt: user.verificationEmailSentAt || null,
+
             points: user.points || 0,
             totalPoints: user.totalPoints || user.points || 0,
             badge: user.badge || "Beginner",
@@ -646,6 +657,12 @@ router.get("/users", async (req, res) => {
       usersWithPendingPRs: enrichedUsers.filter((u) => u.pendingPRsCount > 0)
         .length,
       usersWithPoints: enrichedUsers.filter((u) => u.totalPoints > 0).length,
+
+      // Email verification statistics
+      verifiedUsers: enrichedUsers.filter((u) => u.emailVerified).length,
+      unverifiedUsers: enrichedUsers.filter((u) => !u.emailVerified).length,
+      verificationEmailsSent: enrichedUsers.filter((u) => u.verificationEmailSent).length,
+
       totalPointsAwarded: enrichedUsers.reduce(
         (sum, u) => sum + u.totalPoints,
         0
@@ -1035,6 +1052,167 @@ router.post("/users/:userId/resync", async (req, res) => {
   } catch (error) {
     console.error("Error resyncing user data:", error);
     res.status(500).json({ error: "Failed to resync user data" });
+  }
+});
+
+// Resend verification email endpoint (admin)
+router.post("/users/:userId/resend-verification", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const adminIds = process.env.ADMIN_GITHUB_IDS.split(",");
+  if (!adminIds.includes(req.user.username)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
+
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (user.emailVerified) {
+      return res.status(400).json({ error: "User email is already verified" });
+    }
+
+    if (!user.email) {
+      return res.status(400).json({ error: "User has no email address" });
+    }
+
+    // Generate new verification token
+    const { createEmailVerificationToken } = require("../utils/emailVerification");
+    const verificationToken = await createEmailVerificationToken(user.githubId);
+
+    // Send verification email
+    const emailResult = await emailService.sendEmailVerificationEmail(
+      user.email,
+      user.username,
+      verificationToken
+    );
+
+    if (emailResult.success) {
+      res.json({
+        success: true,
+        message: "Verification email sent successfully",
+        email: user.email
+      });
+    } else {
+      res.status(500).json({
+        error: "Failed to send verification email",
+        details: emailResult.error
+      });
+    }
+  } catch (error) {
+    console.error("Error resending verification email:", error);
+    res.status(500).json({
+      error: "Failed to resend verification email",
+      details: error.message
+    });
+  }
+});
+
+// Manually verify user email endpoint (admin only)
+router.post("/users/:userId/verify-email", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const adminIds = process.env.ADMIN_GITHUB_IDS.split(",");
+  if (!adminIds.includes(req.user.username)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
+
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (user.emailVerified) {
+      return res.status(400).json({ error: "User email is already verified" });
+    }
+
+    // Manually verify the user's email
+    user.emailVerified = true;
+    user.emailVerificationToken = null;
+    user.emailVerificationExpires = null;
+    user.verificationEmailSent = true;
+    user.verificationEmailSentAt = new Date();
+    await user.save();
+
+    // Send confirmation email to user
+    await emailService.sendEmailVerifiedConfirmationEmail(
+      user.email,
+      user.username
+    );
+
+    res.json({
+      success: true,
+      message: "User email verified successfully by admin",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        emailVerified: user.emailVerified
+      }
+    });
+  } catch (error) {
+    console.error("Error manually verifying user email:", error);
+    res.status(500).json({
+      error: "Failed to verify user email",
+      details: error.message
+    });
+  }
+});
+
+// Reset user email verification status (admin only)
+router.post("/users/:userId/reset-verification", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const adminIds = process.env.ADMIN_GITHUB_IDS.split(",");
+  if (!adminIds.includes(req.user.username)) {
+    return res.status(403).json({ error: "Not authorized" });
+  }
+
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Reset verification status
+    user.emailVerified = false;
+    user.emailVerificationToken = null;
+    user.emailVerificationExpires = null;
+    user.verificationEmailSent = false;
+    user.verificationEmailSentAt = null;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "User email verification status reset successfully",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        emailVerified: user.emailVerified
+      }
+    });
+  } catch (error) {
+    console.error("Error resetting user email verification:", error);
+    res.status(500).json({
+      error: "Failed to reset user email verification",
+      details: error.message
+    });
   }
 });
 
