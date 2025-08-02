@@ -154,6 +154,13 @@ function updateProfileInfo(data) {
                     </div>
                 `;
             }).join('');
+
+            // Refresh dynamic island after badges are updated
+            setTimeout(() => {
+                if (window.refreshBadgesIsland) {
+                    window.refreshBadgesIsland();
+                }
+            }, 100);
         }
     }
 }
