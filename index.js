@@ -92,16 +92,16 @@ mongoose.connect(process.env.MONGODB_URI)
 //         if (validMergedPRsCount >= 10) badges.push('Super Contributor');
 
 //         // Level badges - add all badges up to current points level
-//         if (points >= 0) levelBadges.push('Cursed Newbie | Just awakened.....');
-//         if (points >= 100) levelBadges.push('Graveyard Shifter | Lost but curious');
-//         if (points >= 250) levelBadges.push('Night Stalker | Shadows are friends');
-//         if (points >= 500) levelBadges.push('Skeleton of Structure | Casts magic on code');
-//         if (points >= 1000) levelBadges.push('Phantom Architect | Builds from beyond');
-//         if (points >= 2000) levelBadges.push('Haunted Debugger | Haunting every broken line');
-//         if (points >= 3500) levelBadges.push('Lord of Shadows | Master of the unseen');
-//         if (points >= 5000) levelBadges.push('Dark Sorcerer | Controls the dark arts');
-//         if (points >= 7500) levelBadges.push('Demon Crafter | Shapes the cursed world');
-//         if (points >= 10000) levelBadges.push('Eternal Revenge | Undying ghost');
+//         if (points >= 0) levelBadges.push('Seeker | Curious to explore');
+//         if (points >= 100) levelBadges.push('Explorer | Learning the landscape');
+//         if (points >= 250) levelBadges.push('Tinkerer | Building with intent');
+//         if (points >= 500) levelBadges.push('Crafter | Shaping solutions');
+//         if (points >= 1000) levelBadges.push('Architect | Designing with clarity');
+//         if (points >= 2000) levelBadges.push('Innovator | Creating what's next');
+//         if (points >= 3500) levelBadges.push('Strategist | Solving with vision');
+//         if (points >= 5000) levelBadges.push('Visionary | Thinking beyond the code');
+//         if (points >= 7500) levelBadges.push('Trailblazer | Setting new standards');
+//         if (points >= 10000) levelBadges.push('Luminary | Inspires the ecosystem');
 
 //         return [...badges, ...levelBadges];
 //     } catch (error) {
@@ -1893,16 +1893,16 @@ app.use('/api/users', publicLimiter, usersRoutes);
 
 // Helper function to get current badge based on points
 // async function getCurrentBadge(points) {
-//     if (points >= 10000) return 'Eternal Revenge | Undying ghost';
-//     if (points >= 7500) return 'Demon Crafter | Shapes the cursed world';
-//     if (points >= 5000) return 'Dark Sorcerer | Controls the dark arts';
-//     if (points >= 3500) return 'Lord of Shadows | Master of the unseen';
-//     if (points >= 2000) return 'Haunted Debugger | Haunting every broken line';
-//     if (points >= 1000) return 'Phantom Architect | Builds from beyond';
-//     if (points >= 500) return 'Skeleton of Structure | Casts magic on code';
-//     if (points >= 250) return 'Night Stalker | Shadows are friends';
-//     if (points >= 100) return 'Graveyard Shifter | Lost but curious';
-//     if (points >= 0) return 'Cursed Newbie | Just awakened.....';
+//     if (points >= 10000) return 'Luminary | Inspires the ecosystem';
+//     if (points >= 7500) return 'Trailblazer | Setting new standards';
+//     if (points >= 5000) return 'Visionary | Thinking beyond the code';
+//     if (points >= 3500) return 'Strategist | Solving with vision';
+//     if (points >= 2000) return 'Innovator | Creating what's next';
+//     if (points >= 1000) return 'Architect | Designing with clarity';
+//     if (points >= 500) return 'Crafter | Shaping solutions';
+//     if (points >= 250) return 'Tinkerer | Building with intent';
+//     if (points >= 100) return 'Explorer | Learning the landscape';
+//     if (points >= 0) return 'Seeker | Curious to explore';
 //     return 'Beginner';
 // }
 

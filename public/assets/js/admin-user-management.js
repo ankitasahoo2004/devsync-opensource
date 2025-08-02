@@ -7,6 +7,11 @@ class UserManagement {
         this.currentFilter = 'all';
         this.summary = {};
         this.loadCSS();
+        this.loadAdminActions();
+    }
+    loadAdminActions() {
+        // Ensure admin actions are initialized and shown
+        console.log('Admin actions initialized');
     }
 
     loadCSS() {
@@ -1323,25 +1328,25 @@ class UserManagement {
                                     </div>
                                     <div class="form-group">
                                         <label for="editBadge">Current Badge</label>
-                                        <select id="editBadge">
-                                            <option value="Cursed Newbie | Just awakened....." ${user.badge === 'Cursed Newbie | Just awakened.....' ? 'selected' : ''}>Cursed Newbie</option>
-                                            <option value="Graveyard Shifter | Lost but curious" ${user.badge === 'Graveyard Shifter | Lost but curious' ? 'selected' : ''}>Graveyard Shifter</option>
-                                            <option value="Night Stalker | Shadows are friends" ${user.badge === 'Night Stalker | Shadows are friends' ? 'selected' : ''}>Night Stalker</option>
-                                            <option value="Skeleton of Structure | Casts magic on code" ${user.badge === 'Skeleton of Structure | Casts magic on code' ? 'selected' : ''}>Skeleton of Structure</option>
-                                            <option value="Phantom Architect | Builds from beyond" ${user.badge === 'Phantom Architect | Builds from beyond' ? 'selected' : ''}>Phantom Architect</option>
-                                            <option value="Haunted Debugger | Haunting every broken line" ${user.badge === 'Haunted Debugger | Haunting every broken line' ? 'selected' : ''}>Haunted Debugger</option>
-                                            <option value="Lord of Shadows | Master of the unseen" ${user.badge === 'Lord of Shadows | Master of the unseen' ? 'selected' : ''}>Lord of Shadows</option>
-                                            <option value="Dark Sorcerer | Controls the dark arts" ${user.badge === 'Dark Sorcerer | Controls the dark arts' ? 'selected' : ''}>Dark Sorcerer</option>
-                                            <option value="Demon Crafter | Shapes the cursed world" ${user.badge === 'Demon Crafter | Shapes the cursed world' ? 'selected' : ''}>Demon Crafter</option>
-                                            <option value="Eternal Revenge | Undying ghost" ${user.badge === 'Eternal Revenge | Undying ghost' ? 'selected' : ''}>Eternal Revenge</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
+                        <select id="editBadge">
+                            <option value="Seeker | Curious to explore" ${user.badge === 'Seeker | Curious to explore' ? 'selected' : ''}>Seeker</option>
+                            <option value="Explorer | Learning the landscape" ${user.badge === 'Explorer | Learning the landscape' ? 'selected' : ''}>Explorer</option>
+                            <option value="Tinkerer | Building with intent" ${user.badge === 'Tinkerer | Building with intent' ? 'selected' : ''}>Tinkerer</option>
+                            <option value="Crafter | Shaping solutions" ${user.badge === 'Crafter | Shaping solutions' ? 'selected' : ''}>Crafter</option>
+                            <option value="Architect | Designing with clarity" ${user.badge === 'Architect | Designing with clarity' ? 'selected' : ''}>Architect</option>
+                            <option value="Innovator | Creating what's next" ${user.badge === "Innovator | Creating what's next" ? 'selected' : ''}>Innovator</option>
+                            <option value="Strategist | Solving with vision" ${user.badge === 'Strategist | Solving with vision' ? 'selected' : ''}>Strategist</option>
+                            <option value="Visionary | Thinking beyond the code" ${user.badge === 'Visionary | Thinking beyond the code' ? 'selected' : ''}>Visionary</option>
+                            <option value="Trailblazer | Setting new standards" ${user.badge === 'Trailblazer | Setting new standards' ? 'selected' : ''}>Trailblazer</option>
+                            <option value="Luminary | Inspires the ecosystem" ${user.badge === 'Luminary | Inspires the ecosystem' ? 'selected' : ''}>Luminary</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-                            <!-- Account Settings Section -->
-                            <div class="form-section">
-                                <h3>Account Settings</h3>
+            <!-- Account Settings Section -->
+            <div class="form-section">
+                <h3>Account Settings</h3>
                                 <div class="form-row">
                                     <div class="form-group checkbox-group">
                                         <label class="checkbox-label">
@@ -1392,22 +1397,22 @@ class UserManagement {
                                     </div>
                                 </div>
                                 ${!user.isAdmin ? `
-                                <div class="form-row">
-                                    <div class="form-group danger-group">
-                                        <label class="danger-label">Danger Zone</label>
-                                        <div class="danger-actions">
-                                            <button type="button" class="danger-btn suspend-btn" onclick="userManagement.suspendUser('${user._id || user.id}')">
-                                                <i class='bx bx-user-x'></i>
-                                                Suspend Account
-                                            </button>
-                                            <button type="button" class="danger-btn delete-btn" onclick="userManagement.deleteUser('${user._id || user.id}')">
-                                                <i class='bx bx-trash'></i>
-                                                Delete Account
-                                            </button>
+                                    <div class="form-row">
+                                        <div class="form-group danger-group">
+                                            <label class="danger-label">Danger Zone</label>
+                                            <div class="danger-actions">
+                                                <button type="button" class="danger-btn suspend-btn" onclick="userManagement.suspendUser('${user._id || user.id}')">
+                                                    <i class='bx bx-user-x'></i>
+                                                    Suspend Account
+                                                </button>
+                                                <button type="button" class="danger-btn delete-btn" onclick="userManagement.deleteUser('${user._id || user.id}')">
+                                                    <i class='bx bx-trash'></i>
+                                                    Delete Account
+                                                </button>
+                                            </div>
+                                            <small class="danger-note">These actions are permanent and cannot be undone</small>
                                         </div>
-                                        <small class="danger-note">These actions are permanent and cannot be undone</small>
                                     </div>
-                                </div>
                                 ` : ''}
                             </div>
                         </div>
@@ -1478,7 +1483,7 @@ class UserManagement {
         button.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Saving...';
 
         try {
-            const response = await fetch(`${this.serverUrl}/api/admin/users/${userId}`, {
+            const response = await fetch(`${this.serverUrl} /api/admin / users / ${userId} `, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1489,7 +1494,7 @@ class UserManagement {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                throw new Error(errorData.message || `HTTP error! status: ${response.status} `);
             }
 
             const result = await response.json();
@@ -1538,7 +1543,7 @@ class UserManagement {
             if (formData.badge !== (result.originalUser?.badge || '')) updatedFields.push('Badge');
 
             const updateMessage = updatedFields.length > 0
-                ? `User ${formData.displayName} updated successfully! Updated: ${updatedFields.join(', ')}`
+                ? `User ${formData.displayName} updated successfully! Updated: ${updatedFields.join(', ')} `
                 : `User ${formData.displayName} updated successfully!`;
 
             window.showToast && window.showToast('success', updateMessage);
@@ -1558,7 +1563,7 @@ class UserManagement {
             button.innerHTML = originalText;
 
             // Show error message
-            window.showToast && window.showToast('error', `Failed to save changes: ${error.message}`);
+            window.showToast && window.showToast('error', `Failed to save changes: ${error.message} `);
         }
     }
 
@@ -1568,7 +1573,7 @@ class UserManagement {
         }
 
         try {
-            const response = await fetch(`${this.serverUrl}/api/admin/users/${userId}/reset-auth`, {
+            const response = await fetch(`${this.serverUrl} /api/admin / users / ${userId}/reset-auth`, {
                 method: 'POST',
                 credentials: 'include'
             });

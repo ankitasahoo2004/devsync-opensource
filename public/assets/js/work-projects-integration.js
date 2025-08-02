@@ -7,13 +7,13 @@ document.addEventListener('DOMContentLoaded', function () {
         window.serverUrl = window.location.origin;
     }
 
-    console.log('🚀 DevSync Projects Integration starting...');
-    console.log('🌐 Server URL:', window.serverUrl);
+    // console.log('🚀 DevSync Projects Integration starting...');
+    // console.log('🌐 Server URL:', window.serverUrl);
 
     // Initialize all components with delay to ensure DOM is ready
     // Use longer delay to ensure all elements are properly rendered
     setTimeout(() => {
-        console.log('🔧 Starting component initialization...');
+        // console.log('🔧 Starting component initialization...');
 
         initializeCompactCommunity();
         initializeProjectSummary(); // This now includes retry mechanism
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Include required scripts
         includeRequiredScripts();
 
-        console.log('✅ DevSync Projects Integration initialized');
+        // console.log('✅ DevSync Projects Integration initialized');
     }, 1000); // Increased delay for better reliability
 });
 
@@ -339,12 +339,12 @@ function checkSummaryElements() {
         communityCount: document.getElementById('communityCount')
     };
 
-    console.log('📊 Summary Elements Check:');
+    // console.log('📊 Summary Elements Check:');
     Object.entries(elements).forEach(([key, element]) => {
         if (element) {
-            console.log(`✅ ${key}: Element found`);
+            // console.log(`✅ ${key}: Element found`);
         } else {
-            console.log(`❌ ${key}: Element NOT found`);
+            // console.log(`❌ ${key}: Element NOT found`);
         }
     });
 
@@ -355,7 +355,7 @@ function checkSummaryElements() {
 function initializeProjectSummary() {
     const summaryCards = document.querySelectorAll('.summary-card');
 
-    console.log(`🎯 Found ${summaryCards.length} summary cards`);
+    // console.log(`🎯 Found ${summaryCards.length} summary cards`);
 
     summaryCards.forEach(card => {
         card.addEventListener('click', function () {
@@ -389,7 +389,7 @@ function initializeProjectSummary() {
         const elementsWithDash = Object.values(elements).filter(el => el && el.textContent === '-');
 
         if (elementsWithDash.length > 0) {
-            console.log('🔄 Some elements still showing "-", retrying data load...');
+            // console.log('🔄 Some elements still showing "-", retrying data load...');
             loadProjectSummaryDataWithRetry();
         }
     }, 2000);
@@ -432,7 +432,7 @@ async function loadProjectSummaryDataWithRetry(retryCount = 0) {
         console.error(`❌ Attempt ${retryCount + 1} failed:`, error);
 
         if (retryCount < maxRetries) {
-            console.log(`🔄 Retrying in ${(retryCount + 1) * 1000}ms...`);
+            // console.log(`🔄 Retrying in ${(retryCount + 1) * 1000}ms...`);
             setTimeout(() => {
                 loadProjectSummaryDataWithRetry(retryCount + 1);
             }, (retryCount + 1) * 1000);
@@ -447,8 +447,8 @@ async function loadProjectSummaryDataWithRetry(retryCount = 0) {
 
 // Load project summary data with improved error handling
 async function loadProjectSummaryData() {
-    console.log('📊 Loading project summary data...');
-    console.log('🌐 Server URL:', window.serverUrl);
+    // console.log('📊 Loading project summary data...');
+    // console.log('🌐 Server URL:', window.serverUrl);
 
     // Check elements exist before loading
     const elementsCheck = checkSummaryElements();
@@ -458,16 +458,16 @@ async function loadProjectSummaryData() {
 
     try {
         // Load accepted projects count
-        console.log('🔄 Fetching accepted projects...');
+        // console.log('🔄 Fetching accepted projects...');
         const acceptedResponse = await fetch(`${window.serverUrl}/api/accepted-projects`);
-        console.log('📡 Accepted projects response status:', acceptedResponse.status);
+        // console.log('📡 Accepted projects response status:', acceptedResponse.status);
 
         if (acceptedResponse.ok) {
             const acceptedData = await acceptedResponse.json();
-            console.log('📊 Accepted projects data:', acceptedData);
+            // console.log('📊 Accepted projects data:', acceptedData);
             const acceptedCount = Array.isArray(acceptedData) ? acceptedData.length : 0;
             clearLoadingState('acceptedCount', acceptedCount);
-            console.log(`✅ Accepted projects loaded: ${acceptedCount}`);
+            // console.log(`✅ Accepted projects loaded: ${acceptedCount}`);
         } else {
             console.error('❌ Failed to load accepted projects:', acceptedResponse.status, acceptedResponse.statusText);
             clearLoadingState('acceptedCount', '0');
@@ -477,35 +477,35 @@ async function loadProjectSummaryData() {
         let totalCount = 0;
 
         // First try admin endpoint for all projects
-        console.log('🔄 Trying admin endpoint for total projects...');
+        // console.log('🔄 Trying admin endpoint for total projects...');
         try {
             const adminResponse = await fetch(`${window.serverUrl}/api/admin/projects`, {
                 credentials: 'include'
             });
-            console.log('📡 Admin projects response status:', adminResponse.status);
+            // console.log('📡 Admin projects response status:', adminResponse.status);
 
             if (adminResponse.ok) {
                 const adminData = await adminResponse.json();
-                console.log('📊 Admin projects data length:', Array.isArray(adminData) ? adminData.length : 'Not array');
+                // console.log('📊 Admin projects data length:', Array.isArray(adminData) ? adminData.length : 'Not array');
                 totalCount = Array.isArray(adminData) ? adminData.length : 0;
-                console.log(`✅ Total projects (admin): ${totalCount}`);
+                // console.log(`✅ Total projects (admin): ${totalCount}`);
             }
         } catch (adminError) {
-            console.log('⚠️ Admin endpoint not accessible:', adminError.message);
+            // console.log('⚠️ Admin endpoint not accessible:', adminError.message);
         }
 
         // If admin endpoint fails, try regular projects endpoint
         if (totalCount === 0) {
-            console.log('🔄 Trying regular projects endpoint...');
+            // console.log('🔄 Trying regular projects endpoint...');
             try {
                 const projectsResponse = await fetch(`${window.serverUrl}/api/projects`);
-                console.log('📡 Regular projects response status:', projectsResponse.status);
+                // console.log('📡 Regular projects response status:', projectsResponse.status);
 
                 if (projectsResponse.ok) {
                     const projectsData = await projectsResponse.json();
-                    console.log('📊 Regular projects data length:', Array.isArray(projectsData) ? projectsData.length : 'Not array');
+                    // console.log('📊 Regular projects data length:', Array.isArray(projectsData) ? projectsData.length : 'Not array');
                     totalCount = Array.isArray(projectsData) ? projectsData.length : 0;
-                    console.log(`✅ Total projects (regular): ${totalCount}`);
+                    // console.log(`✅ Total projects (regular): ${totalCount}`);
                 }
             } catch (projectsError) {
                 console.error('❌ Failed to load from projects endpoint:', projectsError);
@@ -514,24 +514,24 @@ async function loadProjectSummaryData() {
 
         // Last resort: try user-specific projects endpoint
         if (totalCount === 0) {
-            console.log('🔄 Trying alternative endpoint for projects count...');
+            // console.log('🔄 Trying alternative endpoint for projects count...');
             try {
                 // Try to get projects from stats endpoint
                 const statsResponse = await fetch(`${window.serverUrl}/api/stats/global`);
-                console.log('📡 Stats response status:', statsResponse.status);
+                // console.log('📡 Stats response status:', statsResponse.status);
 
                 if (statsResponse.ok) {
                     const statsData = await statsResponse.json();
-                    console.log('📊 Stats data:', statsData);
+                    // console.log('📊 Stats data:', statsData);
 
                     if (statsData.registeredRepos) {
                         totalCount = statsData.registeredRepos;
-                        console.log(`✅ Total projects from stats: ${totalCount}`);
+                        // console.log(`✅ Total projects from stats: ${totalCount}`);
                     }
                 }
             } catch (statsError) {
                 console.error('❌ Stats endpoint also failed:', statsError);
-                console.log('🎯 Setting fallback count of 0');
+                // console.log('🎯 Setting fallback count of 0');
                 totalCount = 0;
             }
         }
@@ -540,25 +540,25 @@ async function loadProjectSummaryData() {
         const totalCountElement = document.getElementById('totalCount');
         if (totalCountElement) {
             totalCountElement.textContent = totalCount;
-            console.log(`✅ Total count displayed: ${totalCount} in element:`, totalCountElement);
+            // console.log(`✅ Total count displayed: ${totalCount} in element:`, totalCountElement);
         } else {
             console.warn('⚠️ Element #totalCount not found in DOM');
         }
 
         // Load community count
-        console.log('🔄 Fetching community users...');
+        // console.log('🔄 Fetching community users...');
         const usersResponse = await fetch(`${window.serverUrl}/api/users`);
-        console.log('📡 Users response status:', usersResponse.status);
+        // console.log('📡 Users response status:', usersResponse.status);
 
         if (usersResponse.ok) {
             const usersData = await usersResponse.json();
-            console.log('📊 Users data length:', Array.isArray(usersData) ? usersData.length : 'Not array');
+            // console.log('📊 Users data length:', Array.isArray(usersData) ? usersData.length : 'Not array');
             const communityCountElement = document.getElementById('communityCount');
             const userCount = Array.isArray(usersData) ? usersData.length : 0;
 
             if (communityCountElement) {
                 communityCountElement.textContent = userCount;
-                console.log(`✅ Community count loaded: ${userCount} in element:`, communityCountElement);
+                // console.log(`✅ Community count loaded: ${userCount} in element:`, communityCountElement);
             } else {
                 console.warn('⚠️ Element #communityCount not found in DOM');
             }
@@ -568,7 +568,7 @@ async function loadProjectSummaryData() {
             const communityCountElement = document.getElementById('communityCount');
             if (communityCountElement) {
                 communityCountElement.textContent = '0';
-                console.log('⚠️ Set default community count to 0');
+                // console.log('⚠️ Set default community count to 0');
             }
         }
 
@@ -579,7 +579,7 @@ async function loadProjectSummaryData() {
                 totalCount: document.getElementById('totalCount')?.textContent,
                 communityCount: document.getElementById('communityCount')?.textContent
             };
-            console.log('🔍 Final statistics check:', finalCheck);
+            // console.log('🔍 Final statistics check:', finalCheck);
         }, 500);
 
     } catch (error) {
@@ -592,15 +592,15 @@ async function loadProjectSummaryData() {
 
         if (acceptedCount) {
             acceptedCount.textContent = '0';
-            console.log('🔧 Set default accepted count to 0');
+            // console.log('🔧 Set default accepted count to 0');
         }
         if (totalCount) {
             totalCount.textContent = '0';
-            console.log('🔧 Set default total count to 0');
+            // console.log('🔧 Set default total count to 0');
         }
         if (communityCount) {
             communityCount.textContent = '0';
-            console.log('🔧 Set default community count to 0');
+            // console.log('🔧 Set default community count to 0');
         }
 
         // Show toast notification about the error
@@ -628,7 +628,7 @@ async function loadCommunityData() {
             updateCommunityDisplay();
         }
     } catch (error) {
-        console.log('Failed to load community data, using sample data');
+        // console.log('Failed to load community data, using sample data');
         paginationState.allUsers = generateSampleUsers();
         paginationState.filteredUsers = [...paginationState.allUsers];
         updateCommunityDisplay();
@@ -729,7 +729,7 @@ function openGitHubProfile(githubUsername) {
 // Make openGitHubProfile available globally
 window.openGitHubProfile = openGitHubProfile;
 
-console.log('DevSync Projects Integration initialized successfully!');
+// console.log('DevSync Projects Integration initialized successfully!');
 
 // Enhance tab switching with animations
 const enhanceTabSwitching = () => {
@@ -989,7 +989,7 @@ setTimeout(() => {
     });
 }, 2000);
 
-console.log('DevSync Projects Integration initialized successfully!');
+// console.log('DevSync Projects Integration initialized successfully!');
 
 // Add custom modal system for better integration
 window.showCustomModal = function (title, content, callback) {
@@ -1056,7 +1056,7 @@ window.showDemoToast = function (type, message) {
     if (window.showToast) {
         window.showToast(message, type, 4000);
     } else {
-        console.log('Toast function not available');
+        // console.log('Toast function not available');
     }
 };
 

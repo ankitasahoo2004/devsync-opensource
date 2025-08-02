@@ -190,9 +190,9 @@ html.dark .h-b {
 }
 
 .abt-txt {
-    font-size: 2rem;
+    font-size: 1em;
     line-height: 1.3;
-    color: var(--main-dark);
+    color: white;
     opacity: 0.9;
 }
 

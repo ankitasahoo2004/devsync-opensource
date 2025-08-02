@@ -99,13 +99,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const selectedDeadline = getSelectedDeadline();
             const selectedDiscoverySource = getSelectedDiscoverySource();
 
-            console.log('Form data collection:', {
-                services: selectedServices,
-                budget: selectedBudget,
-                deadline: selectedDeadline,
-                discoverySource: selectedDiscoverySource,
-                formEntries: data
-            });
+            // console.log('Form data collection:', {
+            //     services: selectedServices,
+            //     budget: selectedBudget,
+            //     deadline: selectedDeadline,
+            //     discoverySource: selectedDiscoverySource,
+            //     formEntries: data
+            // });
 
             const requestBody = {
                 organization: data.organization || data.name,
@@ -121,8 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 formType: 'sponsorship'
             };
 
-            console.log('Sending request to:', endpoint);
-            console.log('Request body:', requestBody);
+            // console.log('Sending request to:', endpoint);
+            // console.log('Request body:', requestBody);
 
             const response = await fetch(endpoint, {
                 method: 'POST',
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(requestBody)
             });
 
-            console.log('Response status:', response.status);
+            // console.log('Response status:', response.status);
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const responseData = await response.json();
-            console.log('Response data:', responseData);
+            // console.log('Response data:', responseData);
 
             // Show success toast
             const successMessage = 'Thank you for your sponsorship inquiry! We will review your request and get back to you soon.';

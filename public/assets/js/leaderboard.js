@@ -315,16 +315,16 @@ function getLevelImage(levelBadge) {
     if (!levelBadge || !levelBadge.includes('|')) return null;
     const badgeName = levelBadge.split('|')[0].trim();
     const levelMap = {
-        'Cursed Newbie': 'level1',
-        'Graveyard Shifter': 'level2',
-        'Night Stalker': 'level3',
-        'Skeleton of Structure': 'level4',
-        'Phantom Architect': 'level5',
-        'Haunted Debugger': 'level6',
-        'Lord of Shadows': 'level7',
-        'Dark Sorcerer': 'level8',
-        'Demon Crafter': 'level9',
-        'Eternal Revenge': 'level10'
+        'Seeker': 'level1',
+        'Explorer': 'level2',
+        'Tinkerer': 'level3',
+        'Crafter': 'level4',
+        'Architect': 'level5',
+        'Innovator': 'level6',
+        'Strategist': 'level7',
+        'Visionary': 'level8',
+        'Trailblazer': 'level9',
+        'Luminary': 'level10'
     };
     return levelMap[badgeName] ? `https://cdn.devsync.club/devsync-assets/Badges/${levelMap[badgeName]}.png` : null;
 }
