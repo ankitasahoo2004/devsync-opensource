@@ -16,7 +16,7 @@ const cleanupExpiredTickets = async () => {
                 status: 'closed'
             });
 
-            console.log(`Cleaned up ${expiredTickets.length} expired tickets`);
+            // console.log(`Cleaned up ${expiredTickets.length} expired tickets`);
         }
     } catch (error) {
         console.error('Error cleaning up expired tickets:', error);
@@ -32,7 +32,7 @@ cleanupExpiredTickets();
 const startTicketCleanupJob = () => {
     setInterval(cleanupExpiredTickets, 60 * 60 * 1000); // Every hour
     cleanupExpiredTickets(); // Run on startup
-    console.log('Ticket cleanup job started.');
+    // console.log('Ticket cleanup job started.');
 };
 
 module.exports = { startTicketCleanupJob };

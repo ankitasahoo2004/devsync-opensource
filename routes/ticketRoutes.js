@@ -60,7 +60,7 @@ router.post('/', requireAuth, async (req, res) => {
         // Send ticket created email to user
         try {
             const emailResult = await emailService.sendTicketCreatedEmail(ticket);
-            console.log('Ticket created email result:', emailResult);
+            // console.log('Ticket created email result:', emailResult);
         } catch (emailError) {
             console.error('Failed to send ticket created email:', emailError);
         }
@@ -68,7 +68,7 @@ router.post('/', requireAuth, async (req, res) => {
         // Send admin notification
         try {
             const adminEmailResult = await emailService.sendAdminTicketNotification(ticket, 'new_ticket');
-            console.log('Admin notification email result:', adminEmailResult);
+            // console.log('Admin notification email result:', adminEmailResult);
         } catch (emailError) {
             console.error('Failed to send admin notification email:', emailError);
         }
@@ -200,11 +200,11 @@ router.patch('/:ticketId', requireAdmin, async (req, res) => {
             if (status === 'closed' && resolution) {
                 // Send closed/resolved email
                 const emailResult = await emailService.sendTicketClosedEmail(ticket, resolution, req.user.username);
-                console.log('Ticket closed email result:', emailResult);
+                // console.log('Ticket closed email result:', emailResult);
             } else {
                 // Send status update email
                 const emailResult = await emailService.sendTicketStatusUpdateEmail(ticket, oldStatus, req.user.username);
-                console.log('Ticket status update email result:', emailResult);
+                // console.log('Ticket status update email result:', emailResult);
             }
         } catch (emailError) {
             console.error('Failed to send ticket update email:', emailError);
@@ -236,7 +236,7 @@ router.delete('/:ticketId', requireAdmin, async (req, res) => {
         // Send deletion email
         try {
             const emailResult = await emailService.sendTicketDeletedEmail(ticket, req.user.username);
-            console.log('Ticket deleted email result:', emailResult);
+            // console.log('Ticket deleted email result:', emailResult);
         } catch (emailError) {
             console.error('Failed to send ticket deleted email:', emailError);
         }

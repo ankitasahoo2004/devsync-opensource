@@ -2433,7 +2433,7 @@ html[data-theme="light"] .devsync-projects-section .modal-content {
 
 .filter-container {
     background: transparent !important;
-    border: 1px solid var(--devsync-border) !important;
+    /* border: 1px solid var(--devsync-border) !important; */
 }
 
 .filter-btn {

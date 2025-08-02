@@ -3188,14 +3188,10 @@ html.dark .gradient-text {
     overflow: visible;
     /* text-overflow: ellipsis; */
     white-space: nowrap;
-    max-width: 250px;
+    /* max-width: 250px; */
 }
 
-@media screen and (max-width: 768px) {
-    .profile__name {
-        max-width: 180px;
-    }
-    
+@media screen and (max-width: 768px) {    
     .text-truncate-lg {
         max-width: 150px;
     }
@@ -3205,11 +3201,7 @@ html.dark .gradient-text {
     }
 }
 
-@media screen and (max-width: 480px) {
-    .profile__name {
-        max-width: 120px;
-    }
-    
+@media screen and (max-width: 480px) {    
     .text-truncate-md {
         max-width: 100px;
     }
