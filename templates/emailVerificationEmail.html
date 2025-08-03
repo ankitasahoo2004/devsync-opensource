@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - DevSync OpenSource</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .verification-box {
+            background-color: #f8f9ff;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .verify-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .verify-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .features {
+            margin: 20px 0;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 8px 0;
+        }
+
+        .feature-icon {
+            color: #667eea;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">📧</div>
+            <h1>Verify Your Email</h1>
+            <p>Welcome to DevSync OpenSource Community!</p>
+        </div>
+
+        <div class="content">
+            <h2>Hello {{username}}! 👋</h2>
+
+            <p>Thank you for joining the DevSync OpenSource community! To complete your registration and start
+                contributing to amazing open source projects, please verify your email address.</p>
+
+            <div class="verification-box">
+                <h3>🔐 Email Verification Required</h3>
+                <p>Click the button below to verify your email address and unlock all features:</p>
+                <a href="{{verificationUrl}}" class="verify-button">Verify My Email Address</a>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ Important:</strong> Until your email is verified, you won't be able to:
+                <div class="features">
+                    <div class="feature">
+                        <span class="feature-icon">•</span>
+                        Submit new projects for review
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">•</span>
+                        Contribute to existing projects
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">•</span>
+                        Access your full profile section
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">•</span>
+                        Participate in community events
+                    </div>
+                </div>
+            </div>
+
+            <h3>🚀 What happens after verification?</h3>
+            <ul>
+                <li>Full access to submit and manage your projects</li>
+                <li>Ability to contribute to community projects</li>
+                <li>Access to leaderboards and achievement system</li>
+                <li>Participation in exclusive events and challenges</li>
+                <li>Connect with other developers in the community</li>
+            </ul>
+
+            <p><strong>Security Note:</strong> This verification link will expire in 24 hours for security reasons. If
+                you didn't create an account with DevSync OpenSource, please ignore this email.</p>
+
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+
+            <p>If the button above doesn't work, copy and paste this link into your browser:</p>
+            <p style="word-break: break-all; color: #667eea; font-family: monospace;">{{verificationUrl}}</p>
+        </div>
+
+        <div class="footer">
+            <p>This email was sent from DevSync OpenSource Platform</p>
+            <p>If you have any questions, please contact our support team.</p>
+            <p><a href="{{serverUrl}}">Visit DevSync OpenSource</a></p>
+        </div>
+    </div>
+</body>
+
+</html>

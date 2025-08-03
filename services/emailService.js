@@ -496,6 +496,65 @@ class EmailService {
             return { success: false, error: error.message };
         }
     }
+
+    // Email verification methods
+    async sendEmailVerificationEmail(userEmail, username, verificationToken) {
+        try {
+            const template = await this.loadTemplate('emailVerificationEmail');
+            const verificationUrl = `${process.env.SERVER_URL}/api/auth/verify-email?token=${verificationToken}`;
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: userEmail,
+                subject: '📧 Verify Your Email - DevSync OpenSource',
+                html: template({
+                    username,
+                    verificationUrl,
+                    serverUrl: process.env.SERVER_URL
+                })
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log(`Email verification sent to ${userEmail}`);
+
+            return {
+                success: true,
+                messageId: result.messageId,
+                verificationUrl
+            };
+        } catch (error) {
+            console.error('Error sending email verification:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async sendEmailVerifiedConfirmationEmail(userEmail, username) {
+        try {
+            const template = await this.loadTemplate('emailVerifiedConfirmationEmail');
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: userEmail,
+                subject: '✅ Email Successfully Verified - DevSync OpenSource',
+                html: template({
+                    username,
+                    serverUrl: process.env.SERVER_URL,
+                    loginUrl: `${process.env.SERVER_URL}/login`
+                })
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log(`Email verification confirmation sent to ${userEmail}`);
+
+            return {
+                success: true,
+                messageId: result.messageId
+            };
+        } catch (error) {
+            console.error('Error sending email verification confirmation:', error);
+            return { success: false, error: error.message };
+        }
+    }
 }
 
 module.exports = new EmailService();

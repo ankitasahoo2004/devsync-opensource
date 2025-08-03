@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // Fallback to direct logout if auth.js is not loaded
             const fallbackServerUrl = window.serverUrl || 'http://localhost:3000';
-            window.location.href = `${fallbackServerUrl}/auth/logout`;
+            window.location.href = `${fallbackServerUrl}/api/auth/logout`;
         }
     });
 });

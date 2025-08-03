@@ -5,6 +5,7 @@ const User = require("../models/User");
 const dotenv = require("dotenv");
 dotenv.config();
 const emailService = require("../services/emailService");
+const { createEmailVerificationToken } = require("../utils/emailVerification");
 
 module.exports = function (passport) {
   passport.use(
@@ -48,7 +49,7 @@ module.exports = function (passport) {
           let user = await User.findOne({ githubId: profile.id });
 
           if (!user) {
-            // Create new user with verified email
+            // Create new user - email verification required for all new users
             user = await User.create({
               githubId: profile.id,
               username: profile.username,
@@ -59,16 +60,64 @@ module.exports = function (passport) {
               cancelledPRs: [],
               points: 0,
               badges: ["Newcomer"],
+              emailVerified: false, // New users must verify email
+              verificationEmailSent: false
             });
 
-            // Send welcome email only for new users
-            const emailSent = await emailService.sendWelcomeEmail(
-              primaryEmail,
-              profile.username
-            );
-            if (emailSent) {
-              user.welcomeEmailSent = true;
-              await user.save();
+            // Generate verification token and send verification email
+            try {
+              const verificationToken = await createEmailVerificationToken(profile.id);
+              const emailResult = await emailService.sendEmailVerificationEmail(
+                primaryEmail,
+                profile.username,
+                verificationToken
+              );
+
+              if (emailResult.success) {
+                console.log(`Email verification sent to new user: ${primaryEmail}`);
+              } else {
+                console.error('Failed to send verification email to new user:', emailResult.error);
+              }
+            } catch (verificationError) {
+              console.error('Error sending verification email:', verificationError);
+            }
+
+            // Still send welcome email but mention verification requirement
+            try {
+              const emailSent = await emailService.sendWelcomeEmail(
+                primaryEmail,
+                profile.username
+              );
+              if (emailSent) {
+                user.welcomeEmailSent = true;
+                await user.save();
+              }
+            } catch (welcomeEmailError) {
+              console.error('Error sending welcome email:', welcomeEmailError);
+            }
+          } else {
+            // Existing user - check if email verification is needed
+            if (!user.emailVerified) {
+              // If existing user doesn't have verified email, mark them as needing verification
+              // This handles users created before email verification was implemented
+              if (!user.verificationEmailSent) {
+                try {
+                  const verificationToken = await createEmailVerificationToken(profile.id);
+                  const emailResult = await emailService.sendEmailVerificationEmail(
+                    user.email,
+                    user.username,
+                    verificationToken
+                  );
+
+                  if (emailResult.success) {
+                    console.log(`Email verification sent to existing user: ${user.email}`);
+                  } else {
+                    console.error('Failed to send verification email to existing user:', emailResult.error);
+                  }
+                } catch (verificationError) {
+                  console.error('Error sending verification email to existing user:', verificationError);
+                }
+              }
             }
           }
 

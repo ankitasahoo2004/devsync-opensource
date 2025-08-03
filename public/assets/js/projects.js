@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // console.log('Projects.js loaded and DOM ready');
 
     // Global debug function for testing button clicks
-    window.testViewRepoButtons = function() {
+    window.testViewRepoButtons = function () {
         // console.log('=== Testing View Repository Buttons ===');
         const allViewRepoButtons = document.querySelectorAll('.view-repo');
         // console.log(`Found ${allViewRepoButtons.length} view-repo buttons`);
-        
+
         allViewRepoButtons.forEach((btn, index) => {
             const url = btn.dataset.url;
             const computedStyle = window.getComputedStyle(btn);
@@ -21,12 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
             //     clientRect: btn.getBoundingClientRect()
             // });
         });
-        
+
         return allViewRepoButtons;
     };
 
     // Global function to manually test a button click
-    window.testButtonClick = function(buttonIndex = 0) {
+    window.testButtonClick = function (buttonIndex = 0) {
         const buttons = document.querySelectorAll('.view-repo');
         if (buttons[buttonIndex]) {
             // console.log('Manually triggering click on button:', buttonIndex);
@@ -37,14 +37,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Global function to check for event conflicts
-    window.checkEventConflicts = function() {
+    window.checkEventConflicts = function () {
         // console.log('=== Checking for Event Conflicts ===');
         const containers = [
             { name: 'Projects Container', element: document.getElementById('projectsContainer') },
             { name: 'Accepted Container', element: document.getElementById('acceptedContainer') },
             { name: 'Admin Container', element: document.getElementById('adminContainer') }
         ];
-        
+
         containers.forEach(({ name, element }) => {
             if (element) {
                 const listeners = getEventListeners ? getEventListeners(element) : 'getEventListeners not available';
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add event delegation for project interactions
             const handleProjectClick = (e) => {
                 // console.log('Click detected on:', e.target, 'Classes:', e.target.className); // Debug log
-                
+
                 // Handle view repository button clicks with enhanced prevention
                 const viewBtn = e.target.closest('.view-repo');
                 if (viewBtn) {
@@ -210,17 +210,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     e.preventDefault();
                     e.stopPropagation();
                     e.stopImmediatePropagation();
-                    
+
                     const repoUrl = viewBtn.getAttribute('data-url') || viewBtn.dataset.url;
                     // console.log('View repo clicked. URL found:', repoUrl); // Debug log
                     // console.log('Button element:', viewBtn); // Debug log
-                    
+
                     if (!repoUrl) {
                         console.error('No repository URL found on button:', viewBtn);
                         showToast('Repository URL not found', 'error');
                         return false;
                     }
-                    
+
                     // Validate URL
                     try {
                         new URL(repoUrl);
@@ -229,11 +229,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         showToast('Invalid repository URL', 'error');
                         return false;
                     }
-                    
+
                     // Open repository in new tab with additional safety measures
                     try {
                         // console.log('Attempting to open URL:', repoUrl); // Debug log
-                        
+
                         // Use a timeout to ensure the event is fully handled first
                         setTimeout(() => {
                             const newWindow = window.open(repoUrl, '_blank', 'noopener,noreferrer');
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             } else {
                                 console.warn('Popup blocked, trying alternative method');
                                 // showToast('Please allow popups to open repository links', 'warning');
-                                
+
                                 // Create a temporary link and click it
                                 const tempLink = document.createElement('a');
                                 tempLink.href = repoUrl;
@@ -255,28 +255,28 @@ document.addEventListener('DOMContentLoaded', () => {
                                 document.body.removeChild(tempLink);
                             }
                         }, 0);
-                        
+
                     } catch (error) {
                         console.error('Failed to open repository:', error);
                         showToast('Failed to open repository. Please try again.', 'error');
                     }
-                    
+
                     return false; // Ensure no further processing
                 }
-                
+
                 // Handle delete button clicks
                 const deleteBtn = e.target.closest('.delete-project');
                 if (deleteBtn) {
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     const projectId = deleteBtn.getAttribute('data-id');
                     if (projectId) {
                         deleteProject(projectId);
                     }
                     return false;
                 }
-                
+
                 // Handle project card clicks for details (only if not clicking on buttons)
                 const projectCard = e.target.closest('.project-card');
                 if (projectCard && !e.target.closest('.project-actions') && !e.target.closest('button')) {
@@ -299,12 +299,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Function to perform search
             const performSearch = (searchTerm) => {
                 // First apply the current filter state
-                let baseProjects = filterState.view === 'all' ? 
-                    projects : 
+                let baseProjects = filterState.view === 'all' ?
+                    projects :
                     projects.filter(project => project.reviewStatus === filterState.view);
-                
+
                 // Then apply search filter on top of the filtered projects
-                const filteredProjects = searchTerm ? 
+                const filteredProjects = searchTerm ?
                     baseProjects.filter(project =>
                         project.repoLink.toLowerCase().includes(searchTerm) ||
                         project.ownerName.toLowerCase().includes(searchTerm) ||
@@ -312,13 +312,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     ) : baseProjects;
 
                 if (filteredProjects.length === 0) {
-                    const message = searchTerm ? 
-                        `No projects found matching "${searchTerm}"` : 
+                    const message = searchTerm ?
+                        `No projects found matching "${searchTerm}"` :
                         'No projects found';
                     projectsGrid.innerHTML = `<p class="no-results">${message}</p>`;
                 } else {
                     projectsGrid.innerHTML = renderProjects(filteredProjects);
-                    
+
                     /* The above JavaScript code is adding a search result summary to the webpage if a
                     search term is provided. It creates a new `div` element with the class name
                     'search-results-summary' and sets its inner HTML to display the number of
@@ -343,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     filterState.view = filterValue; // Update state
                     filterBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    
+
                     // Reapply search if there's a search term
                     const searchBar = document.getElementById('userProjectSearch');
                     const currentSearchTerm = searchBar ? searchBar.value.toLowerCase() : '';
@@ -362,14 +362,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             searchBar.addEventListener('input', (e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                
+
                 // Show/hide clear button
                 if (searchTerm.length > 0) {
                     searchClear.style.display = 'flex';
                 } else {
                     searchClear.style.display = 'none';
                 }
-                
+
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(() => {
                     performSearch(searchTerm);
@@ -820,7 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
         authContainer.innerHTML = `
             <div class="auth-prompt">
                 <h3>Please log in to submit a project</h3>
-                <a href="${serverUrl}/auth/github" class="button">
+                <a href="${serverUrl}/api/auth/github" class="button">
                     <i class='bx bxl-github'></i> Login with GitHub
                 </a>
             </div>
@@ -1716,7 +1716,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Enhanced event delegation for accepted projects
             const handleAcceptedProjectClick = (e) => {
                 // console.log('Accepted project click event:', e.target);
-                
+
                 // Handle view repository button clicks with enhanced prevention
                 const viewBtn = e.target.closest('.view-repo');
                 if (viewBtn) {
@@ -1725,16 +1725,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     e.preventDefault();
                     e.stopPropagation();
                     e.stopImmediatePropagation();
-                    
+
                     const repoUrl = viewBtn.dataset.url;
                     // console.log('Repository URL:', repoUrl);
-                    
+
                     if (!repoUrl) {
                         console.error('No repository URL found on button:', viewBtn);
                         showToast('Repository URL not found', 'error');
                         return false;
                     }
-                    
+
                     // Validate URL
                     try {
                         new URL(repoUrl);
@@ -1743,7 +1743,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         showToast('Invalid repository URL', 'error');
                         return false;
                     }
-                    
+
                     // Open repository in new tab with additional safety measures
                     setTimeout(() => {
                         try {
@@ -1754,7 +1754,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             } else {
                                 console.warn('Popup blocked, trying alternative method');
                                 // showToast('Please allow popups to open repository links', 'warning');
-                                
+
                                 // Create a temporary link and click it
                                 const tempLink = document.createElement('a');
                                 tempLink.href = repoUrl;
@@ -1770,7 +1770,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             showToast('Failed to open repository. Please try again.', 'error');
                         }
                     }, 0);
-                    
+
                     return false;
                 }
 
@@ -2140,16 +2140,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
-                
+
                 const repoUrl = viewBtn.dataset.url;
                 // console.log('Admin view repo clicked. URL:', repoUrl);
-                
+
                 if (!repoUrl) {
                     console.error('No repository URL found on admin button:', viewBtn);
                     showToast('Repository URL not found', 'error');
                     return false;
                 }
-                
+
                 // Validate URL
                 try {
                     new URL(repoUrl);
@@ -2158,7 +2158,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast('Invalid repository URL', 'error');
                     return false;
                 }
-                
+
                 // Open repository in new tab with additional safety measures
                 setTimeout(() => {
                     try {
@@ -2169,7 +2169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         } else {
                             console.warn('Admin popup blocked, trying alternative method');
                             // showToast('Please allow popups to open repository links', 'warning');
-                            
+
                             // Create a temporary link and click it
                             const tempLink = document.createElement('a');
                             tempLink.href = repoUrl;
@@ -2185,7 +2185,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         showToast('Failed to open repository. Please try again.', 'error');
                     }
                 }, 0);
-                
+
                 return false;
             }
         };

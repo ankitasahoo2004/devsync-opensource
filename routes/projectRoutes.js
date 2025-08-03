@@ -3,14 +3,15 @@ const Repo = require('../models/Repo');
 const User = require('../models/User');
 const emailService = require('../services/emailService');
 const { normalizeAndValidateGitHubUrl } = require('../utils/githubUtils');
+const { requireEmailVerification } = require('../middleware/emailVerificationMiddleware');
 const router = express.Router();
 const dotenv = require('dotenv');
 dotenv.config();
 
+// Apply email verification requirement to ALL project-related routes
+router.use(requireEmailVerification);
+
 router.post('/', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
 
     try {
         let { repoLink, ownerName, technology, description } = req.body;

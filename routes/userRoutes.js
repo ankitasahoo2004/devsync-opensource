@@ -7,8 +7,9 @@ dotenv.config();
 const router = express.Router();
 const octokit = new Octokit({ auth: process.env.GITHUB_ACCESS_TOKEN });
 const PROGRAM_START_DATE = '2025-03-14';
+const { requireEmailVerification, addEmailVerificationStatus } = require('../middleware/emailVerificationMiddleware');
 
-router.get('/', (req, res) => {
+router.get('/', addEmailVerificationStatus, (req, res) => {
     if (req.isAuthenticated()) {
         res.json({
             isAuthenticated: true,
@@ -17,18 +18,15 @@ router.get('/', (req, res) => {
                 username: req.user.username,
                 displayName: req.user.displayName,
                 photos: req.user.photos
-            }
+            },
+            emailVerificationStatus: req.emailVerificationStatus
         });
     } else {
         res.json({ isAuthenticated: false });
     }
 });
 
-router.get('/stats', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-
+router.get('/stats', requireEmailVerification, async (req, res) => {
     try {
         const user = await User.findOne({ githubId: req.user.id });
         if (!user) {
@@ -47,8 +45,22 @@ router.get('/stats', async (req, res) => {
 });
 
 // Add new comprehensive user profile endpoint
-router.get('/profile/:username', async (req, res) => {
+router.get('/profile/:username', requireEmailVerification, async (req, res) => {
     try {
+        // First check email verification for authenticated user viewing their own profile
+        if (req.isAuthenticated() && req.user.username === req.params.username) {
+            const user = await User.findOne({ githubId: req.user.id });
+            if (user && !user.emailVerified) {
+                return res.status(403).json({
+                    error: 'Email verification required to view your profile',
+                    emailVerificationRequired: true,
+                    message: 'Please verify your email address to access your profile',
+                    userEmail: user.email,
+                    verificationEmailSent: user.verificationEmailSent || false
+                });
+            }
+        }
+
         // Get GitHub user data and DevSync data
         const [userData, acceptedRepos, user] = await Promise.all([
             octokit.users.getByUsername({ username: req.params.username }),

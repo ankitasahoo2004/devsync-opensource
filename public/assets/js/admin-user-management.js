@@ -623,6 +623,10 @@ class UserManagement {
                         <h3 class="user-display-name">${user.displayName || user.username || 'Unknown User'}</h3>
                         <p class="user-username">@${user.username || 'unknown'}</p>
                         <p class="user-email">${user.email || 'No email provided'}</p>
+                        ${user.emailVerified ?
+                '<span class="verification-badge verified">✅ Verified</span>' :
+                '<span class="verification-badge unverified">⚠️ Unverified</span>'
+            }
                         
                         <div class="profile-completeness">
                             <span class="completeness-label">Profile: ${profileCompleteness}%</span>
@@ -648,6 +652,11 @@ class UserManagement {
                             <button class="quick-action-btn email-btn" onclick="userManagement.sendEmail('${user.email}', '${user.username}')">
                                 <i class='bx bx-envelope'></i>
                             </button>
+                            ${!user.emailVerified ? `
+                                <button class="quick-action-btn verify-btn" onclick="userManagement.resendVerificationEmail('${user._id || user.id}')" title="Resend Verification Email">
+                                    <i class='bx bx-envelope-check'></i>
+                                </button>
+                            ` : ''}
                         ` : ''}
                     </div>
                 </div>
@@ -705,6 +714,10 @@ class UserManagement {
                     <div class="activity-item">
                         <i class='bx bx-envelope-check'></i>
                         <span>Welcome Email: ${user.welcomeEmailSent ? 'Sent' : 'Not Sent'}</span>
+                    </div>
+                    <div class="activity-item">
+                        <i class='bx ${user.emailVerified ? 'bx-check-shield' : 'bx-shield-x'}'></i>
+                        <span>Email Status: ${user.emailVerified ? 'Verified' : 'Not Verified'}</span>
                     </div>
                 </div>
 
@@ -1131,6 +1144,20 @@ class UserManagement {
                                 <span>${user.welcomeEmailSent ? 'Sent' : 'Not Sent'}</span>
                             </div>
                             <div class="detail-item">
+                                <label>Email Verified:</label>
+                                <span class="${user.emailVerified ? 'status-verified' : 'status-unverified'}">${user.emailVerified ? 'Yes' : 'No'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Verification Email Sent:</label>
+                                <span>${user.verificationEmailSent ? 'Yes' : 'No'}</span>
+                            </div>
+                            ${user.verificationEmailSentAt ? `
+                                <div class="detail-item">
+                                    <label>Verification Email Date:</label>
+                                    <span>${new Date(user.verificationEmailSentAt).toLocaleString()}</span>
+                                </div>
+                            ` : ''}
+                            <div class="detail-item">
                                 <label>Account Status:</label>
                                 <span class="${user.isActive ? 'status-active' : 'status-inactive'}">${user.isActive ? 'Active' : 'Inactive'}</span>
                             </div>
@@ -1393,6 +1420,21 @@ class UserManagement {
                                                 <i class='bx bx-envelope'></i>
                                                 Resend Welcome Email
                                             </button>
+                                            ${!user.emailVerified ? `
+                                                <button type="button" class="action-btn verify-email-btn" onclick="userManagement.resendVerificationEmail('${user._id || user.id}')">
+                                                    <i class='bx bx-envelope-check'></i>
+                                                    Resend Verification Email
+                                                </button>
+                                                <button type="button" class="action-btn manual-verify-btn" onclick="userManagement.manuallyVerifyEmail('${user._id || user.id}')">
+                                                    <i class='bx bx-check-shield'></i>
+                                                    Manually Verify Email
+                                                </button>
+                                            ` : `
+                                                <button type="button" class="action-btn reset-verification-btn" onclick="userManagement.resetEmailVerification('${user._id || user.id}')">
+                                                    <i class='bx bx-shield-x'></i>
+                                                    Reset Email Verification
+                                                </button>
+                                            `}
                                         </div>
                                     </div>
                                 </div>
@@ -1635,6 +1677,87 @@ class UserManagement {
         } catch (error) {
             console.error('Error sending welcome email:', error);
             window.showToast && window.showToast('error', 'Failed to send welcome email');
+        }
+    }
+
+    async resendVerificationEmail(userId) {
+        if (!confirm('This will send a verification email to the user. Continue?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.serverUrl}/api/admin/users/${userId}/resend-verification`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to resend verification email');
+            }
+
+            const result = await response.json();
+            window.showToast && window.showToast('success', `Verification email sent to ${result.email}`);
+
+            // Reload user data to reflect updated verification status
+            this.loadUsers();
+        } catch (error) {
+            console.error('Error resending verification email:', error);
+            window.showToast && window.showToast('error', error.message);
+        }
+    }
+
+    async manuallyVerifyEmail(userId) {
+        if (!confirm('This will manually mark the user\'s email as verified. Continue?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.serverUrl}/api/admin/users/${userId}/verify-email`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to verify user email');
+            }
+
+            const result = await response.json();
+            window.showToast && window.showToast('success', `Email verified for user ${result.user.username}`);
+
+            // Reload user data to reflect updated verification status
+            this.loadUsers();
+        } catch (error) {
+            console.error('Error manually verifying email:', error);
+            window.showToast && window.showToast('error', error.message);
+        }
+    }
+
+    async resetEmailVerification(userId) {
+        if (!confirm('This will reset the user\'s email verification status. They will need to verify their email again. Continue?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.serverUrl}/api/admin/users/${userId}/reset-verification`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to reset email verification');
+            }
+
+            const result = await response.json();
+            window.showToast && window.showToast('success', `Email verification reset for user ${result.user.username}`);
+
+            // Reload user data to reflect updated verification status
+            this.loadUsers();
+        } catch (error) {
+            console.error('Error resetting email verification:', error);
+            window.showToast && window.showToast('error', error.message);
         }
     }
 
