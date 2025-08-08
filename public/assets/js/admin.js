@@ -1,6 +1,20 @@
-// Server URL from auth.js
-const serverUrl = 'https://www.devsync.club';
-// const serverUrl = 'http://localhost:3000';
+// Server URL - will be set by config service
+let serverUrl = window.location.origin; // fallback
+
+// Load serverUrl from config service when available
+if (window.configService) {
+    window.configService.loadConfig().then(config => {
+        serverUrl = config.serverUrl;
+    }).catch(error => {
+        console.warn('Failed to load server config in admin.js, using fallback:', error);
+        serverUrl = window.location.origin;
+    });
+} else {
+    // Listen for config loaded event
+    window.addEventListener('configLoaded', (event) => {
+        serverUrl = event.detail.serverUrl;
+    });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     // Check admin authorization

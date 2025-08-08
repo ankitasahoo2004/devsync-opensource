@@ -320,6 +320,10 @@ const requireApiKeyOrAuth = (req, res, next) => {
 const authRoutes = require('./routes/authRoutes');
 app.use("/api/auth", authLimiter, authRoutes);
 
+// Config endpoint for frontend (public with rate limiting)
+const configRoutes = require('./routes/configRoutes');
+app.use('/api/config', publicLimiter, configRoutes);
+
 // API Status endpoint (public with rate limiting)
 app.get('/api/status', publicLimiter, (req, res) => {
     res.json({
