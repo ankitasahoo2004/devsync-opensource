@@ -126,9 +126,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentUser = data.user;
                 // console.log('User is authenticated:', data.user.username);
 
-                // Check if user is admin using hardcoded list for now
-                const adminIds = ['ankitasahoo2004', 'Sayan-dev731', 'Shubham66020', 'NamanSoni18'];
-                const isAdmin = adminIds.includes(data.user.username);
+                // Check if user is admin using configuration service
+                let isAdmin = false;
+                
+                if (window.configService) {
+                    await window.configService.loadConfig();
+                    isAdmin = window.configService.isAdmin(data.user.username);
+                } else {
+                    // Fallback to global adminIds if config service is not available
+                    const adminIds = window.adminIds || [];
+                    isAdmin = adminIds.includes(data.user.username);
+                }
+                
                 // console.log('Is admin check:', isAdmin, 'for user:', data.user.username);
 
                 if (isAdmin) {
