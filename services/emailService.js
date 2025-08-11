@@ -555,6 +555,102 @@ class EmailService {
             return { success: false, error: error.message };
         }
     }
+
+    async sendAmbassadorApplicationEmail(userEmail, name) {
+        try {
+            const template = await this.loadTemplate('ambassadorApplicationEmail');
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: userEmail,
+                subject: '🎉 Ambassador Application Received - DevSync OpenSource',
+                html: template({
+                    name,
+                    serverUrl: process.env.SERVER_URL,
+                    ambassadorUrl: `${process.env.SERVER_URL}/ambassadors`
+                })
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log(`Ambassador application confirmation sent to ${userEmail}`);
+
+            return {
+                success: true,
+                messageId: result.messageId
+            };
+        } catch (error) {
+            console.error('Error sending ambassador application email:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async sendAmbassadorApplicationNotification(applicationData) {
+        try {
+            const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
+            if (adminEmails.length === 0) {
+                console.log('No admin emails configured for ambassador notifications');
+                return { success: true };
+            }
+
+            const template = await this.loadTemplate('adminAmbassadorNotificationEmail');
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: adminEmails,
+                subject: '🌟 New Ambassador Application - DevSync OpenSource',
+                html: template({
+                    applicantName: applicationData.name,
+                    applicantEmail: applicationData.email,
+                    university: applicationData.university,
+                    specialization: applicationData.specialization,
+                    github: applicationData.github,
+                    adminUrl: `${process.env.SERVER_URL}/admin`,
+                    applicationId: applicationData._id
+                })
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log(`Ambassador application notification sent to admins`);
+
+            return {
+                success: true,
+                messageId: result.messageId
+            };
+        } catch (error) {
+            console.error('Error sending ambassador application notification:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async sendAmbassadorApprovalEmail(userEmail, name, referralCode) {
+        try {
+            const template = await this.loadTemplate('ambassadorApprovalEmail');
+
+            const mailOptions = {
+                from: process.env.gmail_email,
+                to: userEmail,
+                subject: '🎊 Welcome to the Ambassador Program - DevSync OpenSource',
+                html: template({
+                    name,
+                    referralCode,
+                    serverUrl: process.env.SERVER_URL,
+                    ambassadorUrl: `${process.env.SERVER_URL}/ambassadors`,
+                    profileUrl: `${process.env.SERVER_URL}/profile`
+                })
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log(`Ambassador approval email sent to ${userEmail} with referral code ${referralCode}`);
+
+            return {
+                success: true,
+                messageId: result.messageId
+            };
+        } catch (error) {
+            console.error('Error sending ambassador approval email:', error);
+            return { success: false, error: error.message };
+        }
+    }
 }
 
 module.exports = new EmailService();

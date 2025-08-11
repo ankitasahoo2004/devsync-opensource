@@ -64,6 +64,16 @@ const userSchema = new mongoose.Schema({
     verificationEmailSentAt: {
         type: Date,
         default: null
+    },
+    // Referral system fields
+    referredBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Ambassador',
+        default: null
+    },
+    referralCode: {
+        type: String,
+        default: null
     }
 });
 

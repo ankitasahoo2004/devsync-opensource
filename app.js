@@ -52,7 +52,7 @@ app.get("*", (req, res) => {
     // Define valid frontend routes
     const validRoutes = [
       "/", "/about", "/projects", "/events", "/leaderboard",
-      "/profile", "/contact", "/login", "/admin"
+      "/profile", "/contact", "/login", "/admin", "/ambassadors"
     ];
 
     // Check if the requested path is a valid route

@@ -61,7 +61,7 @@
 </script>
     <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="assets/css/profile.css">
-    <link rel="stylesheet" href="assets/css/badges-dynamic-island.css">
+    <!-- <link rel="stylesheet" href="assets/css/badges-dynamic-island.css"> -->
 
 
     <!-- Dynamic Asset Loader -->
@@ -77,8 +77,8 @@
 
     <!-- user bundle -->
 
-    <script defer src="https://assets.itsoffbrand.io/ob/js/index.n.04.js"></script>
-    <script src="https://assets.itsoffbrand.io/ob/js/offbrand-orb.iife.js"></script>
+    <script defer src="assets/js/imp2.js"></script>
+    <script src="assets/js/imp.js"></script>
 </head>
 
 <body data-start="hidden">
@@ -600,6 +600,82 @@
                         <!-- Badges Section (will be populated by profile.js) -->
                         <div class="profile__badges"></div>
 
+                        <!-- Referral Code Section -->
+                        <section class="referral-section" id="referral-section" style="display: none;">
+                            <div class="section-header">
+                                <h2 class="section-title">
+                                    <i class='bx bx-user-plus'></i>
+                                    Ambassador Referral Code
+                                </h2>
+                                <p class="section-subtitle">Add your ambassador referral code to get proper attribution
+                                </p>
+                            </div>
+                            <div class="referral-content">
+                                <div class="referral-input-group">
+                                    <label for="profile-referral-code" class="referral-label">Referral Code</label>
+                                    <div class="referral-input-wrapper">
+                                        <input type="text" id="profile-referral-code" class="referral-input"
+                                            placeholder="Enter ambassador referral code"
+                                            style="text-transform: uppercase;">
+                                        <button id="save-referral-btn" class="btn btn--primary btn--sm">
+                                            <i class='bx bx-save'></i>
+                                            Save
+                                        </button>
+                                    </div>
+                                    <small class="referral-help">
+                                        Once set, the referral code cannot be changed. Leave blank if you don't have
+                                        one.
+                                    </small>
+                                </div>
+                                <div class="referral-status" id="referral-status" style="display: none;">
+                                    <div class="referral-status-content">
+                                        <i class='bx bx-check-circle'></i>
+                                        <div class="referral-info">
+                                            <span>Referred by: <strong
+                                                    id="referral-ambassador-name">Loading...</strong></span>
+                                            <small class="referral-code-display">Code: <span
+                                                    id="user-referral-code-display"></span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Ambassador Code Section (for approved ambassadors) -->
+                        <section class="ambassador-code-section" id="ambassador-code-section" style="display: none;">
+                            <div class="section-header">
+                                <h2 class="section-title">
+                                    <i class='bx bx-code-alt'></i>
+                                    Your Ambassador Code
+                                </h2>
+                                <p class="section-subtitle">Share this code with others to refer them to DevSync</p>
+                            </div>
+                            <div class="ambassador-code-content">
+                                <div class="ambassador-code-display">
+                                    <div class="code-wrapper">
+                                        <span class="code-label">Referral Code:</span>
+                                        <div class="code-value-wrapper">
+                                            <span class="code-value" id="ambassador-code-value">Loading...</span>
+                                            <button class="code-copy-btn" id="copy-ambassador-code"
+                                                title="Copy to clipboard">
+                                                <i class='bx bx-copy'></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="referral-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-value" id="total-referrals">0</span>
+                                            <span class="stat-label">Total Referrals</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-value" id="verified-referrals">0</span>
+                                            <span class="stat-label">Verified Referrals</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
                         <!-- Pull Requests Section -->
                         <section class="pull-requests-section">
                             <div class="section-header">
@@ -1113,7 +1189,7 @@
     <script src="assets/js/main.js"></script>
     <script src="assets/js/theme-transition.js"></script>
     <script src="assets/js/profile.js"></script>
-    <script src="assets/js/badges-dynamic-island.js"></script>
+    <!-- <script src="assets/js/badges-dynamic-island.js"></script> -->
     <script src="assets/js/email-verification.js"></script>
 
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>

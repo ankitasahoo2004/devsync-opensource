@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Ambassadors | DevSync</title>
+    <meta name="description"
+        content="Meet DevSync's Student Ambassadors - passionate students leading the open-source revolution in their communities.">
+
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="Student Ambassadors | DevSync">
+    <meta property="og:description"
+        content="Meet DevSync's Student Ambassadors - passionate students leading the open-source revolution in their communities.">
+    <meta property="og:image" content="assets/img/og-ambassadors.png">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Student Ambassadors | DevSync">
+    <meta name="twitter:description"
+        content="Meet DevSync's Student Ambassadors - passionate students leading the open-source revolution in their communities.">
+    <meta name="twitter:image" content="assets/img/og-ambassadors.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="assets/css/ambassadors.css">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <!-- GSAP for advanced animations (optional) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- Responsive viewport meta tag -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+</head>
+
+<body>
+    <!-- Exit Button -->
+    <div class="exit-button">
+        <button class="exit-btn" onclick="window.location.href='/'">
+            <i class="fas fa-times"></i>
+            <span>Exit</span>
+        </button>
+    </div>
+
+    <!-- User Profile Section (for logged in users) -->
+    <div class="user-profile" id="user-profile" style="display: none;">
+        <div class="user-profile__container">
+            <div class="user-profile__content">
+                <div class="user-profile__avatar">
+                    <img src="" alt="User Avatar" id="user-avatar">
+                </div>
+                <div class="user-profile__info">
+                    <h3 class="user-profile__name" id="user-name">Loading...</h3>
+                    <p class="user-profile__username" id="user-username">@loading</p>
+                    <div class="user-profile__stats">
+                        <div class="user-profile__stat">
+                            <span class="user-profile__stat-value" id="user-points">0</span>
+                            <span class="user-profile__stat-label">Points</span>
+                        </div>
+                        <div class="user-profile__stat">
+                            <span class="user-profile__stat-value" id="user-rank">#-</span>
+                            <span class="user-profile__stat-label">Rank</span>
+                        </div>
+                        <div class="user-profile__stat">
+                            <span class="user-profile__stat-value" id="user-badge">Newcomer</span>
+                            <span class="user-profile__stat-label">Badge</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-profile__actions">
+                    <button class="btn btn--primary" id="apply-ambassador-btn">
+                        <i class="fas fa-star"></i>
+                        Apply to be Ambassador
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero__container">
+                <div class="hero__content">
+                    <div class="hero__badge">
+                        <i class="fas fa-star"></i>
+                        <span>Leading Innovation</span>
+                    </div>
+                    <h1 class="hero__title">
+                        Student <span class="hero__title--gradient">Ambassadors</span>
+                    </h1>
+                    <p class="hero__description">
+                        Meet the passionate student leaders who are driving open-source innovation in their communities.
+                        Our ambassadors represent the future of technology, bridging academia and industry.
+                    </p>
+                    <div class="hero__stats">
+                        <div class="hero__stat">
+                            <span class="hero__stat-number" data-count="50">0</span>
+                            <span class="hero__stat-label">Active Ambassadors</span>
+                        </div>
+                        <div class="hero__stat">
+                            <span class="hero__stat-number" data-count="120">0</span>
+                            <span class="hero__stat-label">Universities</span>
+                        </div>
+                        <div class="hero__stat">
+                            <span class="hero__stat-number" data-count="25">0</span>
+                            <span class="hero__stat-label">Countries</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero__visual">
+                    <div class="hero__globe">
+                        <div class="hero__globe-inner">
+                            <div class="hero__orbits">
+                                <div class="hero__orbit hero__orbit--1">
+                                    <div class="hero__node"></div>
+                                </div>
+                                <div class="hero__orbit hero__orbit--2">
+                                    <div class="hero__node"></div>
+                                </div>
+                                <div class="hero__orbit hero__orbit--3">
+                                    <div class="hero__node"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Elements -->
+            <div class="hero__floating">
+                <div class="hero__float hero__float--1">
+                    <i class="fab fa-github"></i>
+                </div>
+                <div class="hero__float hero__float--2">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="hero__float hero__float--3">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="hero__float hero__float--4">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filter Section -->
+        <section class="filter">
+            <div class="filter__container">
+                <div class="filter__header">
+                    <h2 class="filter__title">Find Ambassadors</h2>
+                    <p class="filter__description">Filter by region, university, or specialization</p>
+                </div>
+
+                <div class="filter__controls">
+                    <div class="filter__group">
+                        <label for="region-filter" class="filter__label">Region</label>
+                        <select id="region-filter" class="filter__select">
+                            <option value="">All Regions</option>
+                            <option value="north-america">North America</option>
+                            <option value="europe">Europe</option>
+                            <option value="asia">Asia</option>
+                            <option value="south-america">South America</option>
+                            <option value="africa">Africa</option>
+                            <option value="oceania">Oceania</option>
+                        </select>
+                    </div>
+
+                    <div class="filter__group">
+                        <label for="specialization-filter" class="filter__label">Specialization</label>
+                        <select id="specialization-filter" class="filter__select">
+                            <option value="">All Specializations</option>
+                            <option value="frontend">Frontend Development</option>
+                            <option value="backend">Backend Development</option>
+                            <option value="fullstack">Full-Stack Development</option>
+                            <option value="mobile">Mobile Development</option>
+                            <option value="devops">DevOps & Cloud</option>
+                            <option value="ai-ml">AI & Machine Learning</option>
+                            <option value="blockchain">Blockchain</option>
+                            <option value="cybersecurity">Cybersecurity</option>
+                        </select>
+                    </div>
+
+                    <div class="filter__group">
+                        <label for="search-filter" class="filter__label">Search</label>
+                        <div class="filter__search">
+                            <input type="text" id="search-filter" class="filter__input"
+                                placeholder="Search by name or university...">
+                            <i class="fas fa-search filter__search-icon"></i>
+                        </div>
+                    </div>
+
+                    <button class="filter__clear" id="clear-filters">
+                        <i class="fas fa-times"></i>
+                        Clear All
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ambassadors Grid -->
+        <section class="ambassadors">
+            <div class="ambassadors__container">
+                <!-- Ambassador Leaderboard -->
+                <div class="ambassador-leaderboard">
+                    <div class="leaderboard__header">
+                        <h2 class="leaderboard__title">Ambassador Leaderboard</h2>
+                        <p class="leaderboard__description">Top performing ambassadors making a difference</p>
+                    </div>
+                    <div class="leaderboard__container" id="ambassador-leaderboard">
+                        <!-- Leaderboard will be populated here -->
+                    </div>
+                </div>
+
+                <div class="ambassadors__grid" id="ambassadors-grid">
+                    <!-- Ambassador cards will be dynamically loaded here -->
+                </div>
+
+                <!-- Loading State -->
+                <div class="ambassadors__loading" id="loading-state">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                    <p>Loading amazing ambassadors...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div class="ambassadors__empty" id="empty-state" style="display: none;">
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>No ambassadors found</h3>
+                        <p>Try adjusting your filters to see more results.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Application Section -->
+        <section class="application">
+            <div class="application__container">
+                <div class="application__content">
+                    <div class="application__text">
+                        <div class="application__badge">
+                            <i class="fas fa-rocket"></i>
+                            <span>Join the Movement</span>
+                        </div>
+                        <h2 class="application__title">
+                            Become a DevSync <span class="application__title--gradient">Ambassador</span>
+                        </h2>
+                        <p class="application__description">
+                            Ready to lead the open-source revolution at your university? Join our global network of
+                            student ambassadors and help shape the future of technology education.
+                        </p>
+
+                        <div class="application__benefits">
+                            <div class="application__benefit">
+                                <i class="fas fa-medal"></i>
+                                <div>
+                                    <h4>Recognition & Rewards</h4>
+                                    <p>Gain official recognition and exclusive perks</p>
+                                </div>
+                            </div>
+                            <div class="application__benefit">
+                                <i class="fas fa-network-wired"></i>
+                                <div>
+                                    <h4>Global Network</h4>
+                                    <p>Connect with like-minded students worldwide</p>
+                                </div>
+                            </div>
+                            <div class="application__benefit">
+                                <i class="fas fa-graduation-cap"></i>
+                                <div>
+                                    <h4>Skill Development</h4>
+                                    <p>Enhance leadership and technical skills</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="application__actions">
+                            <button class="btn btn--primary application__btn" id="apply-btn">
+                                <i class="fas fa-paper-plane"></i>
+                                Apply Now
+                            </button>
+                            <a href="/about" class="btn btn--secondary">
+                                <i class="fas fa-info-circle"></i>
+                                Learn More
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="application__visual">
+                        <div class="application__cards">
+                            <div class="application__card application__card--1">
+                                <i class="fab fa-github"></i>
+                                <span>Open Source</span>
+                            </div>
+                            <div class="application__card application__card--2">
+                                <i class="fas fa-users"></i>
+                                <span>Community</span>
+                            </div>
+                            <div class="application__card application__card--3">
+                                <i class="fas fa-trophy"></i>
+                                <span>Leadership</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Ambassador Modal -->
+    <div class="modal" id="ambassador-modal">
+        <div class="modal__overlay" id="modal-overlay"></div>
+        <div class="modal__content">
+            <button class="modal__close" id="modal-close" aria-label="Close modal">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="modal__body" id="modal-body">
+                <!-- Modal content will be dynamically loaded -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Modal -->
+    <div class="modal" id="application-modal">
+        <div class="modal__overlay" id="application-overlay"></div>
+        <div class="modal__content modal__content--large">
+            <button class="modal__close" id="application-close" aria-label="Close application modal">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="modal__body">
+                <div class="application-form">
+                    <div class="application-form__header">
+                        <h2>Ambassador Application</h2>
+                        <p>Join the DevSync Ambassador Program and lead innovation at your university</p>
+                    </div>
+
+                    <form class="form" id="application-form">
+                        <div class="form__grid">
+                            <div class="form__group">
+                                <label for="app-name" class="form__label">Full Name *</label>
+                                <input type="text" id="app-name" name="name" class="form__input" required
+                                    aria-describedby="name-help">
+                            </div>
+
+                            <div class="form__group">
+                                <label for="app-email" class="form__label">Email Address *</label>
+                                <input type="email" id="app-email" name="email" class="form__input" required
+                                    aria-describedby="email-help">
+                            </div>
+
+                            <div class="form__group">
+                                <label for="app-university" class="form__label">University *</label>
+                                <input type="text" id="app-university" name="university" class="form__input" required
+                                    aria-describedby="university-help">
+                            </div>
+
+                            <div class="form__group">
+                                <label for="app-year" class="form__label">Year of Study *</label>
+                                <select id="app-year" name="year" class="form__select" required>
+                                    <option value="">Select Year</option>
+                                    <option value="1">1st Year</option>
+                                    <option value="2">2nd Year</option>
+                                    <option value="3">3rd Year</option>
+                                    <option value="4">4th Year</option>
+                                    <option value="graduate">Graduate</option>
+                                    <option value="phd">PhD</option>
+                                </select>
+                            </div>
+
+                            <div class="form__group">
+                                <label for="app-major" class="form__label">Major/Field of Study *</label>
+                                <input type="text" id="app-major" name="major" class="form__input" required
+                                    aria-describedby="major-help">
+                            </div>
+
+                            <div class="form__group">
+                                <label for="app-github" class="form__label">GitHub Username *</label>
+                                <input type="text" id="app-github" name="github" class="form__input" required
+                                    aria-describedby="github-help">
+                            </div>
+                        </div>
+
+                        <div class="form__group">
+                            <label for="app-specialization" class="form__label">Primary Specialization *</label>
+                            <select id="app-specialization" name="specialization" class="form__select" required>
+                                <option value="">Select Specialization</option>
+                                <option value="frontend">Frontend Development</option>
+                                <option value="backend">Backend Development</option>
+                                <option value="fullstack">Full-Stack Development</option>
+                                <option value="mobile">Mobile Development</option>
+                                <option value="devops">DevOps & Cloud</option>
+                                <option value="ai-ml">AI & Machine Learning</option>
+                                <option value="blockchain">Blockchain</option>
+                                <option value="cybersecurity">Cybersecurity</option>
+                            </select>
+                        </div>
+
+                        <div class="form__group">
+                            <label for="app-experience" class="form__label">Open Source Experience *</label>
+                            <textarea id="app-experience" name="experience" class="form__textarea" rows="4"
+                                placeholder="Tell us about your open source contributions, projects, or experience..."
+                                required aria-describedby="experience-help"></textarea>
+                        </div>
+
+                        <div class="form__group">
+                            <label for="app-motivation" class="form__label">Why do you want to be an ambassador?
+                                *</label>
+                            <textarea id="app-motivation" name="motivation" class="form__textarea" rows="4"
+                                placeholder="Share your motivation and how you plan to contribute to the DevSync community..."
+                                required aria-describedby="motivation-help"></textarea>
+                        </div>
+
+                        <div class="form__group">
+                            <label for="app-activities" class="form__label">Planned Activities</label>
+                            <textarea id="app-activities" name="activities" class="form__textarea" rows="3"
+                                placeholder="What activities would you organize at your university? (workshops, hackathons, etc.)"></textarea>
+                        </div>
+
+                        <div class="form__group form__group--checkbox">
+                            <label class="form__checkbox">
+                                <input type="checkbox" name="terms" required>
+                                <span class="form__checkmark"></span>
+                                I agree to the <a href="/terms" target="_blank">Terms and Conditions</a> and
+                                <a href="/privacy" target="_blank">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <div class="form__actions">
+                            <button type="button" class="btn btn--secondary" id="cancel-application">Cancel</button>
+                            <button type="submit" class="btn btn--primary">
+                                <i class="fas fa-paper-plane"></i>
+                                Submit Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- JavaScript Files -->
+    <script src="assets/js/ambassadors.js"></script>
+</body>
+
+</html>
