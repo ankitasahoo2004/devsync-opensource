@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reapplication Opportunity - {{programName}}</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8fafc;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4c51bf;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 24px;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4c51bf 0%, #667eea 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 10px;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #718096;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .tips {
+            background: #f7fafc;
+            border-left: 4px solid #4c51bf;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .tips h3 {
+            color: #4c51bf;
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🚀 DevSync</div>
+            <h1 class="title">Second Chance Opportunity!</h1>
+        </div>
+
+        <div class="content">
+            <p>Hi {{name}},</p>
+
+            <p>Great news! We're giving you another opportunity to join the <strong>{{programName}}</strong>.</p>
+
+            <div class="highlight">
+                <h2 style="margin: 0; font-size: 20px;">Your application status has been reset to PENDING</h2>
+                <p style="margin: 10px 0 0 0; opacity: 0.9;">You can now submit a new, improved application!</p>
+            </div>
+
+            <p>We believe in growth and second chances. Based on feedback from your previous application, you now have
+                the opportunity to:</p>
+
+            <ul>
+                <li><strong>Revise your application</strong> with improved content</li>
+                <li><strong>Showcase new skills</strong> and experiences you've gained</li>
+                <li><strong>Address any concerns</strong> from your previous submission</li>
+                <li><strong>Demonstrate your commitment</strong> to the community</li>
+            </ul>
+
+            <div class="tips">
+                <h3>💡 Tips for Your New Application</h3>
+                <ul>
+                    <li>Provide more specific examples of your open-source contributions</li>
+                    <li>Clearly articulate your motivation and passion for community building</li>
+                    <li>Include detailed plans for activities you want to organize</li>
+                    <li>Show evidence of your technical skills and experience</li>
+                    <li>Explain how you've grown since your last application</li>
+                </ul>
+            </div>
+
+            <p>Take your time to craft a thoughtful application that truly represents your passion for open-source
+                development and community building.</p>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{applicationUrl}}" class="cta-button">
+                    📝 Submit New Application
+                </a>
+            </div>
+
+            <p>If you have any questions or need guidance, feel free to reach out to our team. We're here to support
+                your journey!</p>
+
+            <p>Best of luck,<br>
+                <strong>The DevSync Ambassador Team</strong>
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>This is an automated email from the DevSync Ambassador Program.</p>
+            <p>© 2025 DevSync. Building the future of open-source collaboration.</p>
+        </div>
+    </div>
+</body>
+
+</html>

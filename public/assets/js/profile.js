@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-async function fetchUserProfile() {
+async function loadProfile() {
     try {
         const response = await fetch(`${serverUrl}/api/user`, {
             credentials: 'include'
@@ -45,13 +45,24 @@ async function fetchUserProfile() {
             ...profileData,
             points: statsData.points,
             badges: statsData.badges,
-            mergedPRs: statsData.mergedPRs || []
+            mergedPRs: statsData.mergedPRs || [],
+            referralCode: statsData.referralCode,
+            referredBy: statsData.referredBy
         };
+
+        // Store globally for referral code validation
+        window.currentUserData = combinedData;
 
         // Update profile information with combined data
         updateProfileInfo(combinedData);
         updateProfileStats(combinedData);
         displayPullRequests(combinedData.pullRequests || []);
+
+        // Initialize referral section
+        initializeReferralSection(combinedData);
+
+        // Initialize ambassador code section if user is an ambassador
+        initializeAmbassadorCodeSection(combinedData);
 
         // Display activities if available (fallback to pull requests)
         const activities = {
@@ -65,7 +76,12 @@ async function fetchUserProfile() {
         // Show error message to user
         document.getElementById('profile-name').textContent = 'Error loading profile';
         document.getElementById('profile-bio').textContent = 'Please try refreshing the page';
+        throw error; // Re-throw for error handling in calling function
     }
+}
+
+async function fetchUserProfile() {
+    return loadProfile();
 }
 
 function updateProfileInfo(data) {
@@ -698,4 +714,386 @@ function initializePRAnimations() {
             card.style.transform = '';
         });
     });
+}
+
+// Referral Code Functionality
+function initializeReferralSection(userData) {
+    const referralSection = document.getElementById('referral-section');
+    const referralInput = document.getElementById('profile-referral-code');
+    const saveBtn = document.getElementById('save-referral-btn');
+    const referralStatus = document.getElementById('referral-status');
+    const ambassadorNameElement = document.getElementById('referral-ambassador-name');
+    const inputGroup = document.querySelector('.referral-input-group');
+
+    if (!referralSection) return;
+
+    // Debug logging
+    console.log('Initializing referral section with userData:', {
+        referralCode: userData.referralCode,
+        referredBy: userData.referredBy,
+        isAmbassador: userData.isAmbassador,
+        ambassadorStatus: userData.ambassadorStatus
+    });
+
+    // Show referral section only for authenticated users
+    referralSection.style.display = 'block';
+
+    // Check if user is an ambassador
+    const isAmbassador = userData.isAmbassador || userData.ambassadorStatus === 'approved' || userData.ambassadorStatus === 'pending';
+
+    // Check if user already has a referral code OR has been referred by someone
+    if (userData.referralCode || userData.referredBy) {
+        console.log('User has referral data, showing status section');
+        // User already has a referral code, hide input and show status
+        if (inputGroup) {
+            inputGroup.style.display = 'none';
+        }
+        referralInput.style.display = 'none';
+        saveBtn.style.display = 'none';
+        referralStatus.style.display = 'block';
+
+        // Show the referral code used
+        const userReferralCodeDisplay = document.getElementById('user-referral-code-display');
+        if (userReferralCodeDisplay) {
+            userReferralCodeDisplay.textContent = userData.referralCode || 'Unknown Code';
+        }
+
+        // Show ambassador name if available
+        if (ambassadorNameElement) {
+            if (userData.referredBy && typeof userData.referredBy === 'object') {
+                const displayName = userData.referredBy.name || 'Unknown Ambassador';
+                const githubUsername = userData.referredBy.githubUsername ? `(@${userData.referredBy.githubUsername})` : '';
+                ambassadorNameElement.innerHTML = `${displayName} ${githubUsername}`;
+            } else if (userData.referredBy && typeof userData.referredBy === 'string') {
+                // Fallback to load ambassador name by ID, but only if it's a valid ID
+                loadAmbassadorName(userData.referredBy);
+            } else {
+                // No referredBy data available
+                ambassadorNameElement.textContent = 'Unknown Ambassador';
+            }
+        }
+    } else if (isAmbassador) {
+        console.log('User is ambassador, hiding referral section');
+        // Ambassadors cannot use referral codes, hide the entire section
+        referralSection.style.display = 'none';
+    } else {
+        console.log('User has no referral data, showing input form');
+        // User doesn't have a referral code and is not an ambassador, show input
+        if (inputGroup) {
+            inputGroup.style.display = 'block';
+        }
+        referralInput.style.display = 'block';
+        saveBtn.style.display = 'block';
+        referralStatus.style.display = 'none';
+
+        // Set up input formatting
+        referralInput.addEventListener('input', function () {
+            this.value = this.value.toUpperCase();
+        });
+
+        // Set up save button - remove any existing listeners first
+        saveBtn.removeEventListener('click', saveReferralCode);
+        saveBtn.addEventListener('click', saveReferralCode);
+    }
+}
+
+async function saveReferralCode() {
+    const referralInput = document.getElementById('profile-referral-code');
+    const saveBtn = document.getElementById('save-referral-btn');
+    const referralCode = referralInput.value.trim();
+
+    console.log('saveReferralCode called with:', {
+        referralCode,
+        currentUserData: window.currentUserData
+    });
+
+    if (!referralCode) {
+        showNotification('Please enter a referral code', 'error');
+        return;
+    }
+
+    // Check if user already has a referral code set (prevent duplicate submissions)
+    if (window.currentUserData && (window.currentUserData.referralCode || window.currentUserData.referredBy)) {
+        console.log('Client-side validation: User already has referral data', {
+            referralCode: window.currentUserData.referralCode,
+            referredBy: window.currentUserData.referredBy
+        });
+        showNotification('You have already used a referral code', 'warning');
+        // Refresh the UI to show current status
+        initializeReferralSection(window.currentUserData);
+        return;
+    }
+
+    try {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Saving...';
+
+        const response = await fetch(`${serverUrl}/api/user/verify-referral`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ referralCode })
+        });
+
+        // Log response for debugging
+        console.log('Referral verification response:', response.status, response.statusText);
+
+        const result = await response.json();
+
+        if (response.ok) {
+            showNotification('Referral code saved successfully!', 'success');
+
+            // Clear and hide input field
+            referralInput.value = '';
+            referralInput.style.display = 'none';
+            saveBtn.style.display = 'none';
+
+            // Hide the entire input group
+            const inputGroup = document.querySelector('.referral-input-group');
+            if (inputGroup) {
+                inputGroup.style.display = 'none';
+            }
+
+            const referralStatus = document.getElementById('referral-status');
+            referralStatus.style.display = 'block';
+
+            // Show the referral code used
+            const userReferralCodeDisplay = document.getElementById('user-referral-code-display');
+            if (userReferralCodeDisplay) {
+                userReferralCodeDisplay.textContent = referralCode;
+            }
+
+            // Set ambassador name directly from response or load it
+            const ambassadorNameElement = document.getElementById('referral-ambassador-name');
+            if (ambassadorNameElement) {
+                if (result.ambassadorName) {
+                    ambassadorNameElement.textContent = result.ambassadorName;
+                } else {
+                    // Fallback to loading ambassador name by ID
+                    loadAmbassadorName(result.ambassadorId);
+                }
+            }
+
+            // Update the local state to prevent future submissions
+            window.currentUserData = window.currentUserData || {};
+            window.currentUserData.referralCode = referralCode;
+            window.currentUserData.referredBy = {
+                _id: result.ambassadorId,
+                name: result.ambassadorName
+            };
+
+        } else {
+            throw new Error(result.error || 'Failed to save referral code');
+        }
+
+    } catch (error) {
+        console.error('Error saving referral code:', error);
+
+        // Handle specific error cases
+        if (error.message === 'You have already used a referral code') {
+            // Check if this is a data inconsistency issue
+            console.log('Referral code error detected, checking for data inconsistency...');
+            await debugReferralData();
+
+            showNotification('You have already used a referral code. Refreshing your profile...', 'warning');
+
+            // Automatically refresh user data to show current status
+            setTimeout(async () => {
+                try {
+                    await loadProfile();
+                } catch (e) {
+                    console.error('Failed to refresh profile:', e);
+                    window.location.reload();
+                }
+            }, 1500);
+        } else {
+            showNotification(error.message || 'Failed to save referral code', 'error');
+        }
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="bx bx-save"></i> Save';
+    }
+}
+
+async function loadAmbassadorName(ambassadorId) {
+    // Validate ambassadorId before making API call
+    if (!ambassadorId || ambassadorId === 'null' || ambassadorId === null || ambassadorId === undefined) {
+        console.warn('Invalid ambassador ID provided:', ambassadorId);
+        const ambassadorNameElement = document.getElementById('referral-ambassador-name');
+        if (ambassadorNameElement) {
+            ambassadorNameElement.textContent = 'Unknown Ambassador';
+        }
+        return;
+    }
+
+    // Check if it's a valid MongoDB ObjectId format (24 characters, alphanumeric)
+    const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+    if (!objectIdRegex.test(ambassadorId)) {
+        console.warn('Invalid ambassador ID format:', ambassadorId);
+        const ambassadorNameElement = document.getElementById('referral-ambassador-name');
+        if (ambassadorNameElement) {
+            ambassadorNameElement.textContent = 'Unknown Ambassador';
+        }
+        return;
+    }
+
+    try {
+        const response = await fetch(`${serverUrl}/api/ambassadors/${ambassadorId}`, {
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            const ambassador = await response.json();
+            const ambassadorNameElement = document.getElementById('referral-ambassador-name');
+            if (ambassadorNameElement) {
+                // Show both name and GitHub username for clarity
+                const displayName = ambassador.name || 'Unknown Ambassador';
+                const githubUsername = ambassador.githubUsername ? `(@${ambassador.githubUsername})` : '';
+                ambassadorNameElement.innerHTML = `${displayName} ${githubUsername}`;
+            }
+        } else {
+            throw new Error('Ambassador not found');
+        }
+    } catch (error) {
+        console.error('Error loading ambassador name:', error);
+        const ambassadorNameElement = document.getElementById('referral-ambassador-name');
+        if (ambassadorNameElement) {
+            ambassadorNameElement.textContent = 'Unknown Ambassador';
+        }
+    }
+}
+
+async function debugReferralData() {
+    try {
+        console.log('=== Debugging Referral Data ===');
+
+        // Check debug endpoint
+        const debugResponse = await fetch(`${serverUrl}/api/user/debug-referral`, {
+            credentials: 'include'
+        });
+        const debugData = await debugResponse.json();
+        console.log('Debug referral data:', debugData);
+
+        // Check if we need to fix the data
+        if (debugData.raw.referredBy && !debugData.populated.referredBy) {
+            console.log('Found invalid referral data, attempting to fix...');
+
+            const fixResponse = await fetch(`${serverUrl}/api/user/fix-referral-data`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            const fixResult = await fixResponse.json();
+            console.log('Fix result:', fixResult);
+
+            if (fixResult.fixed) {
+                showNotification('Fixed invalid referral data. Please refresh the page.', 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+        }
+
+    } catch (error) {
+        console.error('Error debugging referral data:', error);
+    }
+}
+
+// Call debug function on page load
+if (window.location.search.includes('debug=true')) {
+    document.addEventListener('DOMContentLoaded', debugReferralData);
+}
+function initializeAmbassadorCodeSection(userData) {
+    const ambassadorCodeSection = document.getElementById('ambassador-code-section');
+    const ambassadorCodeValue = document.getElementById('ambassador-code-value');
+    const copyButton = document.getElementById('copy-ambassador-code');
+
+    if (!ambassadorCodeSection) return;
+
+    // Check if user is an approved ambassador
+    const isApprovedAmbassador = userData.ambassadorStatus === 'approved' && userData.ambassadorCode;
+
+    if (isApprovedAmbassador) {
+        ambassadorCodeSection.style.display = 'block';
+
+        // Display the ambassador code
+        if (ambassadorCodeValue) {
+            ambassadorCodeValue.textContent = userData.ambassadorCode;
+        }
+
+        // Set up copy functionality
+        if (copyButton) {
+            copyButton.addEventListener('click', function () {
+                navigator.clipboard.writeText(userData.ambassadorCode).then(() => {
+                    showNotification('Referral code copied to clipboard!', 'success');
+
+                    // Visual feedback
+                    const icon = this.querySelector('i');
+                    icon.className = 'bx bx-check';
+                    setTimeout(() => {
+                        icon.className = 'bx bx-copy';
+                    }, 2000);
+                }).catch(() => {
+                    showNotification('Failed to copy code', 'error');
+                });
+            });
+        }
+
+        // Load referral statistics
+        loadReferralStats();
+    }
+}
+
+async function loadReferralStats() {
+    try {
+        const response = await fetch(`${serverUrl}/api/ambassadors/my-application`, {
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.hasApplication && data.application.status === 'approved') {
+                const totalReferrals = document.getElementById('total-referrals');
+                const verifiedReferrals = document.getElementById('verified-referrals');
+
+                if (totalReferrals) {
+                    totalReferrals.textContent = data.application.membersReferred || 0;
+                }
+                if (verifiedReferrals) {
+                    verifiedReferrals.textContent = data.application.membersReferred || 0;
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error loading referral stats:', error);
+    }
+}
+
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification--${type}`;
+    notification.innerHTML = `
+        <div class="notification__content">
+            <i class="bx ${type === 'success' ? 'bx-check-circle' : type === 'error' ? 'bx-x-circle' : 'bx-info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+
+    // Add to page
+    document.body.appendChild(notification);
+
+    // Show notification
+    setTimeout(() => notification.classList.add('notification--show'), 100);
+
+    // Auto remove
+    setTimeout(() => {
+        notification.classList.remove('notification--show');
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.parentElement.removeChild(notification);
+            }
+        }, 300);
+    }, 4000);
 }

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Ambassador Application</title>
+    <style>
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .header-text {
+            opacity: 0.9;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .applicant-info {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #2d3748;
+            width: 120px;
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            color: #4a5568;
+            flex: 1;
+        }
+
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 10px 20px 0;
+            transition: transform 0.2s;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+        }
+
+        .button-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        .footer-text {
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">🌟</div>
+            <div class="logo">DevSync Admin</div>
+            <p class="header-text">New Ambassador Application</p>
+        </div>
+
+        <div class="content">
+            <h1 class="title">New Ambassador Application Received</h1>
+
+            <p>A new ambassador application has been submitted and requires your review:</p>
+
+            <div class="applicant-info">
+                <div class="info-row">
+                    <span class="info-label">Name:</span>
+                    <span class="info-value">{{applicantName}}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">{{applicantEmail}}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">University:</span>
+                    <span class="info-value">{{university}}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Specialization:</span>
+                    <span class="info-value">{{specialization}}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">GitHub:</span>
+                    <span class="info-value"><a href="https://github.com/{{github}}"
+                            target="_blank">@{{github}}</a></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Application ID:</span>
+                    <span class="info-value">{{applicationId}}</span>
+                </div>
+            </div>
+
+            <a href="{{adminUrl}}" class="button">Review Application</a>
+            <a href="https://github.com/{{github}}" class="button button-secondary">View GitHub Profile</a>
+
+            <p>
+                Please review the application promptly to maintain a positive candidate experience.
+                You can approve, reject, or request additional information through the admin panel.
+            </p>
+        </div>
+
+        <div class="footer">
+            <p class="footer-text">
+                © 2025 DevSync OpenSource Community - Admin Notification System
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to the Ambassador Program</title>
+    <style>
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            color: white;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .header-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .content {
+            background: white;
+            padding: 40px 30px;
+        }
+
+        .greeting {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .congratulations {
+            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+            border-left: 4px solid #38a169;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .congratulations-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2f855a;
+            margin: 0;
+        }
+
+        .message {
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 25px;
+        }
+
+        .benefits {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .benefits h3 {
+            color: #2d3748;
+            margin-top: 0;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .benefit-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .benefit-text {
+            color: #4a5568;
+            margin: 0;
+        }
+
+        .referral-code-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+
+        .referral-code-section h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .referral-code {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .code {
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 6px;
+            display: inline-block;
+            letter-spacing: 2px;
+            border: 2px dashed #667eea;
+        }
+
+        .referral-description {
+            margin-top: 15px;
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 10px 10px 10px 0;
+            transition: transform 0.2s;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+        }
+
+        .button-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .next-steps {
+            background: #fff5f5;
+            border-left: 4px solid #f56565;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+
+        .next-steps h3 {
+            color: #c53030;
+            margin-top: 0;
+        }
+
+        .next-steps ul {
+            color: #4a5568;
+            padding-left: 20px;
+        }
+
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        .footer-text {
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .social-links {
+            margin-top: 15px;
+        }
+
+        .social-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            opacity: 0.8;
+        }
+
+        .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">🎊</div>
+            <div class="logo">DevSync</div>
+            <p class="header-text">Ambassador Program</p>
+        </div>
+
+        <div class="content">
+            <h1 class="greeting">Congratulations, {{name}}!</h1>
+
+            <div class="congratulations">
+                <p class="congratulations-text">🌟 You've been accepted into the DevSync Ambassador Program! 🌟</p>
+            </div>
+
+            <p class="message">
+                We're thrilled to welcome you to our exclusive community of student leaders who are passionate about
+                open-source development and making a positive impact in their universities and communities.
+            </p>
+
+            <div class="benefits">
+                <h3>🎁 Your Ambassador Benefits</h3>
+                <div class="benefit-item">
+                    <span class="benefit-icon">🏆</span>
+                    <p class="benefit-text"><strong>Official Recognition:</strong> Ambassador badge and certificate</p>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">🌐</span>
+                    <p class="benefit-text"><strong>Global Network:</strong> Connect with ambassadors worldwide</p>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">🎯</span>
+                    <p class="benefit-text"><strong>Exclusive Access:</strong> Early access to features and events</p>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">💼</span>
+                    <p class="benefit-text"><strong>Career Opportunities:</strong> Networking and job referrals</p>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">🎓</span>
+                    <p class="benefit-text"><strong>Skill Development:</strong> Leadership and technical workshops</p>
+                </div>
+            </div>
+
+            <div class="referral-code-section">
+                <h3>🔗 Your Unique Referral Code</h3>
+                <div class="referral-code">
+                    <span class="code">{{referralCode}}</span>
+                    <p class="referral-description">
+                        Share this code with your peers to help them join DevSync! Every verified referral earns you 10
+                        ambassador points and helps grow our community.
+                    </p>
+                </div>
+            </div>
+
+            <a href="{{ambassadorUrl}}" class="button">Visit Ambassador Portal</a>
+            <a href="{{profileUrl}}" class="button button-secondary">Update Your Profile</a>
+
+            <div class="next-steps">
+                <h3>🚀 Next Steps</h3>
+                <ul>
+                    <li><strong>Complete Your Profile:</strong> Add your bio, social media links, and ambassador goals
+                    </li>
+                    <li><strong>Join Our Community:</strong> Connect with other ambassadors in our exclusive channels
+                    </li>
+                    <li><strong>Plan Your First Event:</strong> Start organizing workshops, hackathons, or study groups
+                    </li>
+                    <li><strong>Spread the Word:</strong> Share DevSync with your peers and university community</li>
+                </ul>
+            </div>
+
+            <p class="message">
+                <strong>Ready to make an impact?</strong> We can't wait to see the amazing initiatives you'll lead
+                and the positive change you'll bring to the open-source community!
+            </p>
+
+            <p class="message">
+                If you have any questions or need support, don't hesitate to reach out. Welcome aboard! 🚀
+            </p>
+        </div>
+
+        <div class="footer">
+            <p class="footer-text">
+                © 2025 DevSync OpenSource Community. Empowering the next generation of open-source leaders.
+            </p>
+            <div class="social-links">
+                <a href="{{serverUrl}}">Website</a>
+                <a href="{{serverUrl}}/about">About</a>
+                <a href="{{serverUrl}}/contact">Contact</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

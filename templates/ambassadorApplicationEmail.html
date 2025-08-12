@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambassador Application Received</title>
+    <style>
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            color: white;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .header-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .content {
+            background: white;
+            padding: 40px 30px;
+        }
+
+        .greeting {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 25px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+
+        .highlight-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .highlight-text {
+            color: #4a5568;
+            margin: 0;
+        }
+
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: transform 0.2s;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+        }
+
+        .next-steps {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .next-steps h3 {
+            color: #2d3748;
+            margin-top: 0;
+        }
+
+        .next-steps ul {
+            color: #4a5568;
+            padding-left: 20px;
+        }
+
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        .footer-text {
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .social-links {
+            margin-top: 15px;
+        }
+
+        .social-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            opacity: 0.8;
+        }
+
+        .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">🎉</div>
+            <div class="logo">DevSync</div>
+            <p class="header-text">Ambassador Application Received</p>
+        </div>
+
+        <div class="content">
+            <h1 class="greeting">Thank you, {{name}}!</h1>
+
+            <p class="message">
+                We're excited to confirm that we've received your application to join the DevSync Ambassador Program!
+                Your passion for open-source development and community building is exactly what we're looking for.
+            </p>
+
+            <div class="highlight-box">
+                <div class="highlight-title">📋 Application Status: Under Review</div>
+                <p class="highlight-text">
+                    Our team is carefully reviewing all applications. We'll notify you of our decision within 5-7
+                    business days.
+                </p>
+            </div>
+
+            <div class="next-steps">
+                <h3>🚀 What Happens Next?</h3>
+                <ul>
+                    <li><strong>Review Process:</strong> Our team will evaluate your application based on your
+                        experience, motivation, and potential impact</li>
+                    <li><strong>Background Check:</strong> We'll review your GitHub profile and open-source
+                        contributions</li>
+                    <li><strong>Decision:</strong> You'll receive an email with our decision and next steps</li>
+                    <li><strong>Onboarding:</strong> If accepted, we'll guide you through the ambassador onboarding
+                        process</li>
+                </ul>
+            </div>
+
+            <a href="{{ambassadorUrl}}" class="button">View Ambassador Program</a>
+
+            <p class="message">
+                While you wait, feel free to continue contributing to open-source projects and engaging with the DevSync
+                community.
+                Every contribution counts and strengthens your application!
+            </p>
+
+            <p class="message">
+                <strong>Questions?</strong> Reply to this email or contact our support team. We're here to help!
+            </p>
+        </div>
+
+        <div class="footer">
+            <p class="footer-text">
+                © 2025 DevSync OpenSource Community. Building the future of open-source collaboration.
+            </p>
+            <div class="social-links">
+                <a href="{{serverUrl}}">Website</a>
+                <a href="{{serverUrl}}/about">About</a>
+                <a href="{{serverUrl}}/contact">Contact</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
