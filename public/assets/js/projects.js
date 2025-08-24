@@ -53,6 +53,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    // Utility function to ensure proper modal positioning
+    const ensureModalPositioning = (modal) => {
+        // Force proper positioning and z-index
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.right = '0';
+        modal.style.bottom = '0';
+        modal.style.width = '100vw';
+        modal.style.height = '100vh';
+        modal.style.margin = '0';
+        modal.style.padding = '0';
+        modal.style.zIndex = '99999';
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.boxSizing = 'border-box';
+
+        // Prevent any parent container from affecting the modal
+        modal.style.transform = 'none';
+        modal.style.filter = 'none';
+        modal.style.clipPath = 'none';
+        modal.style.mask = 'none';
+    };
+
     const loadingState = document.getElementById('loadingState');
     const authContainer = document.getElementById('authContainer');
     const projectsContainer = document.getElementById('projectsContainer');
@@ -421,60 +446,236 @@ document.addEventListener('DOMContentLoaded', () => {
     const reviewProject = async (projectId, status) => {
         try {
             if (status === 'rejected') {
-                // Create rejection reason modal
+                // Create rejection reason modal using the proper modal system
+                removeExistingModals();
+
                 const modal = document.createElement('div');
-                modal.className = 'modal';
-                const overlay = document.createElement('div');
-                overlay.className = 'modal__overlay';
+                modal.className = 'modal-overlay';
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.7);
+                    backdrop-filter: blur(8px);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 99999;
+                    opacity: 0;
+                    visibility: hidden;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                `;
 
                 modal.innerHTML = `
-                    <div class="modal__content">
-                        <h3 class="modal__title">Provide Rejection Reason</h3>
-                        <textarea class="modal__textarea" 
-                                placeholder="Please provide a detailed reason for rejection..."
-                                rows="4"></textarea>
-                        <div class="modal__actions">
-                            <button class="modal__button modal__button--confirm">Submit</button>
-                            <button class="modal__button modal__button--cancel">Cancel</button>
+                    <div class="modal-container" style="
+                        width: 90%;
+                        max-width: 500px;
+                        margin: 20px;
+                    ">
+                        <div class="modal-content" style="
+                            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+                            backdrop-filter: blur(20px);
+                            border-radius: 20px;
+                            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                            border: 1px solid rgba(255, 255, 255, 0.3);
+                            transform: scale(0.9) translateY(20px);
+                            opacity: 0;
+                            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                            overflow: hidden;
+                            position: relative;
+                        ">
+                            <div class="modal-header" style="
+                                padding: 30px 30px 20px;
+                                text-align: center;
+                                position: relative;
+                            ">
+                                <div class="modal-icon-wrapper" style="
+                                    width: 64px;
+                                    height: 64px;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    margin: 0 auto 16px;
+                                    background: #ef444420;
+                                    border: 1px solid #ef444440;
+                                ">
+                                    <i class="bx bx-x-circle modal-icon" style="
+                                        font-size: 28px;
+                                        color: #ef4444;
+                                    "></i>
+                                </div>
+                                <h3 class="modal-title" style="
+                                    font-size: 24px;
+                                    font-weight: 700;
+                                    margin: 0;
+                                    color: #1e293b;
+                                ">Provide Rejection Reason</h3>
+                                <button class="modal-close" style="
+                                    position: absolute;
+                                    top: 20px;
+                                    right: 20px;
+                                    background: none;
+                                    border: none;
+                                    cursor: pointer;
+                                    width: 32px;
+                                    height: 32px;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    transition: all 0.2s ease;
+                                    color: #64748b;
+                                ">
+                                    <i class="bx bx-x"></i>
+                                </button>
+                            </div>
+                            <div class="modal-body" style="
+                                padding: 0 30px 20px;
+                            ">
+                                <textarea class="modal-textarea" 
+                                        placeholder="Please provide a detailed reason for rejection..."
+                                        rows="4" style="
+                                    width: 100%;
+                                    padding: 15px;
+                                    border: 2px solid #e5e7eb;
+                                    border-radius: 10px;
+                                    font-size: 14px;
+                                    line-height: 1.5;
+                                    resize: vertical;
+                                    min-height: 100px;
+                                    max-height: 200px;
+                                    font-family: inherit;
+                                    box-sizing: border-box;
+                                    transition: border-color 0.2s ease;
+                                    background: rgba(255, 255, 255, 0.8);
+                                    color: #1e293b;
+                                "></textarea>
+                            </div>
+                            <div class="modal-actions" style="
+                                padding: 20px 30px 30px;
+                                display: flex;
+                                gap: 12px;
+                                justify-content: center;
+                            ">
+                                <button class="modal-button modal-button--cancel" style="
+                                    padding: 12px 24px;
+                                    border-radius: 10px;
+                                    border: none;
+                                    font-size: 14px;
+                                    font-weight: 600;
+                                    cursor: pointer;
+                                    transition: all 0.2s ease;
+                                    min-width: 100px;
+                                    background: rgba(100, 116, 139, 0.1);
+                                    color: #64748b;
+                                ">Cancel</button>
+                                <button class="modal-button modal-button--confirm" style="
+                                    padding: 12px 24px;
+                                    border-radius: 10px;
+                                    border: none;
+                                    font-size: 14px;
+                                    font-weight: 600;
+                                    cursor: pointer;
+                                    transition: all 0.2s ease;
+                                    min-width: 100px;
+                                    background: linear-gradient(135deg, #e51837, #ff4d5a);
+                                    color: white;
+                                    box-shadow: 0 4px 12px rgba(229, 24, 55, 0.3);
+                                ">Submit</button>
+                            </div>
                         </div>
                     </div>
                 `;
 
-                document.body.appendChild(overlay);
                 document.body.appendChild(modal);
 
+                // Ensure proper modal positioning
+                ensureModalPositioning(modal);
+
+                // Prevent body scrolling when modal is open
+                document.body.style.overflow = 'hidden';
+
+                // Force a reflow to ensure the modal is in the DOM
+                modal.offsetHeight;
+
+                // Trigger animation
                 setTimeout(() => {
-                    modal.classList.add('show');
-                    overlay.classList.add('show');
+                    modal.style.opacity = '1';
+                    modal.style.visibility = 'visible';
+                    const content = modal.querySelector('.modal-content');
+                    if (content) {
+                        content.style.transform = 'scale(1) translateY(0)';
+                        content.style.opacity = '1';
+                    }
                 }, 10);
 
                 // Handle rejection reason submission
                 return new Promise((resolve, reject) => {
-                    const submitBtn = modal.querySelector('.modal__button--confirm');
-                    const cancelBtn = modal.querySelector('.modal__button--cancel');
-                    const textarea = modal.querySelector('.modal__textarea');
+                    const submitBtn = modal.querySelector('.modal-button--confirm');
+                    const cancelBtn = modal.querySelector('.modal-button--cancel');
+                    const closeBtn = modal.querySelector('.modal-close');
+                    const textarea = modal.querySelector('.modal-textarea');
+
+                    const closeModal = () => {
+                        const content = modal.querySelector('.modal-content');
+                        if (content) {
+                            content.style.transform = 'scale(0.9) translateY(20px)';
+                            content.style.opacity = '0';
+                        }
+                        modal.style.opacity = '0';
+                        modal.style.visibility = 'hidden';
+                        setTimeout(() => {
+                            if (modal.parentNode) {
+                                modal.parentNode.removeChild(modal);
+                            }
+                            // Restore body scrolling if no more modals exist
+                            if (document.querySelectorAll('.modal-overlay, .terms-modal, .project-modal-overlay').length === 0) {
+                                document.body.style.overflow = '';
+                            }
+                        }, 300);
+                    };
 
                     submitBtn.addEventListener('click', async () => {
                         const rejectionReason = textarea.value.trim();
                         if (!rejectionReason) {
-                            textarea.classList.add('error');
+                            textarea.style.borderColor = '#ef4444';
+                            textarea.focus();
                             return;
                         }
-                        modal.remove();
-                        overlay.remove();
+                        closeModal();
                         await processReview(projectId, status, rejectionReason);
                         resolve();
                     });
 
                     cancelBtn.addEventListener('click', () => {
-                        modal.remove();
-                        overlay.remove();
+                        closeModal();
                         reject(new Error('Review cancelled'));
                     });
 
-                    textarea.addEventListener('input', () => {
-                        textarea.classList.remove('error');
+                    closeBtn.addEventListener('click', () => {
+                        closeModal();
+                        reject(new Error('Review cancelled'));
                     });
+
+                    // Click outside to close
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) {
+                            closeModal();
+                            reject(new Error('Review cancelled'));
+                        }
+                    });
+
+                    textarea.addEventListener('input', () => {
+                        textarea.style.borderColor = '#e5e7eb';
+                    });
+
+                    // Focus the textarea
+                    setTimeout(() => {
+                        textarea.focus();
+                    }, 100);
                 });
             } else {
                 await processReview(projectId, status);
@@ -1068,6 +1269,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.body.appendChild(modal);
 
+            // Ensure proper modal positioning
+            ensureModalPositioning(modal);
+
+            // Prevent body scrolling when modal is open
+            document.body.style.overflow = 'hidden';
+
             // Trigger animation after a small delay
             setTimeout(() => modal.classList.add('show'), 50);
 
@@ -1117,7 +1324,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Close modal handlers
             const closeModal = () => {
                 modal.classList.remove('show');
-                setTimeout(() => modal.remove(), 300);
+                setTimeout(() => {
+                    modal.remove();
+                    // Restore body scrolling if no more modals exist
+                    if (document.querySelectorAll('.modal-overlay, .terms-modal, .project-modal-overlay').length === 0) {
+                        document.body.style.overflow = '';
+                    }
+                }, 300);
             };
 
             modal.querySelector('.terms-modal__close').addEventListener('click', closeModal);
@@ -1558,6 +1771,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.body.appendChild(modal);
 
+        // Ensure proper modal positioning
+        ensureModalPositioning(modal);
+
+        // Prevent body scrolling when modal is open
+        document.body.style.overflow = 'hidden';
+
         // Force a reflow to ensure the modal is in the DOM
         modal.offsetHeight;
 
@@ -1663,6 +1882,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (modal.parentNode) {
                 modal.parentNode.removeChild(modal);
             }
+
+            // Restore body scrolling if no more modals exist
+            if (document.querySelectorAll('.modal-overlay, .terms-modal, .project-modal-overlay').length === 0) {
+                document.body.style.overflow = '';
+            }
+
             if (callback && typeof callback === 'function') {
                 callback();
             }
@@ -1687,6 +1912,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 100);
         });
+
+        // Restore body scrolling if no more modals exist
+        setTimeout(() => {
+            if (document.querySelectorAll('.modal-overlay, .terms-modal, .project-modal-overlay').length === 0) {
+                document.body.style.overflow = '';
+            }
+        }, 150);
     }
 
     // Add this after checkAuthAndInitialize initialization
@@ -2596,6 +2828,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Add to DOM and show with animation
         document.body.appendChild(modal);
+
+        // Ensure proper modal positioning
+        ensureModalPositioning(modal);
+
         // console.log('✅ Modal added to DOM');
 
         // Force reflow
